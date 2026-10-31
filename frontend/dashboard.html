@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Dashboard | Elite Drone Service</title>
+  <meta name="description" content="Manage your drone shoot bookings, view flight clearance status, and review photography mission deliverables.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .dashboard-wrapper {
+      min-height: 100vh;
+      padding: 7.5rem 1.5rem 4rem 1.5rem;
+      background: radial-gradient(circle at 50% 10%, rgba(14, 165, 233, 0.08) 0%, transparent 50%),
+                  linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    }
+    .profile-banner {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      margin-bottom: 2.5rem;
+      box-shadow: var(--shadow-card);
+      backdrop-filter: blur(12px);
+    }
+    .profile-info {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .profile-avatar-large {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #fff;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+    .stat-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .dash-stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+    .dash-stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    .dash-stat-val {
+      font-family: var(--font-heading);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+    }
+    .dash-stat-lbl {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 0.25rem;
+    }
+    .bookings-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow-card);
+      backdrop-filter: blur(12px);
+    }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.75rem;
+    }
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+    .dash-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+    .dash-table th {
+      padding: 1rem 1.25rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .dash-table td {
+      padding: 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+    .dash-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 0.3rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .status-Pending {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+    }
+    .status-Confirmed {
+      background: rgba(14, 165, 233, 0.15);
+      border: 1px solid rgba(14, 165, 233, 0.4);
+      color: #38bdf8;
+    }
+    .status-Completed {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+    .status-Rejected {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #f87171;
+    }
+    .status-Cancelled {
+      background: rgba(148, 163, 184, 0.15);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: #94a3b8;
+    }
+
+    @media (max-width: 1024px) {
+      .stat-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .profile-banner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+    @media (max-width: 640px) {
+      .stat-cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container">
+      <nav class="navbar">
+        <a href="index.html" class="brand-logo">
+          <div class="brand-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+          <div>
+            <span>ELITE DRONE</span>
+            <span class="brand-name-sub">AERIAL CINEMA</span>
+          </div>
+        </a>
+
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="services.html" class="nav-link">Services</a></li>
+          <li><a href="gallery.html" class="nav-link">Gallery</a></li>
+          <li><a href="booking.html" class="nav-link">Book Shoot</a></li>
+        </ul>
+
+        <div class="nav-actions" id="nav-actions">
+          <!-- Populated by Auth.js -->
+        </div>
+
+        <button class="nav-toggle" id="nav-toggle">☰</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="dashboard-wrapper">
+    <div class="container">
+      
+      <!-- Profile Banner -->
+      <div class="profile-banner">
+        <div class="profile-info">
+          <div class="profile-avatar-large" id="profile-avatar">U</div>
+          <div>
+            <span class="badge badge-primary" style="margin-bottom: 0.4rem;">Verified Client Account</span>
+            <h1 style="font-size: 1.85rem; color: #fff; margin-bottom: 0.25rem;" id="profile-name">Client Name</h1>
+            <div style="font-size: 0.9rem; color: var(--text-muted); display: flex; gap: 1.25rem; flex-wrap: wrap;">
+              <span id="profile-email">email@domain.com</span>
+              <span id="profile-mobile">+91 0000000000</span>
+              <span id="profile-username">@username</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <a href="booking.html" class="btn btn-primary">
+            + Schedule New Shoot
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Metrics -->
+      <div class="stat-cards-grid">
+        <div class="dash-stat-card">
+          <div class="dash-stat-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div>
+            <div class="dash-stat-val" id="stat-total">0</div>
+            <div class="dash-stat-lbl">Total Bookings</div>
+          </div>
+        </div>
+
+        <div class="dash-stat-card">
+          <div class="dash-stat-icon" style="color: #f59e0b;">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div>
+            <div class="dash-stat-val" id="stat-pending">0</div>
+            <div class="dash-stat-lbl">Pending Review</div>
+          </div>
+        </div>
+
+        <div class="dash-stat-card">
+          <div class="dash-stat-icon" style="color: var(--primary-light);">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <div class="dash-stat-val" id="stat-confirmed">0</div>
+            <div class="dash-stat-lbl">Confirmed Shoots</div>
+          </div>
+        </div>
+
+        <div class="dash-stat-card">
+          <div class="dash-stat-icon" style="color: #10b981;">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div>
+            <div class="dash-stat-val" id="stat-completed">0</div>
+            <div class="dash-stat-lbl">Completed Missions</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bookings History Table -->
+      <div class="bookings-panel">
+        <div class="panel-header">
+          <div>
+            <h3 style="font-size: 1.4rem; color: #fff; margin-bottom: 0.25rem;">Your Flight Bookings & History</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Real-time status tracking for flight clearances and deliverables.</p>
+          </div>
+          <button onclick="loadUserBookings()" class="btn btn-secondary btn-sm" title="Refresh Table">
+            Refresh
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="dash-table">
+            <thead>
+              <tr>
+                <th>Booking Reference</th>
+                <th>Service & Tier</th>
+                <th>Event Schedule</th>
+                <th>Shoot Location</th>
+                <th>Flight Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="bookings-tbody">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                  Loading your scheduled flights...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Booking Details & Cancellation Modal -->
+  <div class="modal-backdrop" id="booking-modal">
+    <div class="modal-box" style="max-width: 650px;">
+      <button class="modal-close-btn" id="modal-close">&times;</button>
+      <div style="padding: 2.25rem;">
+        <span class="badge badge-primary" id="modal-status-badge">Pending</span>
+        <h3 style="font-size: 1.6rem; margin: 0.75rem 0 0.25rem 0;" id="modal-ref-title">ELD-REFERENCE</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem;" id="modal-service-sub">Service Details</p>
+
+        <div style="margin: 1.5rem 0; padding: 1.25rem; background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
+          <div>
+            <strong style="color: var(--text-muted); font-size: 0.8rem; display: block;">Event Date & Time</strong>
+            <span id="modal-schedule" style="color: #fff;">-</span>
+          </div>
+          <div>
+            <strong style="color: var(--text-muted); font-size: 0.8rem; display: block;">Event Type</strong>
+            <span id="modal-event-type" style="color: #fff;">-</span>
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <strong style="color: var(--text-muted); font-size: 0.8rem; display: block;">Location & Operational Address</strong>
+            <span id="modal-address" style="color: #fff;">-</span>
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <strong style="color: var(--text-muted); font-size: 0.8rem; display: block;">Special Directives</strong>
+            <span id="modal-requirements" style="color: #cbd5e1;">None</span>
+          </div>
+          <div id="modal-admin-notes-row" style="grid-column: 1 / -1; display: none; background: rgba(14, 165, 233, 0.08); padding: 0.75rem; border-radius: 4px;">
+            <strong style="color: var(--primary-light); font-size: 0.8rem; display: block;">Flight Controller / Admin Notes:</strong>
+            <span id="modal-admin-notes" style="color: #fff;">-</span>
+          </div>
+        </div>
+
+        <div id="cancel-action-container" style="border-top: 1px solid var(--border-subtle); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-size: 0.85rem; color: var(--text-muted);">
+            Need to change or cancel this flight mission?
+          </div>
+          <button id="btn-cancel-booking" class="btn btn-secondary btn-sm" style="border-color: rgba(239,68,68,0.5); color: #f87171;">
+            Cancel Booking
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    let myBookings = [];
+    let currentModalBooking = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = Auth.getUser();
+      if (!user) {
+        window.location.href = 'login.html?unauthorized=true';
+        return;
+      }
+
+      // Populate Profile
+      document.getElementById('profile-name').textContent = user.full_name || user.username;
+      document.getElementById('profile-email').textContent = user.email || '';
+      document.getElementById('profile-mobile').textContent = user.mobile ? `+91 ${user.mobile}` : '';
+      document.getElementById('profile-username').textContent = `@${user.username}`;
+      document.getElementById('profile-avatar').textContent = (user.full_name || user.username).charAt(0).toUpperCase();
+
+      await loadUserBookings();
+
+      // Modal close listener
+      const modal = document.getElementById('booking-modal');
+      document.getElementById('modal-close').addEventListener('click', () => {
+        modal.classList.remove('active');
+      });
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+      });
+
+      // Cancel button in modal
+      document.getElementById('btn-cancel-booking').addEventListener('click', async () => {
+        if (!currentModalBooking) return;
+        const confirmReason = prompt('Please enter the reason for flight cancellation:');
+        if (confirmReason === null) return;
+
+        try {
+          const res = await API.put(`/api/bookings/${currentModalBooking.id}/cancel`, {
+            cancellation_reason: confirmReason || 'Cancelled by client'
+          });
+          if (res.success) {
+            showToast('Booking cancelled successfully.', 'success');
+            modal.classList.remove('active');
+            await loadUserBookings();
+          }
+        } catch (err) {
+          showToast(err.message || 'Failed to cancel booking.', 'error');
+        }
+      });
+    });
+
+    async function loadUserBookings() {
+      const tbody = document.getElementById('bookings-tbody');
+      try {
+        const res = await API.get('/api/bookings/my-bookings');
+        if (res.success && res.bookings) {
+          myBookings = res.bookings;
+          renderMetrics();
+          renderTable();
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 2rem;">Error loading bookings.</td></tr>`;
+      }
+    }
+
+    function renderMetrics() {
+      document.getElementById('stat-total').textContent = myBookings.length;
+      document.getElementById('stat-pending').textContent = myBookings.filter(b => b.status === 'Pending').length;
+      document.getElementById('stat-confirmed').textContent = myBookings.filter(b => b.status === 'Confirmed').length;
+      document.getElementById('stat-completed').textContent = myBookings.filter(b => b.status === 'Completed').length;
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('bookings-tbody');
+      if (myBookings.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+              You haven't scheduled any drone shoots yet. <a href="booking.html" style="color: var(--primary-light); font-weight: 600;">Book your first shoot now →</a>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = myBookings.map(b => {
+        const dateObj = new Date(b.event_date);
+        const formattedDate = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+        return `
+          <tr>
+            <td>
+              <strong style="color: #fff; font-family: var(--font-heading); letter-spacing: 0.5px;">${b.booking_reference}</strong>
+            </td>
+            <td>
+              <div style="color: #fff; font-weight: 600;">${b.service_name || 'Drone Service'}</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">${b.package_name ? `${b.package_name}` : 'Custom Tier'}</div>
+            </td>
+            <td>
+              <div>${formattedDate}</div>
+              <div style="font-size: 0.8rem; color: var(--text-dim);">${b.event_time}</div>
+            </td>
+            <td>
+              <div>${b.event_location}</div>
+            </td>
+            <td>
+              <span class="status-badge status-${b.status}">${b.status}</span>
+            </td>
+            <td>
+              <button onclick="viewBookingDetails(${b.id})" class="btn btn-secondary btn-sm" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+                View
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function viewBookingDetails(id) {
+      const b = myBookings.find(item => item.id === id);
+      if (!b) return;
+
+      currentModalBooking = b;
+      const modal = document.getElementById('booking-modal');
+
+      document.getElementById('modal-status-badge').className = `badge status-${b.status}`;
+      document.getElementById('modal-status-badge').textContent = b.status;
+      document.getElementById('modal-ref-title').textContent = b.booking_reference;
+      document.getElementById('modal-service-sub').textContent = `${b.service_name} • ${b.package_name || 'Standard Service'}`;
+
+      const dateObj = new Date(b.event_date);
+      const formattedDate = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+      document.getElementById('modal-schedule').textContent = `${formattedDate} at ${b.event_time}`;
+      document.getElementById('modal-event-type').textContent = b.event_type;
+      document.getElementById('modal-address').textContent = `${b.event_location} — ${b.complete_address}`;
+      document.getElementById('modal-requirements').textContent = b.additional_requirements || 'No special directives provided.';
+
+      const notesRow = document.getElementById('modal-admin-notes-row');
+      if (b.admin_notes) {
+        notesRow.style.display = 'block';
+        document.getElementById('modal-admin-notes').textContent = b.admin_notes;
+      } else {
+        notesRow.style.display = 'none';
+      }
+
+      // Cancellation option where permitted (Pending or Confirmed)
+      const cancelBox = document.getElementById('cancel-action-container');
+      if (b.status === 'Pending' || b.status === 'Confirmed') {
+        cancelBox.style.display = 'flex';
+      } else {
+        cancelBox.style.display = 'none';
+      }
+
+      modal.classList.add('active');
+    }
+  </script>
+</body>
+</html>

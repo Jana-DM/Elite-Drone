@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Registration | Elite Drone Service</title>
+  <meta name="description" content="Register an account with Elite Drone Service to schedule and manage aerial photography and videography shoots.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .auth-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7rem 1.5rem 4rem 1.5rem;
+      background: radial-gradient(circle at 50% 20%, rgba(14, 165, 233, 0.12) 0%, transparent 60%),
+                  linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    }
+    .auth-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 3rem;
+      max-width: 750px;
+      width: 100%;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(16px);
+      position: relative;
+    }
+    .auth-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .auth-header h1 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .field-hint {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .field-hint.valid {
+      color: #10b981;
+    }
+    .field-hint.invalid {
+      color: #ef4444;
+    }
+    /* OTP Box */
+    .otp-verification-box {
+      background: rgba(14, 165, 233, 0.05);
+      border: 1px dashed var(--border-glow);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .otp-method-selector {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .radio-pill-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: var(--text-main);
+    }
+    .otp-actions-row {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    .otp-verified-badge {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+    .password-rules {
+      font-size: 0.8rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.35rem;
+      margin-top: 0.5rem;
+      padding: 0.75rem;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: var(--radius-sm);
+    }
+    .rule-item {
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .rule-item.pass {
+      color: #10b981;
+    }
+
+    @media (max-width: 768px) {
+      .auth-card {
+        padding: 2rem 1.5rem;
+      }
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      .otp-actions-row {
+        flex-direction: column;
+      }
+      .password-rules {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container">
+      <nav class="navbar">
+        <a href="index.html" class="brand-logo">
+          <div class="brand-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+          <div>
+            <span>ELITE DRONE</span>
+            <span class="brand-name-sub">AERIAL CINEMA</span>
+          </div>
+        </a>
+
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="services.html" class="nav-link">Services</a></li>
+          <li><a href="gallery.html" class="nav-link">Gallery</a></li>
+          <li><a href="booking.html" class="nav-link">Book Now</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <a href="login.html" class="btn btn-secondary btn-sm">Already a Member? Login</a>
+        </div>
+
+        <button class="nav-toggle" id="nav-toggle">☰</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Auth Content -->
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <span class="section-tag">Account Creation</span>
+        <h1>Join Elite Drone Service</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+          Create your verified client profile to schedule aerial shoots and track footage production.
+        </p>
+      </div>
+
+      <form id="registration-form" novalidate>
+        <!-- 1. Full Name & Gender -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="full_name">Full Name <span style="color: #ef4444;">*</span></label>
+            <input type="text" id="full_name" class="form-control" placeholder="e.g. Vikram Malhotra" required>
+            <div class="field-hint" id="name-hint">Enter your legal full name</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="gender">Gender <span style="color: #ef4444;">*</span></label>
+            <select id="gender" class="form-control" style="background: #0c1220;" required>
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+              <option value="Prefer not to say">Prefer not to say</option>
+            </select>
+            <div class="field-hint">Required for flight permit logs</div>
+          </div>
+        </div>
+
+        <!-- 2. Email & Confirm Email -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address <span style="color: #ef4444;">*</span></label>
+            <input type="email" id="email" class="form-control" placeholder="name@domain.com" required autocomplete="email">
+            <div class="field-hint" id="email-hint">Valid email for flight updates & OTP</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="confirm_email">Confirm Email Address <span style="color: #ef4444;">*</span></label>
+            <input type="email" id="confirm_email" class="form-control" placeholder="Re-enter email" required autocomplete="email">
+            <div class="field-hint" id="confirm-email-hint">Must match email exactly</div>
+          </div>
+        </div>
+
+        <!-- 3. Country Code & Mobile -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="country_code">Country Code <span style="color: #ef4444;">*</span></label>
+            <input type="text" id="country_code" class="form-control" value="+91" readonly style="background: rgba(0,0,0,0.5); cursor: not-allowed;">
+            <div class="field-hint">India (+91) standard</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="mobile">Mobile Number <span style="color: #ef4444;">*</span></label>
+            <input type="tel" id="mobile" class="form-control" placeholder="10-digit mobile (e.g. 9876543210)" maxlength="10" required>
+            <div class="field-hint" id="mobile-hint">10-digit Indian mobile starting with 6, 7, 8, or 9</div>
+          </div>
+        </div>
+
+        <!-- 4. Username -->
+        <div class="form-group">
+          <label class="form-label" for="username">Username <span style="color: #ef4444;">*</span></label>
+          <input type="text" id="username" class="form-control" placeholder="e.g. vikram_aerial" minlength="3" maxlength="30" required autocomplete="username">
+          <div class="field-hint" id="username-hint">At least 3 characters. Checked in real-time.</div>
+        </div>
+
+        <!-- 5. Password & Confirm Password -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="password">Password <span style="color: #ef4444;">*</span></label>
+            <input type="password" id="password" class="form-control" placeholder="Minimum 8 characters" required autocomplete="new-password">
+            <div class="password-rules">
+              <div class="rule-item" id="rule-len">○ Min 8 characters</div>
+              <div class="rule-item" id="rule-upper">○ Uppercase letter</div>
+              <div class="rule-item" id="rule-lower">○ Lowercase letter</div>
+              <div class="rule-item" id="rule-num">○ Number (0-9)</div>
+              <div class="rule-item" id="rule-spec" style="grid-column: 1 / -1;">○ Special character (!@#$%^&*...)</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="confirm_password">Confirm Password <span style="color: #ef4444;">*</span></label>
+            <input type="password" id="confirm_password" class="form-control" placeholder="Re-enter password" required autocomplete="new-password">
+            <div class="field-hint" id="confirm-password-hint">Must match password</div>
+          </div>
+        </div>
+
+        <!-- 6. OTP Verification Box -->
+        <div class="otp-verification-box">
+          <h4 style="font-family: var(--font-heading); font-size: 1.15rem; color: #fff; margin-bottom: 0.5rem;">
+            Security Verification (One-Time Password)
+          </h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Select your preferred OTP delivery method. A 6-digit verification code will be sent through the backend.
+          </p>
+
+          <div class="otp-method-selector">
+            <label class="radio-pill-label">
+              <input type="radio" name="otp_method" value="email" checked>
+              <span>Email OTP (Delivered to registered email)</span>
+            </label>
+            <label class="radio-pill-label">
+              <input type="radio" name="otp_method" value="mobile">
+              <span>Mobile OTP (Cellular / Console dispatch)</span>
+            </label>
+          </div>
+
+          <div class="otp-actions-row">
+            <div style="flex-grow: 1;">
+              <input type="text" id="otp_code" class="form-control" placeholder="Enter 6-digit OTP code" maxlength="6" style="letter-spacing: 4px; font-size: 1.1rem; font-weight: bold; text-align: center;">
+            </div>
+
+            <button type="button" id="btn-send-otp" class="btn btn-secondary">
+              Send OTP
+            </button>
+
+            <button type="button" id="btn-verify-otp" class="btn btn-primary" disabled>
+              Verify OTP
+            </button>
+          </div>
+
+          <!-- Countdown and Status Message -->
+          <div id="otp-status-message" style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--primary-light);"></div>
+
+          <!-- Verified Badge -->
+          <div class="otp-verified-badge" id="otp-verified-badge">
+            ✓ Security Verification Completed for <span id="verified-destination-label"></span>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="btn-register-submit" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 1rem;" disabled>
+          Complete Client Registration →
+        </button>
+
+        <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+          Already have an account? <a href="login.html" style="color: var(--primary-light); font-weight: 600;">Sign in here</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // State
+    let isUsernameAvailable = false;
+    let isOtpVerified = false;
+    let verifiedDestination = '';
+    let otpCountdownTimer = null;
+    let countdownRemaining = 0;
+
+    const emailInput = document.getElementById('email');
+    const confirmEmailInput = document.getElementById('confirm_email');
+    const mobileInput = document.getElementById('mobile');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm_password');
+    const otpCodeInput = document.getElementById('otp_code');
+    const sendOtpBtn = document.getElementById('btn-send-otp');
+    const verifyOtpBtn = document.getElementById('btn-verify-otp');
+    const submitBtn = document.getElementById('btn-register-submit');
+    const statusMsg = document.getElementById('otp-status-message');
+    const verifiedBadge = document.getElementById('otp-verified-badge');
+    const verifiedLabel = document.getElementById('verified-destination-label');
+
+    // Reset verification if user changes email or mobile
+    function resetOtpVerification(reason = 'Destination modified') {
+      if (isOtpVerified) {
+        isOtpVerified = false;
+        verifiedDestination = '';
+        verifiedBadge.style.display = 'none';
+        verifyOtpBtn.disabled = false;
+        statusMsg.textContent = `${reason}. Please re-send and verify OTP.`;
+        statusMsg.style.color = '#f59e0b';
+        validateForm();
+      }
+    }
+
+    emailInput.addEventListener('input', () => resetOtpVerification('Email address changed'));
+    mobileInput.addEventListener('input', () => resetOtpVerification('Mobile number changed'));
+
+    // 1. Username Availability Check (Debounced)
+    let usernameTimeout = null;
+    usernameInput.addEventListener('input', () => {
+      clearTimeout(usernameTimeout);
+      const hint = document.getElementById('username-hint');
+      const val = usernameInput.value.trim();
+
+      if (val.length < 3) {
+        hint.textContent = 'Username must be at least 3 characters.';
+        hint.className = 'field-hint invalid';
+        isUsernameAvailable = false;
+        validateForm();
+        return;
+      }
+
+      hint.textContent = 'Checking availability...';
+      hint.className = 'field-hint';
+
+      usernameTimeout = setTimeout(async () => {
+        try {
+          const res = await API.get(`/api/auth/check-username?username=${encodeURIComponent(val)}`);
+          if (res.available) {
+            hint.textContent = `✓ '${val}' is available!`;
+            hint.className = 'field-hint valid';
+            isUsernameAvailable = true;
+          } else {
+            hint.textContent = `✗ '${val}' is already taken.`;
+            hint.className = 'field-hint invalid';
+            isUsernameAvailable = false;
+          }
+        } catch (e) {
+          hint.textContent = 'Error checking username.';
+          hint.className = 'field-hint invalid';
+          isUsernameAvailable = false;
+        }
+        validateForm();
+      }, 400);
+    });
+
+    // 2. Password Strength Validation
+    passwordInput.addEventListener('input', () => {
+      const val = passwordInput.value;
+      const ruleLen = document.getElementById('rule-len');
+      const ruleUpper = document.getElementById('rule-upper');
+      const ruleLower = document.getElementById('rule-lower');
+      const ruleNum = document.getElementById('rule-num');
+      const ruleSpec = document.getElementById('rule-spec');
+
+      const hasLen = val.length >= 8;
+      const hasUpper = /[A-Z]/.test(val);
+      const hasLower = /[a-z]/.test(val);
+      const hasNum = /\d/.test(val);
+      const hasSpec = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(val);
+
+      toggleRule(ruleLen, hasLen, 'Min 8 characters');
+      toggleRule(ruleUpper, hasUpper, 'Uppercase letter');
+      toggleRule(ruleLower, hasLower, 'Lowercase letter');
+      toggleRule(ruleNum, hasNum, 'Number (0-9)');
+      toggleRule(ruleSpec, hasSpec, 'Special character (!@#$%...)');
+
+      validateConfirmPassword();
+      validateForm();
+    });
+
+    function toggleRule(el, pass, text) {
+      if (pass) {
+        el.className = 'rule-item pass';
+        el.textContent = `✓ ${text}`;
+      } else {
+        el.className = 'rule-item';
+        el.textContent = `○ ${text}`;
+      }
+    }
+
+    // 3. Confirm Password Match
+    confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+    function validateConfirmPassword() {
+      const hint = document.getElementById('confirm-password-hint');
+      if (!confirmPasswordInput.value) {
+        hint.textContent = 'Must match password';
+        hint.className = 'field-hint';
+        return;
+      }
+      if (passwordInput.value === confirmPasswordInput.value) {
+        hint.textContent = '✓ Passwords match';
+        hint.className = 'field-hint valid';
+      } else {
+        hint.textContent = '✗ Passwords do not match';
+        hint.className = 'field-hint invalid';
+      }
+      validateForm();
+    }
+
+    // 4. Confirm Email Match
+    confirmEmailInput.addEventListener('input', () => {
+      const hint = document.getElementById('confirm-email-hint');
+      if (emailInput.value.toLowerCase() === confirmEmailInput.value.toLowerCase()) {
+        hint.textContent = '✓ Emails match';
+        hint.className = 'field-hint valid';
+      } else {
+        hint.textContent = '✗ Emails do not match';
+        hint.className = 'field-hint invalid';
+      }
+      validateForm();
+    });
+
+    // 5. Send OTP Handler
+    sendOtpBtn.addEventListener('click', async () => {
+      const selectedMethod = document.querySelector('input[name="otp_method"]:checked').value;
+      const targetDestination = selectedMethod === 'email' ? emailInput.value.trim() : mobileInput.value.trim();
+
+      if (selectedMethod === 'email') {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(targetDestination)) {
+          showToast('Please enter a valid email address first.', 'error');
+          emailInput.focus();
+          return;
+        }
+      } else {
+        if (!/^[6-9]\d{9}$/.test(targetDestination)) {
+          showToast('Please enter a valid 10-digit Indian mobile number first.', 'error');
+          mobileInput.focus();
+          return;
+        }
+      }
+
+      // UX Requirement: Show "PLEASE WAIT..." immediately and disable button
+      const originalBtnText = sendOtpBtn.textContent;
+      sendOtpBtn.disabled = true;
+      sendOtpBtn.textContent = 'PLEASE WAIT...';
+      statusMsg.textContent = 'Contacting security dispatch server...';
+      statusMsg.style.color = 'var(--primary-light)';
+
+      try {
+        const res = await API.post('/api/otp/send', {
+          destinationType: selectedMethod,
+          destination: targetDestination,
+          purpose: 'registration'
+        });
+
+        if (res.success) {
+          showToast(res.message, 'success');
+          verifyOtpBtn.disabled = false;
+          otpCodeInput.focus();
+
+          // Start 90-second countdown
+          startOtpCountdown(res.countdownSeconds || 90);
+        }
+      } catch (err) {
+        showToast(err.message || 'Failed to dispatch OTP.', 'error');
+        sendOtpBtn.disabled = false;
+        sendOtpBtn.textContent = originalBtnText;
+        statusMsg.textContent = err.message || 'OTP dispatch failed.';
+        statusMsg.style.color = '#ef4444';
+      }
+    });
+
+    function startOtpCountdown(seconds) {
+      clearInterval(otpCountdownTimer);
+      countdownRemaining = seconds;
+      sendOtpBtn.disabled = true;
+
+      otpCountdownTimer = setInterval(() => {
+        countdownRemaining--;
+        if (countdownRemaining > 0) {
+          sendOtpBtn.textContent = `Resend in ${countdownRemaining}s`;
+          statusMsg.textContent = `OTP dispatched. You may request a new code in ${countdownRemaining}s.`;
+          statusMsg.style.color = 'var(--primary-light)';
+        } else {
+          clearInterval(otpCountdownTimer);
+          sendOtpBtn.disabled = false;
+          sendOtpBtn.textContent = 'Resend OTP';
+          statusMsg.textContent = 'Did not receive code? Click Resend OTP.';
+          statusMsg.style.color = '#f59e0b';
+        }
+      }, 1000);
+    }
+
+    // 6. Verify OTP Handler
+    verifyOtpBtn.addEventListener('click', async () => {
+      const selectedMethod = document.querySelector('input[name="otp_method"]:checked').value;
+      const targetDestination = selectedMethod === 'email' ? emailInput.value.trim() : mobileInput.value.trim();
+      const code = otpCodeInput.value.trim();
+
+      if (!/^\d{6}$/.test(code)) {
+        showToast('Please enter a valid 6-digit numeric OTP.', 'error');
+        otpCodeInput.focus();
+        return;
+      }
+
+      verifyOtpBtn.disabled = true;
+      verifyOtpBtn.textContent = 'Verifying...';
+
+      try {
+        const res = await API.post('/api/otp/verify', {
+          destinationType: selectedMethod,
+          destination: targetDestination,
+          otpCode: code,
+          purpose: 'registration'
+        });
+
+        if (res.success) {
+          isOtpVerified = true;
+          verifiedDestination = targetDestination;
+          showToast('OTP verified successfully!', 'success');
+          
+          verifiedBadge.style.display = 'flex';
+          verifiedLabel.textContent = `${targetDestination} (${selectedMethod.toUpperCase()})`;
+          verifyOtpBtn.textContent = 'Verified ✓';
+          verifyOtpBtn.disabled = true;
+          sendOtpBtn.disabled = true;
+          clearInterval(otpCountdownTimer);
+          statusMsg.textContent = '';
+
+          validateForm();
+        }
+      } catch (err) {
+        showToast(err.message || 'Invalid or expired OTP.', 'error');
+        verifyOtpBtn.disabled = false;
+        verifyOtpBtn.textContent = 'Verify OTP';
+        statusMsg.textContent = err.message;
+        statusMsg.style.color = '#ef4444';
+      }
+    });
+
+    // 7. Overall Form Validation
+    function validateForm() {
+      const isNameValid = document.getElementById('full_name').value.trim().length >= 2;
+      const isGenderValid = document.getElementById('gender').value !== '';
+      const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim());
+      const isEmailMatch = emailInput.value.trim().toLowerCase() === confirmEmailInput.value.trim().toLowerCase();
+      const isMobileValid = /^[6-9]\d{9}$/.test(mobileInput.value.trim());
+      
+      const pwd = passwordInput.value;
+      const isPwdValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/.test(pwd);
+      const isPwdMatch = pwd === confirmPasswordInput.value && pwd.length > 0;
+
+      const isValid = isNameValid && isGenderValid && isEmailValid && isEmailMatch && 
+                      isMobileValid && isUsernameAvailable && isPwdValid && isPwdMatch && isOtpVerified;
+
+      submitBtn.disabled = !isValid;
+    }
+
+    document.querySelectorAll('#registration-form input, #registration-form select').forEach(input => {
+      input.addEventListener('input', validateForm);
+      input.addEventListener('change', validateForm);
+    });
+
+    // 8. Submit Registration
+    document.getElementById('registration-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!isOtpVerified) {
+        showToast('Please verify your OTP before submitting registration.', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating Account...';
+
+      const selectedMethod = document.querySelector('input[name="otp_method"]:checked').value;
+
+      const payload = {
+        full_name: document.getElementById('full_name').value.trim(),
+        gender: document.getElementById('gender').value,
+        email: emailInput.value.trim(),
+        confirm_email: confirmEmailInput.value.trim(),
+        country_code: document.getElementById('country_code').value,
+        mobile: mobileInput.value.trim(),
+        username: usernameInput.value.trim(),
+        password: passwordInput.value,
+        confirm_password: confirmPasswordInput.value,
+        otp_destination_type: selectedMethod,
+        otp_destination: verifiedDestination
+      };
+
+      try {
+        const res = await API.post('/api/auth/register', payload);
+        if (res.success) {
+          showToast('Registration successful! Redirecting to login...', 'success');
+          // Requirement: Redirect to Login page after successful registration
+          setTimeout(() => {
+            window.location.href = 'login.html?registered=true';
+          }, 1500);
+        }
+      } catch (err) {
+        showToast(err.message || 'Registration failed.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Complete Client Registration →';
+      }
+    });
+  </script>
+</body>
+</html>

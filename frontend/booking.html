@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book a Drone Shoot | Elite Drone Service</title>
+  <meta name="description" content="Schedule your drone photography and 4K aerial videography shoot with certified commercial pilots.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .booking-wrapper {
+      min-height: 100vh;
+      padding: 8rem 1.5rem 5rem 1.5rem;
+      background: radial-gradient(circle at 50% 15%, rgba(14, 165, 233, 0.12) 0%, transparent 60%),
+                  linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    }
+    .booking-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 3.5rem;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(16px);
+      position: relative;
+    }
+    .booking-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .form-section-title {
+      grid-column: 1 / -1;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 0.5rem;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .notice-box {
+      grid-column: 1 / -1;
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      color: #fbbf24;
+      line-height: 1.6;
+    }
+    /* Confirmation Overlay */
+    .confirmation-card {
+      display: none;
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+    .confirmation-icon {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.15);
+      border: 2px solid #10b981;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: #34d399;
+      margin: 0 auto 1.5rem auto;
+    }
+    .reference-box {
+      background: rgba(14, 165, 233, 0.1);
+      border: 1px dashed var(--border-glow);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      margin: 2rem auto;
+      max-width: 420px;
+    }
+    .reference-code {
+      font-family: var(--font-heading);
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--primary-light);
+      letter-spacing: 2px;
+      margin-top: 0.25rem;
+    }
+
+    @media (max-width: 768px) {
+      .booking-container {
+        padding: 2rem 1.5rem;
+      }
+      .booking-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container">
+      <nav class="navbar">
+        <a href="index.html" class="brand-logo">
+          <div class="brand-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+          <div>
+            <span>ELITE DRONE</span>
+            <span class="brand-name-sub">AERIAL CINEMA</span>
+          </div>
+        </a>
+
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="services.html" class="nav-link">Services</a></li>
+          <li><a href="gallery.html" class="nav-link">Gallery</a></li>
+          <li><a href="booking.html" class="nav-link active">Book Shoot</a></li>
+        </ul>
+
+        <div class="nav-actions" id="nav-actions">
+          <!-- Auth buttons dynamically rendered -->
+        </div>
+
+        <button class="nav-toggle" id="nav-toggle">☰</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="booking-wrapper">
+    <div class="booking-container">
+      
+      <!-- Booking Form View -->
+      <div id="booking-form-view">
+        <div style="text-align: center; margin-bottom: 2.5rem;">
+          <span class="section-tag">Flight Dispatch Scheduling</span>
+          <h1 style="font-size: 2.4rem; margin-bottom: 0.5rem;">Book Your Aerial Mission</h1>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">
+            Provide your event requirements below. Your shoot request will be submitted to flight dispatch for airspace feasibility review.
+          </p>
+        </div>
+
+        <form id="drone-booking-form">
+          <div class="booking-grid">
+            
+            <!-- Section 1: Customer Contact -->
+            <div class="form-section-title">
+              1. Customer Information
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="customer_name">Full Contact Name <span style="color: #ef4444;">*</span></label>
+              <input type="text" id="customer_name" class="form-control" placeholder="e.g. Vikram Malhotra" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="email">Email Address <span style="color: #ef4444;">*</span></label>
+              <input type="email" id="email" class="form-control" placeholder="name@domain.com" required>
+            </div>
+
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label class="form-label" for="mobile">Primary Mobile Phone <span style="color: #ef4444;">*</span></label>
+              <input type="tel" id="mobile" class="form-control" placeholder="10-digit mobile number" required>
+            </div>
+
+            <!-- Section 2: Service & Package Selection -->
+            <div class="form-section-title">
+              2. Flight Service & Package Details
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="service_id">Drone Service Offering <span style="color: #ef4444;">*</span></label>
+              <select id="service_id" class="form-control" style="background: #0c1220;" required>
+                <option value="">Select Service...</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="package_id">Package Tier</label>
+              <select id="package_id" class="form-control" style="background: #0c1220;">
+                <option value="">Select Package Tier (Optional)...</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label class="form-label" for="event_type">Event / Shoot Type <span style="color: #ef4444;">*</span></label>
+              <input type="text" id="event_type" class="form-control" placeholder="e.g. Palace Wedding Ceremony, Villa Promotional Video, Music Festival, Corporate Ad" required>
+            </div>
+
+            <!-- Section 3: Date & Location -->
+            <div class="form-section-title">
+              3. Mission Schedule & Coordinates
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event_date">Flight Date <span style="color: #ef4444;">*</span></label>
+              <input type="date" id="event_date" class="form-control" required style="color-scheme: dark;">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event_time">Reporting Time <span style="color: #ef4444;">*</span></label>
+              <input type="time" id="event_time" class="form-control" required style="color-scheme: dark;">
+            </div>
+
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label class="form-label" for="event_location">City / Venue Landmark <span style="color: #ef4444;">*</span></label>
+              <input type="text" id="event_location" class="form-control" placeholder="e.g. The Leela Palace, Udaipur / Bengaluru Tech Park" required>
+            </div>
+
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label class="form-label" for="complete_address">Complete Operational Address <span style="color: #ef4444;">*</span></label>
+              <textarea id="complete_address" class="form-control" rows="3" placeholder="Full street address and pin code (Required by DGCA for Digital Sky flight zone clearance)" required></textarea>
+            </div>
+
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label class="form-label" for="additional_requirements">Special Directives & Requirements (Optional)</label>
+              <textarea id="additional_requirements" class="form-control" rows="3" placeholder="e.g. Need FPV indoor fly-through, live HDMI feed for venue monitors, sunset golden hour shoot..."></textarea>
+            </div>
+
+            <div class="notice-box">
+              <strong>Flight Safety Notice:</strong> All booking requests are initialized in <strong>Pending</strong> status until our certified flight controller evaluates weather, airspace classifications (Digital Sky Red/Yellow/Green zones), and local permissions.
+            </div>
+
+            <div style="grid-column: 1 / -1; margin-top: 1rem;">
+              <button type="submit" id="btn-submit-booking" class="btn btn-primary btn-lg" style="width: 100%;">
+                Submit Flight Booking Request →
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Confirmation Screen View -->
+      <div id="booking-confirmation-view" class="confirmation-card">
+        <div class="confirmation-icon">✓</div>
+        <h2 style="font-size: 2.2rem; margin-bottom: 0.5rem; color: #fff;">Booking Submitted!</h2>
+        <p style="color: var(--text-muted); font-size: 1.05rem; max-width: 550px; margin: 0 auto;">
+          Your drone shoot request has been recorded in the flight operations registry. Our operations director is reviewing your location coordinates.
+        </p>
+
+        <div class="reference-box">
+          <div style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px;">Unique Booking Reference</div>
+          <div class="reference-code" id="confirmed-reference-code">ELD-20261101-ABCD</div>
+          <div style="font-size: 0.8rem; color: #f59e0b; margin-top: 0.5rem;">Status: <strong>PENDING BUSINESS APPROVAL</strong></div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <a href="dashboard.html" class="btn btn-primary btn-lg">
+            View in Customer Dashboard
+          </a>
+          <a href="index.html" class="btn btn-secondary btn-lg">
+            Return to Homepage
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    let servicesData = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Guard route: Only authenticated customers can book services
+      const user = Auth.getUser();
+      if (!user) {
+        window.location.href = 'login.html?unauthorized=true&redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+        return;
+      }
+
+      // Pre-fill user data
+      document.getElementById('customer_name').value = user.full_name || '';
+      document.getElementById('email').value = user.email || '';
+      if (user.mobile) {
+        document.getElementById('mobile').value = user.mobile;
+      }
+
+      // Minimum date is tomorrow
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const minDateStr = tomorrow.toISOString().split('T')[0];
+      document.getElementById('event_date').min = minDateStr;
+      document.getElementById('event_date').value = minDateStr;
+      document.getElementById('event_time').value = '10:00';
+
+      // 2. Fetch Services and Packages to populate dropdowns
+      await loadServicesDropdown();
+
+      // 3. Handle Service Change to update Package options
+      const serviceSelect = document.getElementById('service_id');
+      const packageSelect = document.getElementById('package_id');
+
+      serviceSelect.addEventListener('change', () => {
+        const selectedId = parseInt(serviceSelect.value, 10);
+        updatePackageOptions(selectedId);
+      });
+
+      // 4. Form Submission
+      const form = document.getElementById('drone-booking-form');
+      const submitBtn = document.getElementById('btn-submit-booking');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting Booking...';
+
+        const payload = {
+          customer_name: document.getElementById('customer_name').value.trim(),
+          email: document.getElementById('email').value.trim(),
+          mobile: document.getElementById('mobile').value.trim(),
+          event_type: document.getElementById('event_type').value.trim(),
+          service_id: parseInt(document.getElementById('service_id').value, 10),
+          package_id: document.getElementById('package_id').value ? parseInt(document.getElementById('package_id').value, 10) : null,
+          event_date: document.getElementById('event_date').value,
+          event_time: document.getElementById('event_time').value,
+          event_location: document.getElementById('event_location').value.trim(),
+          complete_address: document.getElementById('complete_address').value.trim(),
+          additional_requirements: document.getElementById('additional_requirements').value.trim(),
+        };
+
+        try {
+          const res = await API.post('/api/bookings', payload);
+          if (res.success) {
+            showToast('Booking submitted successfully!', 'success');
+            document.getElementById('booking-form-view').style.display = 'none';
+            document.getElementById('booking-confirmation-view').style.display = 'block';
+            document.getElementById('confirmed-reference-code').textContent = res.booking.booking_reference;
+          }
+        } catch (err) {
+          showToast(err.message || 'Failed to submit booking.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Flight Booking Request →';
+        }
+      });
+    });
+
+    async function loadServicesDropdown() {
+      const serviceSelect = document.getElementById('service_id');
+      try {
+        const res = await API.get('/api/services');
+        if (res.success && res.data) {
+          servicesData = res.data;
+          servicesData.forEach(svc => {
+            const opt = document.createElement('option');
+            opt.value = svc.id;
+            opt.textContent = svc.name;
+            serviceSelect.appendChild(opt);
+          });
+
+          // Check query parameters to pre-select
+          const urlParams = new URLSearchParams(window.location.search);
+          const svcParam = urlParams.get('service');
+          const pkgParam = urlParams.get('package');
+
+          if (svcParam) {
+            const matched = servicesData.find(s => s.id == svcParam || s.slug == svcParam);
+            if (matched) {
+              serviceSelect.value = matched.id;
+              updatePackageOptions(matched.id, pkgParam);
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Error loading services for booking form:', e);
+      }
+    }
+
+    function updatePackageOptions(serviceId, preselectedPkgId = null) {
+      const packageSelect = document.getElementById('package_id');
+      packageSelect.innerHTML = '<option value="">Select Package Tier (Optional)...</option>';
+
+      const service = servicesData.find(s => s.id === serviceId);
+      if (service && service.packages && service.packages.length > 0) {
+        service.packages.forEach(pkg => {
+          const opt = document.createElement('option');
+          opt.value = pkg.id;
+          const price = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(pkg.price);
+          opt.textContent = `${pkg.name} (${pkg.duration_hours}h) - ${price}`;
+          packageSelect.appendChild(opt);
+        });
+
+        if (preselectedPkgId) {
+          packageSelect.value = preselectedPkgId;
+        }
+      }
+    }
+  </script>
+</body>
+</html>

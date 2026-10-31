@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4K Aerial Gallery | Elite Drone Service</title>
+  <meta name="description" content="Explore cinema-grade 4K drone photography and aerial video reels captured across India by certified drone pilots.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .gallery-hero {
+      padding: 9rem 0 3.5rem 0;
+      background: linear-gradient(180deg, rgba(7, 10, 18, 0.75) 0%, var(--bg-primary) 100%),
+                  url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+      text-align: center;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .gallery-controls-bar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      margin: 3rem 0;
+    }
+    .media-type-toggle {
+      display: inline-flex;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.35rem;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-subtle);
+    }
+    .media-type-btn {
+      padding: 0.45rem 1.25rem;
+      border-radius: var(--radius-full);
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .media-type-btn.active {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 2px 10px var(--primary-glow);
+    }
+    .gallery-masonry-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.75rem;
+      margin-bottom: 4rem;
+    }
+    .gallery-item-card {
+      position: relative;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      height: 320px;
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      box-shadow: var(--shadow-card);
+      transition: all var(--transition-normal);
+    }
+    .gallery-item-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--border-glow);
+      box-shadow: 0 15px 35px -10px var(--primary-glow);
+    }
+    .gallery-item-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform var(--transition-slow);
+    }
+    .gallery-item-card:hover img {
+      transform: scale(1.08);
+    }
+    .gallery-overlay-box {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, transparent 40%, rgba(7, 10, 18, 0.95) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1.5rem;
+    }
+    .gallery-tag-pill {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      padding: 0.35rem 0.8rem;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+    }
+    .tag-photo {
+      background: rgba(14, 165, 233, 0.85);
+      color: #fff;
+    }
+    .tag-video {
+      background: rgba(245, 158, 11, 0.9);
+      color: #000;
+    }
+    .play-icon-watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      color: #fff;
+      transition: all var(--transition-fast);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+    }
+    .gallery-item-card:hover .play-icon-watermark {
+      background: var(--primary);
+      border-color: var(--primary);
+      transform: translate(-50%, -50%) scale(1.15);
+      box-shadow: 0 0 25px var(--primary-glow);
+    }
+    .empty-gallery-msg {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 1024px) {
+      .gallery-masonry-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 640px) {
+      .gallery-masonry-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================================
+       SITE HEADER & NAVIGATION
+       ========================================================================= -->
+  <header class="site-header">
+    <div class="container">
+      <nav class="navbar">
+        <a href="index.html" class="brand-logo">
+          <div class="brand-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+          <div>
+            <span>ELITE DRONE</span>
+            <span class="brand-name-sub">AERIAL CINEMA</span>
+          </div>
+        </a>
+
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="services.html" class="nav-link">Services</a></li>
+          <li><a href="gallery.html" class="nav-link active">Gallery</a></li>
+          <li><a href="index.html#about" class="nav-link">About</a></li>
+          <li><a href="index.html#why-us" class="nav-link">Why Us</a></li>
+          <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+        </ul>
+
+        <div class="nav-actions" id="nav-actions">
+          <a href="login.html" class="btn btn-secondary btn-sm">Login</a>
+          <a href="register.html" class="btn btn-primary btn-sm">Register</a>
+          <a href="booking.html" class="btn btn-outline-gold btn-sm">Book Shoot</a>
+        </div>
+
+        <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+          ☰
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Gallery Hero -->
+    <section class="gallery-hero">
+      <div class="container">
+        <div class="section-tag">Cinematic Portfolio</div>
+        <h1 class="section-title" style="font-size: 3rem;">4K Aerial Photo & Video Gallery</h1>
+        <p class="section-desc" style="max-width: 720px; margin: 0 auto;">
+          Experience breathtaking vantage points captured by our commercial drone fleet. Filter through categories or stream 4K aerial footage directly in the player.
+        </p>
+      </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="section" style="padding-top: 2rem;">
+      <div class="container">
+        
+        <!-- Controls & Filters -->
+        <div class="gallery-controls-bar">
+          <!-- Format toggle -->
+          <div class="media-type-toggle">
+            <button class="media-type-btn active" data-type="all">All Media</button>
+            <button class="media-type-btn" data-type="image">Photos Only</button>
+            <button class="media-type-btn" data-type="video">4K Videos Only</button>
+          </div>
+
+          <!-- Category filter buttons -->
+          <div class="portfolio-filter-bar" style="margin-bottom: 0;">
+            <button class="filter-btn active" data-category="all">All Categories</button>
+            <button class="filter-btn" data-category="wedding">Weddings</button>
+            <button class="filter-btn" data-category="event">Events & Festivals</button>
+            <button class="filter-btn" data-category="real-estate">Real Estate & Villas</button>
+            <button class="filter-btn" data-category="cinematography">Cinematography</button>
+            <button class="filter-btn" data-category="landscape">Landscape & Outdoor</button>
+          </div>
+        </div>
+
+        <!-- Gallery Grid -->
+        <div class="gallery-masonry-grid" id="gallery-grid">
+          <div class="empty-gallery-msg">Loading media showcase...</div>
+        </div>
+
+        <!-- Bottom CTA -->
+        <div class="cta-banner" style="margin-top: 3rem;">
+          <h2>Inspired by our Aerial Work?</h2>
+          <p>
+            Schedule a flight mission for your wedding, property, or film production. Our certified crew is ready for deployment across India.
+          </p>
+          <a href="booking.html" class="btn btn-primary btn-lg">
+            Book Your Shoot Now →
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col footer-about">
+          <div class="brand-logo" style="margin-bottom: 0.5rem;">
+            <div class="brand-logo-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </div>
+            <span>ELITE DRONE</span>
+          </div>
+          <p>
+            India's premier commercial aerial photography and cinema videography service. Fully DGCA compliant with ₹50L comprehensive liability insurance.
+          </p>
+          <div class="footer-socials">
+            <a href="#" class="social-icon-btn" title="Instagram" style="font-weight: 700; font-size: 0.8rem;">IG</a>
+            <a href="#" class="social-icon-btn" title="YouTube" style="font-weight: 700; font-size: 0.8rem;">YT</a>
+            <a href="#" class="social-icon-btn" title="LinkedIn" style="font-weight: 700; font-size: 0.8rem;">IN</a>
+            <a href="#" class="social-icon-btn" title="Twitter" style="font-weight: 700; font-size: 0.8rem;">X</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="services.html">Services & Packages</a></li>
+            <li><a href="gallery.html">4K Media Gallery</a></li>
+            <li><a href="booking.html">Book Online</a></li>
+            <li><a href="login.html">Customer Login</a></li>
+            <li><a href="register.html">Create Account</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Gallery Categories</h4>
+          <ul class="footer-links">
+            <li><a href="gallery.html?category=wedding">Wedding Aerials</a></li>
+            <li><a href="gallery.html?category=event">Event Videography</a></li>
+            <li><a href="gallery.html?category=real-estate">Real Estate Showcase</a></li>
+            <li><a href="gallery.html?category=cinematography">Outdoor Cinematography</a></li>
+            <li><a href="gallery.html?category=landscape">Landscape Vistas</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Media Licensing</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            All photography and video clips displayed are copyright © Elite Drone Service and client partnerships. Commercial stock licensing is available upon request.
+          </p>
+          <div style="padding: 0.75rem 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); font-size: 0.8rem; color: var(--primary-light);">
+            ✓ 4K/60fps Raw & Master Deliverables<br>
+            ✓ Licensed Cinema Soundtracks Included
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          © 2026 Elite Drone Service. All rights reserved. Professional Drone Services.
+        </div>
+        <div style="display: flex; gap: 1.5rem;">
+          <a href="#" style="color: var(--text-dim);">Privacy Policy</a>
+          <a href="#" style="color: var(--text-dim);">Terms of Flight</a>
+          <a href="#" style="color: var(--text-dim);">Safety Standards</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Lightbox Modal -->
+  <div class="modal-backdrop" id="lightbox-modal">
+    <div class="modal-box">
+      <button class="modal-close-btn" id="lightbox-close" aria-label="Close Preview">&times;</button>
+      <div class="modal-media-container" id="lightbox-media"></div>
+      <div class="modal-info-panel">
+        <h3 class="modal-title" id="lightbox-title">Elite Drone Showcase</h3>
+        <p class="modal-caption" id="lightbox-caption">Aerial capture details.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    let galleryData = [];
+    let currentCategory = 'all';
+    let currentType = 'all';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Check query params if any
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryCat = urlParams.get('category');
+      if (queryCat) currentCategory = queryCat;
+
+      await loadGallery();
+      setupControls();
+    });
+
+    async function loadGallery() {
+      const grid = document.getElementById('gallery-grid');
+      try {
+        const res = await API.get('/api/gallery');
+        if (res.success && res.data) {
+          galleryData = res.data;
+          renderItems();
+        }
+      } catch (err) {
+        grid.innerHTML = '<div class="empty-gallery-msg" style="color: #ef4444;">Failed to load gallery items.</div>';
+      }
+    }
+
+    function renderItems() {
+      const grid = document.getElementById('gallery-grid');
+      let filtered = galleryData;
+
+      if (currentCategory !== 'all') {
+        filtered = filtered.filter(item => item.category === currentCategory);
+      }
+
+      if (currentType !== 'all') {
+        filtered = filtered.filter(item => item.media_type === currentType);
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div class="empty-gallery-msg">No media found matching the selected filter.</div>';
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => {
+        const isVideo = item.media_type === 'video';
+        const tagClass = isVideo ? 'tag-video' : 'tag-photo';
+        const tagText = isVideo ? '4K Video' : 'HDR Photo';
+
+        return `
+          <div class="gallery-item-card" onclick="Lightbox.open('${item.media_url}', '${item.media_type}', '${escapeText(item.title)}', '${escapeText(item.description)}')">
+            <img src="${item.thumbnail_url || item.media_url}" alt="${escapeText(item.title)}" loading="lazy">
+            <div class="gallery-tag-pill ${tagClass}">
+              ${tagText}
+            </div>
+            ${isVideo ? '<div class="play-icon-watermark"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>' : ''}
+            <div class="gallery-overlay-box">
+              <h4 style="color: #fff; font-size: 1.15rem; margin-bottom: 0.25rem;">${item.title}</h4>
+              <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 0.4rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                ${item.description || ''}
+              </p>
+              ${item.location ? `<span style="color: var(--primary-light); font-size: 0.8rem;">${item.location}</span>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setupControls() {
+      // Type buttons
+      document.querySelectorAll('.media-type-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.media-type-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentType = btn.dataset.type;
+          renderItems();
+        });
+      });
+
+      // Category buttons
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        if (btn.dataset.category === currentCategory) {
+          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        }
+
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentCategory = btn.dataset.category;
+          renderItems();
+        });
+      });
+    }
+
+    function escapeText(str) {
+      if (!str) return '';
+      return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>

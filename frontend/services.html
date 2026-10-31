@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drone Services & Packages | Elite Drone Service</title>
+  <meta name="description"
+    content="Explore professional drone shooting services: weddings, corporate events, real estate, and cinema. Transparent tiered packages and customizable flights.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .page-hero {
+      padding: 9rem 0 4rem 0;
+      background: linear-gradient(180deg, rgba(7, 10, 18, 0.75) 0%, var(--bg-primary) 100%),
+        url('https://images.unsplash.com/photo-1527977966376-1c8408f9f108?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+      text-align: center;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .service-nav-pills {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 2.5rem;
+    }
+
+    .service-pill-btn {
+      padding: 0.5rem 1.25rem;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all var(--transition-fast);
+    }
+
+    .service-pill-btn:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .service-detail-section {
+      padding: 5rem 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .service-detail-section:nth-child(even) {
+      background: rgba(12, 18, 32, 0.35);
+    }
+
+    .service-intro-block {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 3.5rem;
+      align-items: center;
+      margin-bottom: 3.5rem;
+    }
+
+    .service-intro-block.reverse {
+      grid-template-columns: 1fr 1.2fr;
+    }
+
+    .service-intro-block.reverse .service-intro-media {
+      order: -1;
+    }
+
+    .service-intro-text h2 {
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .service-intro-text p {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+
+    .service-specs-box {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .spec-item {
+      padding: 0.8rem 1rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+    }
+
+    .spec-item strong {
+      color: var(--primary-light);
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+
+    .service-intro-media {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-card);
+      height: 380px;
+    }
+
+    .service-intro-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Package Cards */
+    .packages-heading {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .packages-heading h3 {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    .pricing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2.25rem 2rem;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: all var(--transition-normal);
+      backdrop-filter: blur(8px);
+    }
+
+    .pricing-card.popular {
+      border-color: var(--border-gold);
+      box-shadow: 0 15px 35px -10px var(--accent-gold-glow);
+      transform: translateY(-5px);
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--border-glow);
+    }
+
+    .popular-tag {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--accent-gold), #d97706);
+      color: #000;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 0.25rem 0.85rem;
+      border-radius: var(--radius-full);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .pricing-header h4 {
+      font-family: var(--font-sans);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .pricing-header p {
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+      min-height: 42px;
+    }
+
+    .price-figure {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .price-figure .amount {
+      font-family: var(--font-heading);
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .price-figure .unit {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: block;
+      margin-top: 0.25rem;
+    }
+
+    .pricing-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-bottom: 2rem;
+      flex-grow: 1;
+    }
+
+    .pricing-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+    }
+
+    .pricing-features li span {
+      color: var(--primary-light);
+      font-weight: bold;
+    }
+
+    .pricing-badge-note {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-align: center;
+      margin-top: 0.75rem;
+    }
+
+    @media (max-width: 1024px) {
+
+      .service-intro-block,
+      .service-intro-block.reverse {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .service-intro-block.reverse .service-intro-media {
+        order: 0;
+      }
+
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================================================================
+       SITE HEADER & NAVIGATION
+       ========================================================================= -->
+  <header class="site-header">
+    <div class="container">
+      <nav class="navbar">
+        <a href="index.html" class="brand-logo">
+          <div class="brand-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path
+                d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </div>
+          <div>
+            <span>ELITE DRONE</span>
+            <span class="brand-name-sub">AERIAL CINEMA</span>
+          </div>
+        </a>
+
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="services.html" class="nav-link active">Services</a></li>
+          <li><a href="gallery.html" class="nav-link">Gallery</a></li>
+          <li><a href="index.html#about" class="nav-link">About</a></li>
+          <li><a href="index.html#why-us" class="nav-link">Why Us</a></li>
+          <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+        </ul>
+
+        <div class="nav-actions" id="nav-actions">
+          <a href="login.html" class="btn btn-secondary btn-sm">Login</a>
+          <a href="register.html" class="btn btn-primary btn-sm">Register</a>
+          <a href="booking.html" class="btn btn-outline-gold btn-sm">Book Shoot</a>
+        </div>
+
+        <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+          ☰
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Page Hero -->
+    <section class="page-hero">
+      <div class="container">
+        <div class="section-tag">Aviation Services & Pricing</div>
+        <h1 class="section-title" style="font-size: 3rem;">Cinema-Grade Drone Services</h1>
+        <p class="section-desc" style="max-width: 720px; margin: 0 auto;">
+          From regal wedding ceremonies to multi-acre infrastructure surveys, choose from our specialized packages or
+          request a bespoke flight deployment.
+        </p>
+
+        <!-- Quick navigation pills -->
+        <div class="service-nav-pills" id="services-nav-pills">
+          <a href="#wedding-drone-photography" class="service-pill-btn">Wedding Photography</a>
+          <a href="#event-drone-videography" class="service-pill-btn">Event Videography</a>
+          <a href="#real-estate-aerial-photography" class="service-pill-btn">Real Estate Aerial</a>
+          <a href="#outdoor-cinematography" class="service-pill-btn">Outdoor Cinema</a>
+          <a href="#custom-drone-shooting" class="service-pill-btn">Custom Shoots</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dynamic Services Container (Hydrated from PostgreSQL /api/services) -->
+    <div id="services-details-wrapper">
+      <!-- Loading indicator or pre-rendered template -->
+      <div style="text-align: center; padding: 4rem 0; color: var(--text-muted);">
+        Loading service catalogs and package tiers...
+      </div>
+    </div>
+
+    <!-- Custom Mission Callout -->
+    <section class="section" style="background: rgba(12, 18, 32, 0.6); text-align: center;">
+      <div class="container">
+        <div class="section-tag">Special Operations</div>
+        <h2 class="section-title">Need a Custom Airspace Mission?</h2>
+        <p class="section-desc" style="max-width: 650px; margin: 0 auto 2rem auto;">
+          We support multi-day shoots, high-speed FPV racing drone tracking, industrial volumetric surveys, and
+          specialized cinema payloads (RED / ARRI on heavy-lift rigs).
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <a href="booking.html?service=custom-drone-shooting" class="btn btn-primary btn-lg">
+            Request Custom Flight Quote
+          </a>
+          <a href="index.html#contact" class="btn btn-secondary btn-lg">
+            Speak to Flight Operations
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col footer-about">
+          <div class="brand-logo" style="margin-bottom: 0.5rem;">
+            <div class="brand-logo-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path
+                  d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </div>
+            <span>ELITE DRONE</span>
+          </div>
+          <p>
+            India's premier commercial aerial photography and cinema videography service. Fully DGCA compliant with ₹50L
+            comprehensive liability insurance.
+          </p>
+          <div class="footer-socials">
+            <a href="#" class="social-icon-btn" title="Instagram">📷</a>
+            <a href="#" class="social-icon-btn" title="YouTube">▶</a>
+            <a href="#" class="social-icon-btn" title="LinkedIn">in</a>
+            <a href="#" class="social-icon-btn" title="Twitter">𝕏</a>
+            <a href="#" class="social-icon-btn" title="Instagram" style="font-weight: 700; font-size: 0.8rem;">IG</a>
+            <a href="#" class="social-icon-btn" title="YouTube" style="font-weight: 700; font-size: 0.8rem;">YT</a>
+            <a href="#" class="social-icon-btn" title="LinkedIn" style="font-weight: 700; font-size: 0.8rem;">IN</a>
+            <a href="#" class="social-icon-btn" title="Twitter" style="font-weight: 700; font-size: 0.8rem;">X</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="services.html">Services & Packages</a></li>
+            <li><a href="gallery.html">4K Media Gallery</a></li>
+            <li><a href="booking.html">Book Online</a></li>
+            <li><a href="login.html">Customer Login</a></li>
+            <li><a href="register.html">Create Account</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Our Services</h4>
+          <ul class="footer-links">
+            <li><a href="#wedding-drone-photography">Wedding Drone Shoots</a></li>
+            <li><a href="#event-drone-videography">Event Drone Filming</a></li>
+            <li><a href="#real-estate-aerial-photography">Real Estate Imaging</a></li>
+            <li><a href="#outdoor-cinematography">Outdoor Cinematography</a></li>
+            <li><a href="#custom-drone-shooting">Custom Flight Missions</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Pricing Notice</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Package prices shown are editable starting placeholders. Final invoices depend on airspace clearance,
+            location travel, and special camera payloads.
+          </p>
+          <div
+            style="padding: 0.75rem 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); font-size: 0.8rem; color: var(--primary-light);">
+            ✓ DGCA Category-1 Remote Pilot Certified<br>
+            ✓ Real-time Online Booking & Reference Tracking
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          © 2026 Elite Drone Service. All rights reserved. Professional Drone Services.
+        </div>
+        <div style="display: flex; gap: 1.5rem;">
+          <a href="#" style="color: var(--text-dim);">Privacy Policy</a>
+          <a href="#" style="color: var(--text-dim);">Terms of Flight</a>
+          <a href="#" style="color: var(--text-dim);">Safety Standards</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Container -->
+  <div class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const wrapper = document.getElementById('services-details-wrapper');
+      try {
+        const res = await API.get('/api/services');
+        if (res.success && res.data && res.data.length > 0) {
+          wrapper.innerHTML = res.data.map((svc, index) => {
+            const isReverse = index % 2 === 1 ? 'reverse' : '';
+
+            // Render packages
+            const packagesHtml = (svc.packages || []).map(pkg => {
+              const features = Array.isArray(pkg.features) ? pkg.features : (typeof pkg.features === 'string' ? JSON.parse(pkg.features) : []);
+              const priceFormatted = new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0
+              }).format(pkg.price);
+
+              return `
+                <div class="pricing-card ${pkg.is_popular ? 'popular' : ''}">
+                  ${pkg.is_popular ? '<div class="popular-tag">Most Recommended</div>' : ''}
+                  <div class="pricing-header">
+                    <h4>${pkg.name}</h4>
+                    <p>${pkg.description}</p>
+                  </div>
+                  <div class="price-figure">
+                    <div class="amount">${priceFormatted}</div>
+                    <span class="unit">Starting estimate • ${pkg.duration_hours} Hours Coverage</span>
+                  </div>
+                  <ul class="pricing-features">
+                    ${features.map(f => `<li><span>✓</span> ${f}</li>`).join('')}
+                  </ul>
+                  <a href="booking.html?service=${svc.id}&package=${pkg.id}" class="btn ${pkg.is_popular ? 'btn-primary' : 'btn-secondary'}" style="width: 100%;">
+                    Book This Package
+                  </a>
+                  <div class="pricing-badge-note">Transparent pricing placeholder • Final quote upon clearance</div>
+                </div>
+              `;
+            }).join('');
+
+            return `
+              <section class="service-detail-section" id="${svc.slug}">
+                <div class="container">
+                  <div class="service-intro-block ${isReverse}">
+                    <div class="service-intro-text">
+                      ${svc.badge ? `<span class="section-tag">${svc.badge}</span>` : '<span class="section-tag">Elite Aerial Service</span>'}
+                      <h2>${svc.name}</h2>
+                      <p>${svc.full_description}</p>
+                      
+                      <div class="service-specs-box">
+                        <div class="spec-item">
+                          <strong>Camera Sensors</strong>
+                          4K/60fps HDR, 5.1K Apple ProRes 422 HQ
+                        </div>
+                        <div class="spec-item">
+                          <strong>Pilot Crew</strong>
+                          Certified Commercial Remote Pilot + Visual Observer
+                        </div>
+                        <div class="spec-item">
+                          <strong>Delivery Speed</strong>
+                          48 Hours High-Speed Cloud Link & SSD
+                        </div>
+                        <div class="spec-item">
+                          <strong>Compliance</strong>
+                          Digital Sky Permission & ₹50L Liability Cover
+                        </div>
+                      </div>
+
+                      <div style="margin-top: 2rem;">
+                        <a href="booking.html?service=${svc.id}" class="btn btn-primary">
+                          Book This Service Now →
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="service-intro-media">
+                      <img src="${svc.image_url}" alt="${svc.name}" loading="lazy">
+                    </div>
+                  </div>
+
+                  <!-- Packages -->
+                  <div class="packages-heading">
+                    <span class="section-tag">Available Options</span>
+                    <h3>${svc.name} Tiered Packages</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Select the ideal package duration and deliverables for your timeline.</p>
+                  </div>
+
+                  <div class="pricing-grid">
+                    ${packagesHtml}
+                  </div>
+                </div>
+              </section>
+            `;
+          }).join('');
+
+          // Smooth scroll if URL has hash
+          if (window.location.hash) {
+            const target = document.querySelector(window.location.hash);
+            if (target) {
+              setTimeout(() => {
+                target.scrollIntoView({ behavior: 'smooth' });
+              }, 200);
+            }
+          }
+        }
+      } catch (err) {
+        wrapper.innerHTML = `<div style="text-align: center; padding: 4rem 0; color: #ef4444;">Failed to load services. Please check server connection.</div>`;
+      }
+    });
+  </script>
+</body>
+
+</html>

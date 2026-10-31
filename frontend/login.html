@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer & Admin Sign In | Elite Drone Service</title>
+  <meta name="description" content="Sign in to your Elite Drone Service client portal to manage flight bookings, download deliverables, and review proposals.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .auth-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7rem 1.5rem 4rem 1.5rem;
+      background: radial-gradient(circle at 50% 25%, rgba(14, 165, 233, 0.12) 0%, transparent 60%),
+                  linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    }
+    .auth-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 3rem;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(16px);
+      position: relative;
+    }
+    .password-input-wrap {
+      position: relative;
+    }
+    .toggle-pwd-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 4px;
+    }
+    .toggle-pwd-btn:hover {
+      color: #fff;
+    }
+    .auth-alert {
+      padding: 0.85rem 1.25rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+    .auth-alert-success {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+    .auth-alert-error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #f87171;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container">
+      <nav class="navbar">
+        <a href="index.html" class="brand-logo">
+          <div class="brand-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+          <div>
+            <span>ELITE DRONE</span>
+            <span class="brand-name-sub">AERIAL CINEMA</span>
+          </div>
+        </a>
+
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="services.html" class="nav-link">Services</a></li>
+          <li><a href="gallery.html" class="nav-link">Gallery</a></li>
+          <li><a href="booking.html" class="nav-link">Book Now</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <a href="register.html" class="btn btn-primary btn-sm">Create Account</a>
+        </div>
+
+        <button class="nav-toggle" id="nav-toggle">☰</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Login Main -->
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header" style="text-align: center; margin-bottom: 2rem;">
+        <span class="section-tag">Client Portal</span>
+        <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">Account Sign In</h1>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+          Access your shoot bookings, live flight clearance status, and 4K deliverables.
+        </p>
+      </div>
+
+      <!-- Alerts -->
+      <div id="alert-box" class="auth-alert"></div>
+
+      <form id="login-form">
+        <!-- Login Identifier -->
+        <div class="form-group">
+          <label class="form-label" for="login_identifier">Email Address or Username</label>
+          <input type="text" id="login_identifier" class="form-control" placeholder="name@domain.com or username" required autofocus autocomplete="username">
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.4rem;">
+            <label class="form-label" for="password" style="margin-bottom: 0;">Password</label>
+            <a href="#" id="forgot-password-link" style="font-size: 0.8rem; color: var(--primary-light);">Forgot Password?</a>
+          </div>
+          <div class="password-input-wrap">
+            <input type="password" id="password" class="form-control" placeholder="Enter your password" required autocomplete="current-password" style="padding-right: 60px;">
+            <button type="button" class="toggle-pwd-btn" id="toggle-pwd-btn" title="Show / Hide Password" style="font-size: 0.75rem; font-weight: 700; color: var(--primary-light); text-transform: uppercase;">Show</button>
+          </div>
+        </div>
+
+        <!-- Remember Me -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin: 1.25rem 0;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-muted); cursor: pointer;">
+            <input type="checkbox" id="remember_me">
+            <span>Keep me signed in</span>
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="btn-login-submit" class="btn btn-primary btn-lg" style="width: 100%;">
+          Sign In to Portal →
+        </button>
+
+        <p style="text-align: center; margin-top: 1.75rem; font-size: 0.9rem; color: var(--text-muted);">
+          Don't have an account yet? <a href="register.html" style="color: var(--primary-light); font-weight: 600;">Register here</a>
+        </p>
+      </form>
+
+      <!-- Quick Demo Credentials Banner for Testing -->
+      <div style="margin-top: 2rem; padding: 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); font-size: 0.8rem; color: var(--text-muted);">
+        <strong style="color: #fff; display: block; margin-bottom: 0.25rem;">Administrator Quick Sign In:</strong>
+        Username: <code style="color: var(--primary-light);">admin</code> | Password: <code style="color: var(--primary-light);">Admin@Elite2026!</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const alertBox = document.getElementById('alert-box');
+      const urlParams = new URLSearchParams(window.location.search);
+
+      // Show alert if redirected from registration
+      if (urlParams.get('registered') === 'true') {
+        alertBox.className = 'auth-alert auth-alert-success';
+        alertBox.textContent = 'Account created successfully! Please enter your credentials to sign in.';
+        alertBox.style.display = 'block';
+      }
+
+      // Show alert if redirected from protected route
+      if (urlParams.get('unauthorized') === 'true') {
+        alertBox.className = 'auth-alert auth-alert-error';
+        alertBox.textContent = 'Please log in to your account to book a drone shoot.';
+        alertBox.style.display = 'block';
+      }
+
+      // Show/Hide password toggle
+      const pwdInput = document.getElementById('password');
+      const toggleBtn = document.getElementById('toggle-pwd-btn');
+      toggleBtn.addEventListener('click', () => {
+        if (pwdInput.type === 'password') {
+          pwdInput.type = 'text';
+          toggleBtn.textContent = 'Hide';
+        } else {
+          pwdInput.type = 'password';
+          toggleBtn.textContent = 'Show';
+        }
+      });
+
+      // Forgot password prompt
+      document.getElementById('forgot-password-link').addEventListener('click', (e) => {
+        e.preventDefault();
+        showToast('Password reset link sent to your registered email if an account exists.', 'info');
+      });
+
+      // Form submission
+      const loginForm = document.getElementById('login-form');
+      const submitBtn = document.getElementById('btn-login-submit');
+
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        alertBox.style.display = 'none';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Authenticating...';
+
+        const payload = {
+          login_identifier: document.getElementById('login_identifier').value.trim(),
+          password: pwdInput.value,
+          remember_me: document.getElementById('remember_me').checked,
+        };
+
+        try {
+          const res = await API.post('/api/auth/login', payload);
+          if (res.success) {
+            // Save user profile to client
+            Auth.setUser(res.user);
+            showToast('Sign in successful! Redirecting...', 'success');
+
+            // Check if there is a return redirect url
+            const redirectParam = urlParams.get('redirect');
+            const targetUrl = redirectParam || res.redirectUrl || '/dashboard.html';
+
+            setTimeout(() => {
+              window.location.href = targetUrl;
+            }, 600);
+          }
+        } catch (err) {
+          alertBox.className = 'auth-alert auth-alert-error';
+          alertBox.textContent = err.message || 'Invalid username/email or password.';
+          alertBox.style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Sign In to Portal →';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
