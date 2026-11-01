@@ -367,6 +367,22 @@ button, input, select, textarea {
   font-weight: 900;
   letter-spacing: 1.5px;
   color: #fff;
+  text-decoration: none;
+}
+
+.brand-logo-img {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 12px rgba(14, 165, 233, 0.45));
+  transition: transform var(--transition-fast), filter var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.brand-logo:hover .brand-logo-img {
+  transform: scale(1.06);
+  filter: drop-shadow(0 0 18px rgba(14, 165, 233, 0.75));
 }
 
 .brand-logo-icon {
