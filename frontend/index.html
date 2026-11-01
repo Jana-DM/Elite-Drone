@@ -67,10 +67,31 @@
          CINEMATIC HERO SECTION
          ========================================================================= -->
     <section class="hero" id="home">
+      <!-- Real-Time Background Flying Drone Scene (Replaces Old Static Background Drone) -->
+      <div class="hero-bg-drone-scene" id="hero-bg-drone-stage" aria-hidden="true">
+        <div class="drone-flight-chassis" id="drone-chassis">
+          <img src="images/drone-cutout.png" alt="DJI Air 3S Flying Drone" class="drone-chassis-img">
+
+          <!-- 4 Active High-Speed Spinning Rotor Blurs -->
+          <div class="rotor-blur-disc rotor-fl" title="Front Left Spinning Rotor"></div>
+          <div class="rotor-blur-disc rotor-fr" title="Front Right Spinning Rotor"></div>
+          <div class="rotor-blur-disc rotor-rl" title="Rear Left Spinning Rotor"></div>
+          <div class="rotor-blur-disc rotor-rr" title="Rear Right Spinning Rotor"></div>
+
+          <!-- Aviation Navigation Strobes -->
+          <div class="drone-strobe strobe-port" title="Port Red Beacon"></div>
+          <div class="drone-strobe strobe-starboard" title="Starboard Green Beacon"></div>
+          <div class="drone-strobe strobe-tail" title="Anti-Collision White Strobe"></div>
+
+          <!-- Ground Elevation Shadow -->
+          <div class="drone-ground-shadow"></div>
+        </div>
+      </div>
+
       <div class="hero-overlay"></div>
       <div class="container hero-content">
         <div class="hero-badge">
-          <span class="badge-beacon"></span> DGCA Certified Pilots &bull; 4K/60fps HDR & 5.1K Apple ProRes
+          <span class="badge-beacon"></span> DGCA Certified Pilots &bull; 4K/60fps HDR & 5.1K Apple ProRes &bull; DJI Air 3S Active
         </div>
         <h1 class="hero-title">
           ELEVATE YOUR VISION WITH <span>CINEMA-GRADE</span> AERIAL IMAGING
@@ -85,37 +106,6 @@
           <a href="gallery.html" class="btn btn-secondary btn-lg">
             <span>Explore 4K Gallery</span>
           </a>
-        </div>
-
-        <!-- Real-Time Animated Drone Flight Stage (DJI Air 3S) -->
-        <div class="hero-drone-stage" id="hero-drone-stage">
-          <!-- Flight Telemetry HUD -->
-          <div class="drone-hud-bar">
-            <span class="hud-item"><span class="badge-beacon"></span> FLIGHT STATUS: <strong>AIRBORNE</strong></span>
-            <span class="hud-item">MODEL: <strong>DJI AIR 3S</strong></span>
-            <span class="hud-item">ALT: <strong id="hud-altitude">120.4 M</strong></span>
-            <span class="hud-item">SPEED: <strong id="hud-speed">18.6 M/S</strong></span>
-            <span class="hud-item">SENSOR: <strong>1-INCH CMOS 4K/60</strong></span>
-          </div>
-
-          <!-- 3D Drone Flight Body with Spinning Rotors & Aviation Strobes -->
-          <div class="drone-flight-chassis" id="drone-chassis">
-            <img src="images/drone-cutout.png" alt="DJI Air 3S Real-Time Flight Cinema Drone" class="drone-chassis-img">
-
-            <!-- 4 Active High-Speed Spinning Rotor Blurs -->
-            <div class="rotor-blur-disc rotor-fl" title="Front Left Spinning Rotor"></div>
-            <div class="rotor-blur-disc rotor-fr" title="Front Right Spinning Rotor"></div>
-            <div class="rotor-blur-disc rotor-rl" title="Rear Left Spinning Rotor"></div>
-            <div class="rotor-blur-disc rotor-rr" title="Rear Right Spinning Rotor"></div>
-
-            <!-- Aviation Navigation Strobes -->
-            <div class="drone-strobe strobe-port" title="Port Red Beacon"></div>
-            <div class="drone-strobe strobe-starboard" title="Starboard Green Beacon"></div>
-            <div class="drone-strobe strobe-tail" title="Anti-Collision White Strobe"></div>
-          </div>
-
-          <!-- Ground Elevation Shadow -->
-          <div class="drone-ground-shadow"></div>
         </div>
 
         <!-- Trust / Stats Bar -->

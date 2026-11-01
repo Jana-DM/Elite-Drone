@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Real-Time Drone Flight Simulator (Interactive Flight Dynamics)
 function initDroneFlightSimulator() {
-  const stage = document.getElementById('hero-drone-stage');
+  const stage = document.querySelector('.hero');
   const chassis = document.getElementById('drone-chassis');
   const hudAlt = document.getElementById('hud-altitude');
   const hudSpeed = document.getElementById('hud-speed');
@@ -174,8 +174,8 @@ function initDroneFlightSimulator() {
     const rect = stage.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
-    targetRoll = (x / (rect.width / 2)) * 7;
-    targetPitch = -(y / (rect.height / 2)) * 5;
+    targetRoll = (x / (rect.width / 2)) * 6;
+    targetPitch = -(y / (rect.height / 2)) * 4.5;
   });
 
   stage.addEventListener('mouseleave', () => {
@@ -194,7 +194,7 @@ function initDroneFlightSimulator() {
   }
   requestAnimationFrame(animatePhysics);
 
-  // Live Telemetry Readout Variations
+  // Live Telemetry Readout Variations (if HUD elements exist)
   setInterval(() => {
     if (hudAlt && hudSpeed) {
       const alt = (118.5 + (Math.sin(Date.now() / 1500) * 3.5)).toFixed(1);
