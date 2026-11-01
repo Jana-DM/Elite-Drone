@@ -3,20 +3,24 @@ const { Pool } = require('pg');
 const app = require('./server');
 require('dotenv').config();
 
-const BASE_URL = 'http://127.0.0.1:5000';
-
 async function runTests() {
   console.log('================================================================');
   console.log('🧪 ELITE DRONE SERVICE — COMPREHENSIVE WORKFLOW TEST SUITE');
   console.log('================================================================\n');
 
   let serverInstance = null;
+  let testPort = 5000;
+  let BASE_URL = `http://127.0.0.1:${testPort}`;
+
   try {
-    await fetch(`${BASE_URL}/api/health`);
+    const check = await fetch(`${BASE_URL}/api/health`);
+    if (check.status !== 200) throw new Error('Not running');
   } catch (err) {
-    // Start temporary server if not running
+    // Start dedicated test server on free port
     await new Promise((resolve) => {
-      serverInstance = app.listen(5000, '127.0.0.1', () => {
+      serverInstance = app.listen(0, '127.0.0.1', () => {
+        testPort = serverInstance.address().port;
+        BASE_URL = `http://127.0.0.1:${testPort}`;
         resolve();
       });
     });

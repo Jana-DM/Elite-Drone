@@ -161,35 +161,23 @@ async function loadServicesOverview(container) {
   try {
     const res = await API.get('/api/services');
     if (res.success && res.data && res.data.length > 0) {
+      container.classList.add('services-grid-5');
       container.innerHTML = res.data.map(svc => {
-        const lowestPrice = svc.packages && svc.packages.length > 0 
-          ? Math.min(...svc.packages.map(p => parseFloat(p.price)))
-          : 14999;
-        
-        const priceFormatted = new Intl.NumberFormat('en-IN', {
-          style: 'currency',
-          currency: 'INR',
-          maximumFractionDigits: 0
-        }).format(lowestPrice);
+        const numFormatted = String(svc.badge || svc.display_order || '01').padStart(2, '0');
+        const emoji = svc.emoji || '🚁';
 
         return `
           <div class="service-card">
-            <div class="service-image-box">
-              <img src="${svc.image_url}" alt="${svc.name}" loading="lazy">
-              ${svc.badge ? `<span class="service-badge-pill">${svc.badge}</span>` : ''}
+            <div class="service-card-header">
+              <div class="service-emoji-box">${emoji}</div>
+              <span class="service-card-num">${numFormatted}</span>
             </div>
-            <div class="service-content">
-              <h3>${svc.name}</h3>
-              <p>${svc.short_description}</p>
-              <div class="service-pricing-row">
-                <span class="service-price-tag">Starting from</span>
-                <span class="service-price-value">${priceFormatted}</span>
-              </div>
-              <div class="service-action">
-                <a href="services.html#${svc.slug}" class="btn btn-secondary" style="width: 100%;">
-                  View Packages & Details
-                </a>
-              </div>
+            <h3>${escapeHtml(svc.name)}</h3>
+            <p>${escapeHtml(svc.short_description)}</p>
+            <div class="service-card-action">
+              <a href="booking.html?service=${svc.slug}" class="btn btn-outline-gold btn-sm" style="width: 100%;">
+                Book Shoot →
+              </a>
             </div>
           </div>
         `;

@@ -112,67 +112,77 @@
     <section class="section" id="services" style="background: rgba(12, 18, 32, 0.4);">
       <div class="container">
         <div class="section-header">
-          <div class="section-tag">Our Aerial Offerings</div>
-          <h2 class="section-title">Specialized Drone Solutions</h2>
+          <div class="section-tag">WHAT WE DO</div>
+          <h2 class="section-title">ELITE DRONE SERVICES</h2>
           <p class="section-desc">
-            Explore our curated suite of professional drone shooting packages tailored for private celebrations, commercial enterprises, and cinematic media.
+            Capture the world from above.
           </p>
         </div>
 
         <!-- Dynamic Services Grid (Loaded from PostgreSQL /api/services) -->
-        <div class="services-grid" id="services-container">
-          <!-- Fallback Cards while hydrating -->
+        <div class="services-grid services-grid-5" id="services-container">
+          <!-- Card 01 -->
           <div class="service-card">
-            <div class="service-image-box">
-              <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80" alt="Wedding Drone Photography">
-              <span class="service-badge-pill">Most Popular</span>
+            <div class="service-card-header">
+              <div class="service-emoji-box">📷</div>
+              <span class="service-card-num">01</span>
             </div>
-            <div class="service-content">
-              <h3>Wedding Drone Photography</h3>
-              <p>Cinematic aerial photography & 4K video capturing romantic wedding memories from breathtaking heights.</p>
-              <div class="service-pricing-row">
-                <span class="service-price-tag">Starting from</span>
-                <span class="service-price-value">₹14,999</span>
-              </div>
-              <div class="service-action">
-                <a href="services.html#wedding-drone-photography" class="btn btn-secondary" style="width: 100%;">View Packages & Details</a>
-              </div>
+            <h3>Aerial Photography</h3>
+            <p>Stunning aerial photographs that showcase places, landscapes and special moments from above.</p>
+            <div class="service-card-action">
+              <a href="booking.html?service=aerial-photography" class="btn btn-outline-gold btn-sm" style="width: 100%;">Book Shoot →</a>
             </div>
           </div>
 
+          <!-- Card 02 -->
           <div class="service-card">
-            <div class="service-image-box">
-              <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80" alt="Event Drone Videography">
-              <span class="service-badge-pill">Trending</span>
+            <div class="service-card-header">
+              <div class="service-emoji-box">📹</div>
+              <span class="service-card-num">02</span>
             </div>
-            <div class="service-content">
-              <h3>Event Drone Videography</h3>
-              <p>High-energy aerial coverage for corporate summits, concerts, festivals, and sports spectacles.</p>
-              <div class="service-pricing-row">
-                <span class="service-price-tag">Starting from</span>
-                <span class="service-price-value">₹14,999</span>
-              </div>
-              <div class="service-action">
-                <a href="services.html#event-drone-videography" class="btn btn-secondary" style="width: 100%;">View Packages & Details</a>
-              </div>
+            <h3>Aerial Videography</h3>
+            <p>Cinematic drone videos designed to capture smooth, dynamic and memorable aerial footage.</p>
+            <div class="service-card-action">
+              <a href="booking.html?service=aerial-videography" class="btn btn-outline-gold btn-sm" style="width: 100%;">Book Shoot →</a>
             </div>
           </div>
 
+          <!-- Card 03 -->
           <div class="service-card">
-            <div class="service-image-box">
-              <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80" alt="Real Estate Aerial Photography">
-              <span class="service-badge-pill">Commercial</span>
+            <div class="service-card-header">
+              <div class="service-emoji-box">🚁</div>
+              <span class="service-card-num">03</span>
             </div>
-            <div class="service-content">
-              <h3>Real Estate Aerial Photography</h3>
-              <p>Showcase luxury villas, commercial developments, and expansive estates to accelerate property sales.</p>
-              <div class="service-pricing-row">
-                <span class="service-price-tag">Starting from</span>
-                <span class="service-price-value">₹14,999</span>
-              </div>
-              <div class="service-action">
-                <a href="services.html#real-estate-aerial-photography" class="btn btn-secondary" style="width: 100%;">View Packages & Details</a>
-              </div>
+            <h3>Event & Special Moments</h3>
+            <p>Capture important events and special moments with breathtaking aerial perspectives.</p>
+            <div class="service-card-action">
+              <a href="booking.html?service=event-special-moments" class="btn btn-outline-gold btn-sm" style="width: 100%;">Book Shoot →</a>
+            </div>
+          </div>
+
+          <!-- Card 04 -->
+          <div class="service-card">
+            <div class="service-card-header">
+              <div class="service-emoji-box">🌄</div>
+              <span class="service-card-num">04</span>
+            </div>
+            <h3>Nature & Landscape</h3>
+            <p>Beautiful aerial visuals of nature, roads, locations and scenic environments.</p>
+            <div class="service-card-action">
+              <a href="booking.html?service=nature-landscape" class="btn btn-outline-gold btn-sm" style="width: 100%;">Book Shoot →</a>
+            </div>
+          </div>
+
+          <!-- Card 05 -->
+          <div class="service-card">
+            <div class="service-card-header">
+              <div class="service-emoji-box">✨</div>
+              <span class="service-card-num">05</span>
+            </div>
+            <h3>Custom Drone Shoots</h3>
+            <p>Have a location or creative idea? Tell us what you need and we will plan the shot around your vision.</p>
+            <div class="service-card-action">
+              <a href="booking.html?service=custom-drone-shoots" class="btn btn-outline-gold btn-sm" style="width: 100%;">Book Shoot →</a>
             </div>
           </div>
         </div>
@@ -485,11 +495,11 @@
               <div class="form-group">
                 <label class="form-label" for="inquiry-service">Interested Service</label>
                 <select id="inquiry-service" class="form-control" style="background: #0c1220;">
-                  <option value="wedding">Wedding Drone Photography</option>
-                  <option value="event">Event Drone Videography</option>
-                  <option value="real-estate">Real Estate Aerial Photography</option>
-                  <option value="cinematography">Outdoor Cinematography</option>
-                  <option value="custom">Custom Commercial Shooting</option>
+                  <option value="aerial-photography">📷 Aerial Photography</option>
+                  <option value="aerial-videography">📹 Aerial Videography</option>
+                  <option value="event-special-moments">🚁 Event & Special Moments</option>
+                  <option value="nature-landscape">🌄 Nature & Landscape</option>
+                  <option value="custom-drone-shoots">✨ Custom Drone Shoots</option>
                 </select>
               </div>
 
@@ -543,11 +553,11 @@
         <div class="footer-col">
           <h4>Our Services</h4>
           <ul class="footer-links">
-            <li><a href="services.html#wedding-drone-photography">Wedding Drone Shoots</a></li>
-            <li><a href="services.html#event-drone-videography">Event Drone Filming</a></li>
-            <li><a href="services.html#real-estate-aerial-photography">Real Estate Imaging</a></li>
-            <li><a href="services.html#outdoor-cinematography">Outdoor Cinematography</a></li>
-            <li><a href="services.html#custom-drone-shooting">Custom Flight Missions</a></li>
+            <li><a href="services.html#aerial-photography">📷 Aerial Photography</a></li>
+            <li><a href="services.html#aerial-videography">📹 Aerial Videography</a></li>
+            <li><a href="services.html#event-special-moments">🚁 Event & Special Moments</a></li>
+            <li><a href="services.html#nature-landscape">🌄 Nature & Landscape</a></li>
+            <li><a href="services.html#custom-drone-shoots">✨ Custom Drone Shoots</a></li>
           </ul>
         </div>
 
