@@ -87,6 +87,37 @@
           </a>
         </div>
 
+        <!-- Real-Time Animated Drone Flight Stage (DJI Air 3S) -->
+        <div class="hero-drone-stage" id="hero-drone-stage">
+          <!-- Flight Telemetry HUD -->
+          <div class="drone-hud-bar">
+            <span class="hud-item"><span class="badge-beacon"></span> FLIGHT STATUS: <strong>AIRBORNE</strong></span>
+            <span class="hud-item">MODEL: <strong>DJI AIR 3S</strong></span>
+            <span class="hud-item">ALT: <strong id="hud-altitude">120.4 M</strong></span>
+            <span class="hud-item">SPEED: <strong id="hud-speed">18.6 M/S</strong></span>
+            <span class="hud-item">SENSOR: <strong>1-INCH CMOS 4K/60</strong></span>
+          </div>
+
+          <!-- 3D Drone Flight Body with Spinning Rotors & Aviation Strobes -->
+          <div class="drone-flight-chassis" id="drone-chassis">
+            <img src="images/drone-cutout.png" alt="DJI Air 3S Real-Time Flight Cinema Drone" class="drone-chassis-img">
+
+            <!-- 4 Active High-Speed Spinning Rotor Blurs -->
+            <div class="rotor-blur-disc rotor-fl" title="Front Left Spinning Rotor"></div>
+            <div class="rotor-blur-disc rotor-fr" title="Front Right Spinning Rotor"></div>
+            <div class="rotor-blur-disc rotor-rl" title="Rear Left Spinning Rotor"></div>
+            <div class="rotor-blur-disc rotor-rr" title="Rear Right Spinning Rotor"></div>
+
+            <!-- Aviation Navigation Strobes -->
+            <div class="drone-strobe strobe-port" title="Port Red Beacon"></div>
+            <div class="drone-strobe strobe-starboard" title="Starboard Green Beacon"></div>
+            <div class="drone-strobe strobe-tail" title="Anti-Collision White Strobe"></div>
+          </div>
+
+          <!-- Ground Elevation Shadow -->
+          <div class="drone-ground-shadow"></div>
+        </div>
+
         <!-- Trust / Stats Bar -->
         <div class="trust-bar">
           <div class="stat-item">
@@ -163,10 +194,23 @@
             </a>
           </div>
 
-          <!-- Visual Showcase -->
+          <!-- Visual Showcase with Real-Time Animated DJI Air 3S -->
           <div class="about-media">
-            <div class="about-image-wrapper">
-              <img src="https://images.unsplash.com/photo-1527977966376-1c8408f9f108?auto=format&fit=crop&w=1200&q=80" alt="Professional Drone Operator" loading="lazy">
+            <div class="about-drone-stage" id="about-drone-stage">
+              <div class="about-drone-pill">
+                <span>FLAGSHIP FLEET</span> &bull; DJI AIR 3S
+              </div>
+              <div class="about-drone-flight">
+                <img src="images/drone-cutout.png" alt="DJI Air 3S Enterprise Drone" class="about-drone-img">
+                <div class="rotor-blur-disc rotor-fl"></div>
+                <div class="rotor-blur-disc rotor-fr"></div>
+                <div class="rotor-blur-disc rotor-rl"></div>
+                <div class="rotor-blur-disc rotor-rr"></div>
+                <div class="drone-strobe strobe-port"></div>
+                <div class="drone-strobe strobe-starboard"></div>
+                <div class="drone-strobe strobe-tail"></div>
+              </div>
+              <div class="drone-ground-shadow" style="width: 70%; margin-top: -5px; margin-bottom: 0;"></div>
             </div>
             <div class="about-floating-card">
               <div class="about-floating-icon">

@@ -151,7 +151,59 @@ document.addEventListener('DOMContentLoaded', () => {
       consultForm.reset();
     });
   }
+
+  // 6. Interactive Real-Time Drone Flight Simulation
+  initDroneFlightSimulator();
 });
+
+// Real-Time Drone Flight Simulator (Interactive Flight Dynamics)
+function initDroneFlightSimulator() {
+  const stage = document.getElementById('hero-drone-stage');
+  const chassis = document.getElementById('drone-chassis');
+  const hudAlt = document.getElementById('hud-altitude');
+  const hudSpeed = document.getElementById('hud-speed');
+
+  if (!stage || !chassis) return;
+
+  let targetPitch = 0;
+  let targetRoll = 0;
+  let currentPitch = 0;
+  let currentRoll = 0;
+
+  stage.addEventListener('mousemove', (e) => {
+    const rect = stage.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    targetRoll = (x / (rect.width / 2)) * 7;
+    targetPitch = -(y / (rect.height / 2)) * 5;
+  });
+
+  stage.addEventListener('mouseleave', () => {
+    targetPitch = 0;
+    targetRoll = 0;
+  });
+
+  function animatePhysics() {
+    currentRoll += (targetRoll - currentRoll) * 0.08;
+    currentPitch += (targetPitch - currentPitch) * 0.08;
+
+    chassis.style.setProperty('--user-pitch', `${currentPitch.toFixed(2)}deg`);
+    chassis.style.setProperty('--user-roll', `${currentRoll.toFixed(2)}deg`);
+
+    requestAnimationFrame(animatePhysics);
+  }
+  requestAnimationFrame(animatePhysics);
+
+  // Live Telemetry Readout Variations
+  setInterval(() => {
+    if (hudAlt && hudSpeed) {
+      const alt = (118.5 + (Math.sin(Date.now() / 1500) * 3.5)).toFixed(1);
+      const spd = (18.2 + (Math.cos(Date.now() / 2000) * 1.6)).toFixed(1);
+      hudAlt.textContent = `${alt} M`;
+      hudSpeed.textContent = `${spd} M/S`;
+    }
+  }, 1000);
+}
 
 // Fetch and render services overview
 async function loadServicesOverview(container) {
