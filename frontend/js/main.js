@@ -130,7 +130,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 3. Load Dynamic Services if container exists
+  // 3. Scrollspy: dynamically update active navbar link as user scrolls
+  initScrollspy();
+
+  // 4. Load Dynamic Services if container exists
   const servicesContainer = document.getElementById('services-container');
   if (servicesContainer) {
     loadServicesOverview(servicesContainer);
@@ -253,4 +256,89 @@ function escapeHtml(text) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+// ==========================================================================
+// SCROLLSPY
+// ==========================================================================
+function initScrollspy() {
+  const navAnchorLinks = Array.from(document.querySelectorAll('.nav-links a[href^="#"]'));
+  if (navAnchorLinks.length === 0) return;
+
+  const sections = navAnchorLinks
+    .map(link => {
+      const id = link.getAttribute('href').replace('#', '');
+      const el = document.getElementById(id);
+      return el ? { id, el, link } : null;
+    })
+    .filter(Boolean);
+
+  if (sections.length === 0) return;
+
+  function setActive(activeId) {
+    sections.forEach(({ id, link }) => {
+      if (id === activeId) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+  }
+
+  function updateActiveSection() {
+    const scrollY = window.scrollY;
+    const windowHeight = window.innerHeight;
+    const docHeight = document.documentElement.scrollHeight;
+
+    // 1. If at or near the very bottom of the page -> activate the last section (Contact)
+    if (scrollY + windowHeight >= docHeight - 80) {
+      setActive(sections[sections.length - 1].id);
+      return;
+    }
+
+    // 2. Threshold offset below the fixed navbar
+    const threshold = 140;
+    let currentId = sections[0].id;
+
+    for (let i = 0; i < sections.length; i++) {
+      const rect = sections[i].el.getBoundingClientRect();
+      if (rect.top <= threshold) {
+        currentId = sections[i].id;
+      }
+    }
+
+    setActive(currentId);
+  }
+
+  // Smooth click handler on anchor links
+  navAnchorLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      const targetId = link.getAttribute('href').replace('#', '');
+      setActive(targetId);
+    });
+  });
+
+  // Passive, requestAnimationFrame throttled scroll listener
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        updateActiveSection();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+
+  // Handle URL hash on initial load
+  if (window.location.hash) {
+    const hashId = window.location.hash.replace('#', '');
+    if (sections.some(s => s.id === hashId)) {
+      setActive(hashId);
+    }
+  }
+
+  // Run on initial render
+  updateActiveSection();
+  setTimeout(updateActiveSection, 300);
 }
