@@ -3,7 +3,7 @@ const { Pool } = require('pg');
 const app = require('./server');
 require('dotenv').config();
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = 'http://127.0.0.1:5000';
 
 async function runTests() {
   console.log('================================================================');
@@ -16,7 +16,7 @@ async function runTests() {
   } catch (err) {
     // Start temporary server if not running
     await new Promise((resolve) => {
-      serverInstance = app.listen(5000, () => {
+      serverInstance = app.listen(5000, '127.0.0.1', () => {
         resolve();
       });
     });
