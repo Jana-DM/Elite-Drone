@@ -1,5 +1,6 @@
 const assert = require('assert');
 const { Pool } = require('pg');
+const app = require('./server');
 require('dotenv').config();
 
 const BASE_URL = 'http://localhost:5000';
@@ -8,6 +9,18 @@ async function runTests() {
   console.log('================================================================');
   console.log('🧪 ELITE DRONE SERVICE — COMPREHENSIVE WORKFLOW TEST SUITE');
   console.log('================================================================\n');
+
+  let serverInstance = null;
+  try {
+    await fetch(`${BASE_URL}/api/health`);
+  } catch (err) {
+    // Start temporary server if not running
+    await new Promise((resolve) => {
+      serverInstance = app.listen(5000, () => {
+        resolve();
+      });
+    });
+  }
 
   const pool = new Pool({
     host: process.env.DB_HOST || '127.0.0.1',
@@ -312,6 +325,9 @@ async function runTests() {
     console.error('\n❌ TEST FAILURE:', err);
     process.exit(1);
   } finally {
+    if (serverInstance) {
+      await new Promise((resolve) => serverInstance.close(resolve));
+    }
     await pool.end();
   }
 }

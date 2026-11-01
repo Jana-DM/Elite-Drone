@@ -492,8 +492,9 @@ button, input, select, textarea {
   padding-top: 7rem;
   padding-bottom: 5rem;
   background: 
-    radial-gradient(ellipse at 50% 50%, rgba(14, 165, 233, 0.12) 0%, rgba(7, 10, 18, 0.95) 75%),
-    var(--bg-primary);
+    radial-gradient(ellipse at 50% 45%, rgba(14, 165, 233, 0.18) 0%, transparent 68%),
+    linear-gradient(180deg, rgba(7, 10, 18, 0.58) 0%, rgba(7, 10, 18, 0.72) 50%, rgba(7, 10, 18, 0.96) 92%, var(--bg-primary) 100%),
+    url('../images/dji-air-3s-hero.jpg') center/cover no-repeat;
   overflow: hidden;
 }
 
@@ -613,55 +614,6 @@ button, input, select, textarea {
   font-weight: 500;
 }
 
-/* ==========================================================================
-   HERO BACKGROUND DRONE (CLEAN STATIC DJI AIR 3S)
-   ========================================================================== */
-.hero-bg-drone {
-  position: absolute;
-  top: 52%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  max-width: 950px;
-  pointer-events: none;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.65;
-  transition: opacity 0.5s ease;
-}
-
-.hero:hover .hero-bg-drone {
-  opacity: 0.82;
-}
-
-.hero-bg-drone::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80%;
-  height: 80%;
-  background: radial-gradient(circle, rgba(14, 165, 233, 0.22) 0%, rgba(14, 165, 233, 0.05) 55%, transparent 75%);
-  filter: blur(50px);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.hero-bg-drone-img {
-  width: 100%;
-  max-width: 860px;
-  height: auto;
-  display: block;
-  user-select: none;
-  -webkit-user-drag: none;
-  filter: drop-shadow(0 25px 45px rgba(0, 0, 0, 0.95));
-  position: relative;
-  z-index: 1;
-}
-
 /* About Section Drone Flight Stage */
 .about-drone-stage {
   position: relative;
@@ -704,7 +656,9 @@ button, input, select, textarea {
   display: block;
   user-select: none;
   -webkit-user-drag: none;
-  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.9));
+  border-radius: var(--radius-md);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.85), 0 0 30px rgba(14, 165, 233, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 .about-drone-pill {
@@ -1790,15 +1744,6 @@ button, input, select, textarea {
   .footer-grid {
     grid-template-columns: 1fr;
     gap: 2.5rem;
-  }
-
-  .hero-drone-stage {
-    margin: 1.5rem auto 2rem auto;
-  }
-
-  .hero-bg-drone {
-    max-width: 92%;
-    opacity: 0.48;
   }
 
   .about-drone-stage {
