@@ -144,12 +144,39 @@
       
       <!-- Booking Form View -->
       <div id="booking-form-view">
-        <div style="text-align: center; margin-bottom: 2.5rem;">
+        <div style="text-align: center; margin-bottom: 2rem;">
           <span class="section-tag">Flight Dispatch Scheduling</span>
           <h1 style="font-size: 2.4rem; margin-bottom: 0.5rem;">Book Your Aerial Mission</h1>
           <p style="color: var(--text-muted); font-size: 0.95rem;">
             Provide your event requirements below. Your shoot request will be submitted to flight dispatch for airspace feasibility review.
           </p>
+        </div>
+
+        <!-- Visual Progress Stepper -->
+        <div class="booking-stepper">
+          <div class="stepper-step active" id="step-nav-1">
+            <div class="stepper-circle">1</div>
+            <div class="stepper-label">
+              <span>Step 1</span>
+              <strong>Client Information</strong>
+            </div>
+          </div>
+          <div class="stepper-line"></div>
+          <div class="stepper-step" id="step-nav-2">
+            <div class="stepper-circle">2</div>
+            <div class="stepper-label">
+              <span>Step 2</span>
+              <strong>Mission Offering</strong>
+            </div>
+          </div>
+          <div class="stepper-line"></div>
+          <div class="stepper-step" id="step-nav-3">
+            <div class="stepper-circle">3</div>
+            <div class="stepper-label">
+              <span>Step 3</span>
+              <strong>Venue & Schedule</strong>
+            </div>
+          </div>
         </div>
 
         <form id="drone-booking-form">
@@ -310,6 +337,39 @@
       serviceSelect.addEventListener('change', () => {
         const selectedId = parseInt(serviceSelect.value, 10);
         updatePackageOptions(selectedId);
+      });
+
+      // Stepper Interactive Focus Tracking
+      function setStepperStep(step) {
+        const step1 = document.getElementById('step-nav-1');
+        const step2 = document.getElementById('step-nav-2');
+        const step3 = document.getElementById('step-nav-3');
+        if (!step1 || !step2 || !step3) return;
+
+        [step1, step2, step3].forEach(s => s.classList.remove('active', 'completed'));
+        if (step === 1) {
+          step1.classList.add('active');
+        } else if (step === 2) {
+          step1.classList.add('completed');
+          step2.classList.add('active');
+        } else if (step === 3) {
+          step1.classList.add('completed');
+          step2.classList.add('completed');
+          step3.classList.add('active');
+        }
+      }
+
+      ['customer_name', 'email', 'mobile'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('focus', () => setStepperStep(1));
+      });
+      ['service_id', 'package_id', 'event_type'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('focus', () => setStepperStep(2));
+      });
+      ['event_date', 'event_time', 'event_location', 'complete_address', 'additional_requirements'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('focus', () => setStepperStep(3));
       });
 
       // 4. Form Submission
