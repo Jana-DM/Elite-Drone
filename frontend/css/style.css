@@ -375,18 +375,16 @@ button, input, select, textarea {
   height: 52px;
   object-fit: cover;
   border-radius: 50%;
-  /* mix-blend-mode: screen makes the white background vanish on dark navbar,
-     leaving only the black artwork — which glows white on dark backgrounds */
-  mix-blend-mode: screen;
-  filter: invert(1) drop-shadow(0 0 10px rgba(14, 165, 233, 0.6));
+  /* invert(1): white bg → black, black eagle/drone artwork → white
+     Gives the dark circle with white glowing badge — exactly like the reference screenshot */
+  filter: invert(1) drop-shadow(0 0 8px rgba(14, 165, 233, 0.5));
   transition: transform var(--transition-fast), filter var(--transition-fast);
   flex-shrink: 0;
-  cursor: pointer;
 }
 
 .brand-logo:hover .brand-logo-img {
   transform: scale(1.08);
-  filter: invert(1) drop-shadow(0 0 20px rgba(14, 165, 233, 0.95)) drop-shadow(0 0 35px rgba(14, 165, 233, 0.5));
+  filter: invert(1) drop-shadow(0 0 18px rgba(14, 165, 233, 0.9)) drop-shadow(0 0 30px rgba(14, 165, 233, 0.4));
 }
 
 .brand-logo-icon {
