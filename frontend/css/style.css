@@ -703,6 +703,94 @@ button, input, select, textarea {
 }
 
 /* ==========================================================================
+   OUR JOURNEY / STATS GRID
+   ========================================================================== */
+.journey-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.75rem;
+  margin-bottom: 4.5rem;
+}
+
+.journey-stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2.25rem 1.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition-normal);
+}
+
+.journey-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.journey-stat-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--border-glow);
+  box-shadow: 0 20px 40px -10px var(--primary-glow);
+  background: var(--bg-card-hover);
+}
+
+.journey-stat-card:hover::before {
+  opacity: 1;
+}
+
+.journey-stat-number {
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.1;
+  margin-bottom: 0.65rem;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #ffffff 40%, var(--primary-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.journey-stat-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  display: block;
+}
+
+.journey-stat-card:hover .journey-stat-title {
+  color: var(--primary-light);
+}
+
+@media (max-width: 992px) {
+  .journey-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .journey-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  .journey-stat-number {
+    font-size: 2.4rem;
+  }
+}
+
+/* ==========================================================================
    ABOUT / COMPANY INTRODUCTION
    ========================================================================== */
 .about-grid {

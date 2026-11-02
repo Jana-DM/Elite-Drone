@@ -52,6 +52,17 @@ async function runTests() {
     const galleryData = await resGallery.json();
     assert(galleryData.success && galleryData.data.length >= 4, 'Must have at least 4 gallery items');
     console.log(`  ✓ Gallery API active: ${galleryData.data.length} media items loaded.`);
+
+    // Check Live Stats API
+    const resStats = await fetch(`${BASE_URL}/api/stats`);
+    assert.strictEqual(resStats.status, 200);
+    const statsData = await resStats.json();
+    assert.strictEqual(statsData.success, true);
+    assert(typeof statsData.data.registeredUsers === 'number', 'registeredUsers must be number');
+    assert(typeof statsData.data.projectsCompleted === 'number', 'projectsCompleted must be number');
+    assert(typeof statsData.data.aerialWorks === 'number', 'aerialWorks must be number');
+    assert.strictEqual(statsData.data.passionRate, 100, 'passionRate must be 100');
+    console.log(`  ✓ Real-Time Stats API active: ${statsData.data.registeredUsers}+ users, ${statsData.data.projectsCompleted}+ projects, ${statsData.data.aerialWorks}+ works.`);
     console.log('✅ WORKFLOW 1 PASSED.\n');
 
     // -------------------------------------------------------------

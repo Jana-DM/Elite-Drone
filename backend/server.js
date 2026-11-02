@@ -69,6 +69,34 @@ app.use('/api/otp', require('./routes/otpRoutes'));
 app.use('/api/bookings', require('./routes/bookingRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 
+// Public Live Stats Endpoint for "Our Journey" section
+app.get('/api/stats', async (req, res) => {
+  try {
+    const usersCount = await db.query('SELECT count(*) FROM users');
+    const bookingsCount = await db.query("SELECT count(*) FROM bookings WHERE status IN ('Confirmed', 'Completed')");
+    const allBookingsCount = await db.query('SELECT count(*) FROM bookings');
+    const servicesCount = await db.query('SELECT count(*) FROM services WHERE is_active = TRUE');
+
+    const registeredUsers = parseInt(usersCount.rows[0].count, 10) || 0;
+    const completedOrConfirmed = parseInt(bookingsCount.rows[0].count, 10);
+    const projectsCompleted = completedOrConfirmed > 0 ? completedOrConfirmed : (parseInt(allBookingsCount.rows[0].count, 10) || 0);
+    const aerialWorks = parseInt(servicesCount.rows[0].count, 10) || 5;
+
+    res.json({
+      success: true,
+      data: {
+        registeredUsers,
+        projectsCompleted,
+        aerialWorks,
+        passionRate: 100
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching public stats:', err);
+    res.status(500).json({ success: false, message: 'Failed to fetch live stats' });
+  }
+});
+
 // 404 handler for API routes
 app.use('/api/*', (req, res) => {
   res.status(404).json({

@@ -145,7 +145,10 @@ document.addEventListener('DOMContentLoaded', () => {
     loadFeaturedPortfolio(portfolioContainer);
   }
 
-  // 5. Handle Consultation Form Submission
+  // 5. Initialize Live Journey Stats
+  initLiveJourneyStats();
+
+  // 6. Handle Consultation Form Submission
   const consultForm = document.getElementById('quick-inquiry-form');
   if (consultForm) {
     consultForm.addEventListener('submit', (e) => {
@@ -328,4 +331,82 @@ function initScrollspy() {
   // Run on initial render
   updateActiveSection();
   setTimeout(updateActiveSection, 300);
+}
+
+// ==========================================================================
+// REAL-TIME JOURNEY STATS CONTROLLER
+// ==========================================================================
+function initLiveJourneyStats() {
+  const usersEl = document.getElementById('stat-registered-users');
+  if (!usersEl) return;
+
+  let hasAnimated = false;
+  const runAnimation = async () => {
+    if (hasAnimated) return;
+    hasAnimated = true;
+
+    try {
+      const res = await API.get('/api/stats');
+      if (res && res.success && res.data) {
+        animateStatNumber('stat-registered-users', res.data.registeredUsers, '+');
+        animateStatNumber('stat-projects-completed', res.data.projectsCompleted, '+');
+        animateStatNumber('stat-aerial-works', res.data.aerialWorks, '+');
+        animateStatNumber('stat-passion-rate', res.data.passionRate, '%');
+        return;
+      }
+    } catch (e) {
+      console.warn('Real-time stats fallback applied:', e);
+    }
+
+    // Default baseline fallback
+    animateStatNumber('stat-registered-users', 24, '+');
+    animateStatNumber('stat-projects-completed', 21, '+');
+    animateStatNumber('stat-aerial-works', 5, '+');
+    animateStatNumber('stat-passion-rate', 100, '%');
+  };
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          runAnimation();
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.15 });
+
+    const statsGrid = document.querySelector('.journey-stats-grid');
+    if (statsGrid) observer.observe(statsGrid);
+    else runAnimation();
+  } else {
+    runAnimation();
+  }
+}
+
+function animateStatNumber(id, target, suffix = '') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const numTarget = parseInt(target, 10) || 0;
+  if (numTarget <= 0) {
+    el.textContent = `0${suffix}`;
+    return;
+  }
+
+  const duration = 1600;
+  const frameRate = 30;
+  const totalFrames = Math.max(1, Math.round(duration / (1000 / frameRate)));
+  let frame = 0;
+
+  const timer = setInterval(() => {
+    frame++;
+    const progress = frame / totalFrames;
+    const easeProgress = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(numTarget * easeProgress);
+    el.textContent = `${current}${suffix}`;
+
+    if (frame >= totalFrames) {
+      clearInterval(timer);
+      el.textContent = `${numTarget}${suffix}`;
+    }
+  }, 1000 / frameRate);
 }
