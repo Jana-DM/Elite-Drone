@@ -8,23 +8,14 @@ async function runTests() {
   console.log('🧪 ELITE DRONE SERVICE — COMPREHENSIVE WORKFLOW TEST SUITE');
   console.log('================================================================\n');
 
-  let serverInstance = null;
-  let testPort = 5000;
-  let BASE_URL = `http://127.0.0.1:${testPort}`;
-
-  try {
-    const check = await fetch(`${BASE_URL}/api/health`);
-    if (check.status !== 200) throw new Error('Not running');
-  } catch (err) {
-    // Start dedicated test server on free port
-    await new Promise((resolve) => {
-      serverInstance = app.listen(0, '127.0.0.1', () => {
-        testPort = serverInstance.address().port;
-        BASE_URL = `http://127.0.0.1:${testPort}`;
-        resolve();
-      });
+  // Always start dedicated test server on an ephemeral free port
+  const serverInstance = await new Promise((resolve) => {
+    const s = app.listen(0, '127.0.0.1', () => {
+      resolve(s);
     });
-  }
+  });
+  const testPort = serverInstance.address().port;
+  const BASE_URL = `http://127.0.0.1:${testPort}`;
 
   const pool = new Pool({
     host: process.env.DB_HOST || '127.0.0.1',
