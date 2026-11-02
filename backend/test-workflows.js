@@ -50,7 +50,7 @@ async function runTests() {
     const resGallery = await fetch(`${BASE_URL}/api/gallery`);
     assert.strictEqual(resGallery.status, 200);
     const galleryData = await resGallery.json();
-    assert(galleryData.success && galleryData.data.length >= 8, 'Must have at least 8 gallery items');
+    assert(galleryData.success && galleryData.data.length >= 4, 'Must have at least 4 gallery items');
     console.log(`  ✓ Gallery API active: ${galleryData.data.length} media items loaded.`);
     console.log('✅ WORKFLOW 1 PASSED.\n');
 

@@ -195,7 +195,7 @@ async function loadFeaturedPortfolio(container) {
     const res = await API.get('/api/gallery');
     if (res.success && res.data && res.data.length > 0) {
       allGalleryItems = res.data;
-      renderPortfolioItems(container, allGalleryItems.slice(0, 8));
+      renderPortfolioItems(container, allGalleryItems.slice(0, 4));
       setupPortfolioFilters(container);
     }
   } catch (err) {
@@ -204,19 +204,15 @@ async function loadFeaturedPortfolio(container) {
 }
 
 function renderPortfolioItems(container, items) {
-  container.innerHTML = items.map((item, idx) => {
-    const badgeText = item.badge || `0${idx + 1} / PHOTOGRAPHY`;
-    return `
-      <div class="portfolio-card" onclick="Lightbox.open('${item.media_url}', '${item.media_type}', '${escapeHtml(item.title)}', '${escapeHtml(item.description || '')}')">
-        <img src="${item.thumbnail_url || item.media_url}" alt="${escapeHtml(item.title)}" loading="lazy">
-        <div class="portfolio-overlay">
-          <div class="portfolio-badge">${escapeHtml(badgeText)}</div>
-          <h4 class="portfolio-title">${escapeHtml(item.title)}</h4>
-          ${item.description ? `<p class="portfolio-desc">${escapeHtml(item.description)}</p>` : ''}
-        </div>
+  container.innerHTML = items.map(item => `
+    <div class="portfolio-card" onclick="Lightbox.open('${item.media_url}', '${item.media_type}', '${escapeHtml(item.title)}', '${escapeHtml(item.description || '')}')">
+      <img src="${item.thumbnail_url || item.media_url}" alt="${escapeHtml(item.title)}" loading="lazy">
+      <div class="portfolio-overlay">
+        <h4 class="portfolio-title">${escapeHtml(item.title)}</h4>
+        ${item.description ? `<p class="portfolio-desc">${escapeHtml(item.description)}</p>` : ''}
       </div>
-    `;
-  }).join('');
+    </div>
+  `).join('');
 }
 
 function setupPortfolioFilters(container) {
@@ -228,7 +224,7 @@ function setupPortfolioFilters(container) {
 
       const category = btn.dataset.filter;
       if (category === 'all') {
-        renderPortfolioItems(container, allGalleryItems.slice(0, 8));
+        renderPortfolioItems(container, allGalleryItems.slice(0, 4));
       } else {
         const filtered = allGalleryItems.filter(item => item.category === category);
         renderPortfolioItems(container, filtered);

@@ -209,50 +209,6 @@ async function runSeed(pool) {
         location: '04 / PHOTOGRAPHY',
         is_featured: true,
         display_order: 4
-      },
-      {
-        title: 'Emerald Valley Tea Plantation',
-        category: 'landscape',
-        media_type: 'image',
-        media_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
-        thumbnail_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80',
-        description: 'Symmetrical patterns of lush green hillside tea estates under soft morning sunlight.',
-        location: 'Munnar, Kerala',
-        is_featured: false,
-        display_order: 5
-      },
-      {
-        title: 'Ocean Surf and Rocky Cliffs',
-        category: 'cinematography',
-        media_type: 'video',
-        media_url: 'https://assets.mixkit.co/videos/preview/mixkit-top-view-of-waves-breaking-on-the-shore-41584-large.mp4',
-        thumbnail_url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80',
-        description: 'Bird-eye top-down view of turquoise waves crashing against dramatic cliffs.',
-        location: 'Varkala Beach',
-        is_featured: true,
-        display_order: 6
-      },
-      {
-        title: 'Luxury High-Rise Penthouse Aerial',
-        category: 'real-estate',
-        media_type: 'image',
-        media_url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
-        thumbnail_url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=400&q=80',
-        description: 'Drone view showcasing panoramic skyline vistas from a 42nd-floor luxury penthouse.',
-        location: 'Mumbai Skyline',
-        is_featured: false,
-        display_order: 7
-      },
-      {
-        title: 'Beachside Destination Vows',
-        category: 'wedding',
-        media_type: 'image',
-        media_url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=80',
-        thumbnail_url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=400&q=80',
-        description: 'Sunset mandap on white sand with sweeping drone shot of bride and groom.',
-        location: 'Alibaug, Maharashtra',
-        is_featured: true,
-        display_order: 8
       }
     ];
 
