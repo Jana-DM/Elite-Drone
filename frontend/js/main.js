@@ -204,18 +204,19 @@ async function loadFeaturedPortfolio(container) {
 }
 
 function renderPortfolioItems(container, items) {
-  container.innerHTML = items.map(item => `
-    <div class="portfolio-card" onclick="Lightbox.open('${item.media_url}', '${item.media_type}', '${escapeHtml(item.title)}', '${escapeHtml(item.description)}')">
-      <img src="${item.thumbnail_url || item.media_url}" alt="${escapeHtml(item.title)}" loading="lazy">
-      <div class="portfolio-overlay">
-        <div class="portfolio-badge ${item.media_type === 'video' ? 'portfolio-video-pill' : ''}">
-          ${item.media_type === 'video' ? '4K Video' : 'HDR Photo'}
+  container.innerHTML = items.map((item, idx) => {
+    const badgeText = item.badge || `0${idx + 1} / PHOTOGRAPHY`;
+    return `
+      <div class="portfolio-card" onclick="Lightbox.open('${item.media_url}', '${item.media_type}', '${escapeHtml(item.title)}', '${escapeHtml(item.description || '')}')">
+        <img src="${item.thumbnail_url || item.media_url}" alt="${escapeHtml(item.title)}" loading="lazy">
+        <div class="portfolio-overlay">
+          <div class="portfolio-badge">${escapeHtml(badgeText)}</div>
+          <h4 class="portfolio-title">${escapeHtml(item.title)}</h4>
+          ${item.description ? `<p class="portfolio-desc">${escapeHtml(item.description)}</p>` : ''}
         </div>
-        <h4 class="portfolio-title">${item.title}</h4>
-        ${item.location ? `<span class="portfolio-location">${item.location}</span>` : ''}
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function setupPortfolioFilters(container) {

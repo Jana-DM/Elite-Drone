@@ -155,10 +155,11 @@ CREATE TRIGGER trigger_bookings_updated_at
 CREATE TABLE IF NOT EXISTS gallery_items (
     id SERIAL PRIMARY KEY,
     title VARCHAR(150) NOT NULL,
-    category VARCHAR(50) NOT NULL CHECK (category IN ('wedding', 'event', 'real-estate', 'cinematography', 'landscape')),
+    category VARCHAR(50) NOT NULL CHECK (category IN ('wedding', 'event', 'real-estate', 'cinematography', 'landscape', 'photography')),
     media_type VARCHAR(10) NOT NULL CHECK (media_type IN ('image', 'video')),
     media_url TEXT NOT NULL,
     thumbnail_url TEXT,
+    badge VARCHAR(50) DEFAULT '',
     description TEXT,
     location VARCHAR(100),
     is_featured BOOLEAN NOT NULL DEFAULT FALSE,
