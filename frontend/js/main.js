@@ -206,8 +206,10 @@ async function loadFeaturedPortfolio(container) {
 function renderPortfolioItems(container, items) {
   container.innerHTML = items.map(item => `
     <div class="portfolio-card" onclick="Lightbox.open('${item.media_url}', '${item.media_type}', '${escapeHtml(item.title)}', '${escapeHtml(item.description || '')}')">
-      <img src="${item.thumbnail_url || item.media_url}" alt="${escapeHtml(item.title)}" loading="lazy">
-      <div class="portfolio-overlay">
+      <div class="portfolio-img-wrap">
+        <img src="${item.thumbnail_url || item.media_url}" alt="${escapeHtml(item.title)}" loading="lazy">
+      </div>
+      <div class="portfolio-content">
         <h4 class="portfolio-title">${escapeHtml(item.title)}</h4>
         ${item.description ? `<p class="portfolio-desc">${escapeHtml(item.description)}</p>` : ''}
       </div>
