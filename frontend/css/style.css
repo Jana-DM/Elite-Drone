@@ -812,6 +812,56 @@ button, input, select, textarea {
   margin-bottom: 1.25rem;
 }
 
+.about-pills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.1rem;
+  margin-top: 2.25rem;
+}
+
+.about-pill-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 1.1rem 1.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition-normal);
+}
+
+.about-pill-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-glow);
+  box-shadow: 0 12px 25px -8px var(--primary-glow);
+  background: var(--bg-card-hover);
+}
+
+.about-pill-emoji {
+  font-size: 1.45rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-pill-text {
+  font-family: var(--font-sans);
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+
+@media (max-width: 600px) {
+  .about-pills-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+}
+
 .about-features {
   display: flex;
   flex-direction: column;
