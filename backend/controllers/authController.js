@@ -52,7 +52,7 @@ exports.register = async (req, res) => {
     } = req.body;
 
     // A. Required fields check
-    if (!full_name || !gender || !email || !confirm_email || !mobile || !username || !password || !confirm_password) {
+    if (!full_name || !gender || !email || !confirm_email || !username || !password || !confirm_password) {
       return res.status(400).json({ success: false, message: 'All registration fields are required.' });
     }
 
@@ -67,11 +67,14 @@ exports.register = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Email and Confirm Email do not match.' });
     }
 
-    // C. Mobile validation
-    const cleanMobile = mobile.replace(/\D/g, '').slice(-10);
-    const mobileRegex = /^[6-9]\d{9}$/;
-    if (!mobileRegex.test(cleanMobile)) {
-      return res.status(400).json({ success: false, message: 'Mobile must be a valid 10-digit Indian number.' });
+    // C. Optional Mobile validation (if provided)
+    let cleanMobile = null;
+    if (mobile && typeof mobile === 'string' && mobile.trim().length > 0) {
+      cleanMobile = mobile.replace(/\D/g, '').slice(-10);
+      const mobileRegex = /^[6-9]\d{9}$/;
+      if (!mobileRegex.test(cleanMobile)) {
+        return res.status(400).json({ success: false, message: 'Mobile must be a valid 10-digit Indian number.' });
+      }
     }
 
     // D. Password complexity validation:
@@ -90,7 +93,7 @@ exports.register = async (req, res) => {
 
     // E. Verify OTP binding:
     // Check that the OTP destination (either the email or mobile) has an approved is_verified=TRUE record within last 30 minutes
-    const targetDest = otp_destination_type === 'email' ? cleanEmail : cleanMobile;
+    const targetDest = (otp_destination_type === 'mobile' && cleanMobile) ? cleanMobile : cleanEmail;
     const verifiedOtp = await db.query(
       `SELECT id FROM otp_verifications 
        WHERE destination = $1 AND is_verified = TRUE AND created_at > (NOW() - INTERVAL '30 minutes')
@@ -111,9 +114,11 @@ exports.register = async (req, res) => {
       return res.status(400).json({ success: false, message: 'An account with this email already exists.' });
     }
 
-    const existingMobile = await db.query('SELECT id FROM users WHERE mobile = $1', [cleanMobile]);
-    if (existingMobile.rows.length > 0) {
-      return res.status(400).json({ success: false, message: 'An account with this mobile number already exists.' });
+    if (cleanMobile) {
+      const existingMobile = await db.query('SELECT id FROM users WHERE mobile = $1', [cleanMobile]);
+      if (existingMobile.rows.length > 0) {
+        return res.status(400).json({ success: false, message: 'An account with this mobile number already exists.' });
+      }
     }
 
     const cleanUser = username.trim().toLowerCase();
