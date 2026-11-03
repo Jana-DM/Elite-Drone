@@ -59,9 +59,9 @@ const Auth = {
       `;
     } else {
       navActions.innerHTML = `
-        <a href="login.html" class="btn btn-secondary btn-sm">Login</a>
-        <a href="register.html" class="btn btn-primary btn-sm">Register</a>
-        <a href="booking.html" class="btn btn-outline-gold btn-sm">Book Shoot</a>
+        <a href="login.html" class="btn btn-nav-login">Login</a>
+        <a href="register.html" class="btn btn-nav-register">Register</a>
+        <a href="booking.html" class="btn btn-nav-book"><span>BOOK SHOOT</span> <span>✦</span></a>
       `;
     }
   }
@@ -71,4 +71,3 @@ window.Auth = Auth;
 document.addEventListener('DOMContentLoaded', () => {
   Auth.updateNavbar();
 });
-

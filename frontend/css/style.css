@@ -456,7 +456,86 @@ button, input, select, textarea {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.65rem;
+}
+
+/* Option 3: Cinema Gold Luxury Action Buttons */
+.btn-nav-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 0.95rem;
+  background: #0f233d;
+  border: 1px solid #1b4372;
+  color: #e2e8f0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 9px;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.btn-nav-login:hover {
+  background: #16355c;
+  border-color: #2b6cb0;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.btn-nav-register {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 1rem;
+  background: #0066cc;
+  border: 1px solid #0077ee;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 9px;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.btn-nav-register:hover {
+  background: #0055aa;
+  border-color: #0066cc;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 102, 204, 0.45);
+}
+
+.btn-nav-book {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.48rem 1.15rem;
+  background: linear-gradient(135deg, #d4af37 0%, #f59e0b 100%);
+  border: none;
+  color: #000000;
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  border-radius: 9px;
+  text-decoration: none;
+  box-shadow: 0 6px 18px rgba(212, 175, 55, 0.35);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.btn-nav-book:hover {
+  background: linear-gradient(135deg, #e5bf43 0%, #d97706 100%);
+  transform: translateY(-1.5px);
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.5);
+  color: #000000;
 }
 
 .nav-user-menu {
