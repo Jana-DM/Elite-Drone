@@ -378,8 +378,10 @@ button, input, select, textarea {
 .brand-logo-img {
   width: 52px;
   height: 52px;
+  aspect-ratio: 1 / 1;
   object-fit: cover;
   border-radius: 50%;
+  overflow: hidden;
   transition: transform var(--transition-fast);
   flex-shrink: 0;
 }
