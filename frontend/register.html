@@ -26,7 +26,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 6.5rem 1.25rem 4rem 1.25rem;
+      padding: 3rem 1.25rem 4rem 1.25rem;
       background: radial-gradient(circle at 50% 15%, #032b56 0%, #011833 60%, #000c1a 100%);
     }
     .auth-card {
@@ -46,6 +46,7 @@
       justify-content: center;
       gap: 0.75rem;
       margin-bottom: 1.25rem;
+      text-decoration: none;
     }
     .auth-brand-center img {
       width: 44px;
@@ -369,39 +370,14 @@
 </head>
 <body>
 
-  <!-- Site Header -->
-  <header class="site-header">
-    <div class="container">
-      <nav class="navbar">
-        <a href="index.html" class="brand-logo">
-          <img src="images/logo.png" alt="Elite Drone Logo" class="brand-logo-img">
-          <span>ELITE DRONE</span>
-        </a>
-
-        <ul class="nav-links">
-          <li><a href="index.html" class="nav-link">Home</a></li>
-          <li><a href="services.html" class="nav-link">Services</a></li>
-          <li><a href="gallery.html" class="nav-link">Gallery</a></li>
-          <li><a href="booking.html" class="nav-link">Book Now</a></li>
-        </ul>
-
-        <div class="nav-actions">
-          <a href="login.html" class="btn btn-secondary btn-sm">Login</a>
-        </div>
-
-        <button class="nav-toggle" id="nav-toggle">☰</button>
-      </nav>
-    </div>
-  </header>
-
   <!-- Auth Content Wrapper -->
   <div class="auth-wrapper">
     <div class="auth-card">
       <!-- Centered Logo & Brand -->
-      <div class="auth-brand-center">
+      <a href="index.html" class="auth-brand-center" title="Elite Drone Home">
         <img src="images/logo.png" alt="Elite Drone Logo" class="brand-logo-img">
         <span>ELITE DRONE</span>
-      </div>
+      </a>
 
       <!-- Create Account Title -->
       <h1 class="auth-create-title">CREATE ACCOUNT</h1>
@@ -889,15 +865,6 @@
         submitBtn.textContent = 'REGISTER';
       }
     });
-
-    // Mobile nav toggle
-    const navToggle = document.getElementById('nav-toggle');
-    const navLinks = document.querySelector('.nav-links');
-    if (navToggle) {
-      navToggle.addEventListener('click', () => {
-        navLinks?.classList.toggle('mobile-open');
-      });
-    }
   </script>
 </body>
 </html>
