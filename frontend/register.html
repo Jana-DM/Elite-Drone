@@ -489,16 +489,12 @@
 
         <!-- 9. OTP Verification Box -->
         <div class="reg-otp-box">
-          <div class="reg-otp-title">OTP Verification</div>
+          <div class="reg-otp-title">OTP VERIFICATION</div>
           <div class="reg-otp-methods">
             <span class="reg-verify-label">Verify using <span class="required-asterisk">*</span></span>
             <label class="otp-method-label">
               <input type="radio" name="otp_method" value="email" checked>
               <span>Email</span>
-            </label>
-            <label class="otp-method-label">
-              <input type="radio" name="otp_method" value="mobile">
-              <span>Mobile</span>
             </label>
           </div>
 
@@ -722,22 +718,14 @@
 
     // 5. Send OTP Handler
     sendOtpBtn.addEventListener('click', async () => {
-      const selectedMethod = document.querySelector('input[name="otp_method"]:checked').value;
-      const targetDestination = selectedMethod === 'email' ? emailInput.value.trim() : mobileInput.value.trim();
+      const selectedMethod = document.querySelector('input[name="otp_method"]:checked')?.value || 'email';
+      const targetDestination = emailInput.value.trim();
 
-      if (selectedMethod === 'email') {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(targetDestination)) {
-          showToast('Please enter a valid email address first.', 'error');
-          emailInput.focus();
-          return;
-        }
-      } else {
-        if (!/^[6-9]\d{9}$/.test(targetDestination)) {
-          showToast('Please enter a valid 10-digit Indian mobile number first.', 'error');
-          mobileInput.focus();
-          return;
-        }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(targetDestination)) {
+        showToast('Please enter a valid email address first.', 'error');
+        emailInput.focus();
+        return;
       }
 
       const originalBtnText = sendOtpBtn.textContent;
@@ -791,8 +779,8 @@
 
     // 6. Verify OTP Handler
     verifyOtpBtn.addEventListener('click', async () => {
-      const selectedMethod = document.querySelector('input[name="otp_method"]:checked').value;
-      const targetDestination = selectedMethod === 'email' ? emailInput.value.trim() : mobileInput.value.trim();
+      const selectedMethod = document.querySelector('input[name="otp_method"]:checked')?.value || 'email';
+      const targetDestination = emailInput.value.trim();
       const code = otpCodeInput.value.trim();
 
       if (!/^\d{6}$/.test(code)) {
@@ -871,7 +859,7 @@
       submitBtn.disabled = true;
       submitBtn.textContent = 'Creating Account...';
 
-      const selectedMethod = document.querySelector('input[name="otp_method"]:checked').value;
+      const selectedMethod = document.querySelector('input[name="otp_method"]:checked')?.value || 'email';
 
       const payload = {
         full_name: document.getElementById('full_name').value.trim(),
