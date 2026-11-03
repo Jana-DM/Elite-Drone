@@ -17,125 +17,352 @@
 
   <link rel="stylesheet" href="css/style.css">
   <style>
+    body {
+      background: #01152d;
+      min-height: 100vh;
+    }
     .auth-wrapper {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 7rem 1.5rem 4rem 1.5rem;
-      background: radial-gradient(circle at 50% 20%, rgba(14, 165, 233, 0.12) 0%, transparent 60%),
-                  linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      padding: 6.5rem 1.25rem 4rem 1.25rem;
+      background: radial-gradient(circle at 50% 15%, #032b56 0%, #011833 60%, #000c1a 100%);
     }
     .auth-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 3rem;
-      max-width: 750px;
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 2.75rem 2.25rem 2.5rem;
+      max-width: 520px;
       width: 100%;
-      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(16px);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+      color: #1e293b;
       position: relative;
+      box-sizing: border-box;
     }
-    .auth-header {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
-    .auth-header h1 {
-      font-size: 2.2rem;
-      margin-bottom: 0.5rem;
-    }
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-    }
-    .field-hint {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      margin-top: 0.25rem;
+    .auth-brand-center {
       display: flex;
       align-items: center;
-      gap: 0.25rem;
-    }
-    .field-hint.valid {
-      color: #10b981;
-    }
-    .field-hint.invalid {
-      color: #ef4444;
-    }
-    /* OTP Box */
-    .otp-verification-box {
-      background: rgba(14, 165, 233, 0.05);
-      border: 1px dashed var(--border-glow);
-      border-radius: var(--radius-md);
-      padding: 1.5rem;
-      margin: 1.5rem 0;
-    }
-    .otp-method-selector {
-      display: flex;
-      gap: 1.5rem;
+      justify-content: center;
+      gap: 0.75rem;
       margin-bottom: 1.25rem;
     }
-    .radio-pill-label {
+    .auth-brand-center img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .auth-brand-center span {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #002b5c;
+      letter-spacing: 1.5px;
+    }
+    .auth-create-title {
+      font-family: var(--font-heading);
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: #002b5c;
+      text-align: center;
+      letter-spacing: 2.5px;
+      margin-bottom: 2rem;
+    }
+    .reg-form-group {
+      margin-bottom: 1.25rem;
+    }
+    .reg-form-label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 0.45rem;
+    }
+    .required-asterisk {
+      color: #0284c7;
+      font-weight: 800;
+      margin-left: 2px;
+    }
+    .reg-form-control {
+      width: 100%;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 0.82rem 1rem;
+      font-size: 0.95rem;
+      color: #0f172a;
+      font-family: var(--font-sans);
+      transition: all var(--transition-fast);
+      box-sizing: border-box;
+    }
+    .reg-form-control:focus {
+      border-color: #0284c7;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+      outline: none;
+    }
+    .reg-form-control::placeholder {
+      color: #94a3b8;
+      font-weight: 400;
+    }
+    .gender-radio-group {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      font-size: 0.9rem;
-      cursor: pointer;
-      color: var(--text-main);
+      gap: 1.75rem;
+      margin-top: 0.4rem;
     }
-    .otp-actions-row {
+    .gender-radio-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: #1e293b;
+      cursor: pointer;
+    }
+    .gender-radio-label input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #0284c7;
+      cursor: pointer;
+      margin: 0;
+    }
+    .mobile-input-group {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 0.75rem;
+    }
+    .country-code-select {
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 0.82rem 0.75rem;
+      font-size: 0.92rem;
+      color: #1e293b;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-sans);
+    }
+    .country-code-select:focus {
+      border-color: #0284c7;
+      outline: none;
+    }
+    .field-hint {
+      font-size: 0.76rem;
+      color: #64748b;
+      margin-top: 0.35rem;
+    }
+    .field-hint.valid {
+      color: #059669;
+      font-weight: 600;
+    }
+    .field-hint.invalid {
+      color: #dc2626;
+      font-weight: 600;
+    }
+    .password-rules {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.35rem;
+      margin-top: 0.5rem;
+      font-size: 0.76rem;
+      color: #64748b;
+    }
+    .rule-item.pass {
+      color: #059669;
+      font-weight: 600;
+    }
+    /* OTP Box */
+    .reg-otp-box {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 1.35rem;
+      margin: 1.5rem 0 1.25rem;
+    }
+    .reg-otp-title {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #002b5c;
+      margin-bottom: 0.75rem;
+    }
+    .reg-otp-methods {
       display: flex;
-      gap: 1rem;
-      align-items: flex-start;
+      align-items: center;
+      gap: 1.25rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .reg-verify-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .otp-method-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.9rem;
+      color: #1e293b;
+      cursor: pointer;
+    }
+    .otp-method-label input[type="radio"] {
+      width: 17px;
+      height: 17px;
+      accent-color: #0284c7;
+      cursor: pointer;
+      margin: 0;
+    }
+    .btn-otp-action {
+      background: #f0f7ff;
+      border: 1.5px solid #bae6fd;
+      color: #0284c7;
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 0.85rem;
+      border-radius: 10px;
+      width: 100%;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-family: var(--font-sans);
+    }
+    .btn-otp-action:hover:not(:disabled) {
+      background: #e0f2fe;
+      border-color: #7dd3fc;
+      color: #0369a1;
+    }
+    .btn-otp-action:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .reg-otp-input {
+      width: 100%;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 0.85rem;
+      text-align: center;
+      letter-spacing: 8px;
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: #0f172a;
+      box-sizing: border-box;
+      margin: 0.85rem 0;
+      transition: all var(--transition-fast);
+    }
+    .reg-otp-input:focus {
+      border-color: #0284c7;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+      outline: none;
     }
     .otp-verified-badge {
       display: none;
       align-items: center;
+      justify-content: center;
       gap: 0.5rem;
-      padding: 0.75rem 1.25rem;
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid rgba(16, 185, 129, 0.4);
-      color: #34d399;
-      border-radius: var(--radius-sm);
-      font-weight: 600;
-      font-size: 0.9rem;
-      margin-top: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #059669;
+      font-size: 0.86rem;
+      font-weight: 700;
+      border-radius: 8px;
+      margin-top: 0.85rem;
     }
-    .password-rules {
-      font-size: 0.8rem;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.35rem;
-      margin-top: 0.5rem;
-      padding: 0.75rem;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: var(--radius-sm);
+    /* Main Register Button */
+    .btn-reg-main {
+      background: #003366;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 0.95rem;
+      border-radius: 10px;
+      width: 100%;
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      box-shadow: 0 4px 14px rgba(0, 51, 102, 0.35);
+      font-family: var(--font-heading);
     }
-    .rule-item {
-      color: var(--text-dim);
+    .btn-reg-main:hover:not(:disabled) {
+      background: #002244;
+      box-shadow: 0 6px 20px rgba(0, 51, 102, 0.45);
+      transform: translateY(-1px);
+    }
+    .btn-reg-main:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    /* Social Register & Login */
+    .reg-divider {
       display: flex;
       align-items: center;
-      gap: 0.35rem;
+      text-align: center;
+      margin: 1.75rem 0 1.25rem;
+      color: #64748b;
+      font-size: 0.85rem;
+      font-weight: 500;
     }
-    .rule-item.pass {
-      color: #10b981;
+    .reg-divider::before, .reg-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #e2e8f0;
     }
-
-    @media (max-width: 768px) {
+    .reg-divider span {
+      padding: 0 0.85rem;
+    }
+    .reg-social-row {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .reg-social-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      border: 1.5px solid #e2e8f0;
+      background: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .reg-social-btn:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      transform: translateY(-2px);
+    }
+    .reg-login-note {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #64748b;
+      margin: 0;
+    }
+    .reg-login-note a {
+      color: #003366;
+      font-weight: 700;
+      text-decoration: none;
+      margin-left: 0.25rem;
+    }
+    .reg-login-note a:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 480px) {
       .auth-card {
-        padding: 2rem 1.5rem;
+        padding: 2rem 1.25rem;
+        border-radius: 20px;
       }
-      .form-row {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
-      .otp-actions-row {
-        flex-direction: column;
-      }
-      .password-rules {
-        grid-template-columns: 1fr;
+      .mobile-input-group {
+        grid-template-columns: 120px 1fr;
       }
     }
   </style>
@@ -159,7 +386,7 @@
         </ul>
 
         <div class="nav-actions">
-          <a href="login.html" class="btn btn-secondary btn-sm">Already a Member? Login</a>
+          <a href="login.html" class="btn btn-secondary btn-sm">Login</a>
         </div>
 
         <button class="nav-toggle" id="nav-toggle">☰</button>
@@ -167,133 +394,126 @@
     </div>
   </header>
 
-  <!-- Auth Content -->
+  <!-- Auth Content Wrapper -->
   <div class="auth-wrapper">
     <div class="auth-card">
-      <div class="auth-header">
-        <span class="section-tag">Account Creation</span>
-        <h1>Join Elite Drone Service</h1>
-        <p style="color: var(--text-muted); font-size: 0.95rem;">
-          Create your verified client profile to schedule aerial shoots and track footage production.
-        </p>
+      <!-- Centered Logo & Brand -->
+      <div class="auth-brand-center">
+        <img src="images/logo.png" alt="Elite Drone Logo" class="brand-logo-img">
+        <span>ELITE DRONE</span>
       </div>
 
+      <!-- Create Account Title -->
+      <h1 class="auth-create-title">CREATE ACCOUNT</h1>
+
       <form id="registration-form" novalidate>
-        <!-- 1. Full Name & Gender -->
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="full_name">Full Name <span style="color: #ef4444;">*</span></label>
-            <input type="text" id="full_name" class="form-control" placeholder="e.g. Vikram Malhotra" required>
-            <div class="field-hint" id="name-hint">Enter your legal full name</div>
-          </div>
+        <!-- 1. Full Name -->
+        <div class="reg-form-group">
+          <label class="reg-form-label" for="full_name">Full Name <span class="required-asterisk">*</span></label>
+          <input type="text" id="full_name" class="reg-form-control" placeholder="Enter your full name" required>
+          <div class="field-hint" id="name-hint"></div>
+        </div>
 
-          <div class="form-group">
-            <label class="form-label" for="gender">Gender <span style="color: #ef4444;">*</span></label>
-            <select id="gender" class="form-control" style="background: #0c1220;" required>
-              <option value="">Select Gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
-              <option value="Prefer not to say">Prefer not to say</option>
+        <!-- 2. Gender -->
+        <div class="reg-form-group">
+          <label class="reg-form-label">Gender <span class="required-asterisk">*</span></label>
+          <div class="gender-radio-group">
+            <label class="gender-radio-label">
+              <input type="radio" name="gender" value="Male" required>
+              <span>Male</span>
+            </label>
+            <label class="gender-radio-label">
+              <input type="radio" name="gender" value="Female">
+              <span>Female</span>
+            </label>
+            <label class="gender-radio-label">
+              <input type="radio" name="gender" value="Other">
+              <span>Other</span>
+            </label>
+          </div>
+          <input type="hidden" id="gender" value="">
+        </div>
+
+        <!-- 3. Email -->
+        <div class="reg-form-group">
+          <label class="reg-form-label" for="email">Email <span class="required-asterisk">*</span></label>
+          <input type="email" id="email" class="reg-form-control" placeholder="Enter your email" required autocomplete="email">
+          <div class="field-hint" id="email-hint"></div>
+        </div>
+
+        <!-- 4. Confirm Email -->
+        <div class="reg-form-group">
+          <label class="reg-form-label" for="confirm_email">Confirm Email <span class="required-asterisk">*</span></label>
+          <input type="email" id="confirm_email" class="reg-form-control" placeholder="Re-enter your email" required autocomplete="email">
+          <div class="field-hint" id="confirm-email-hint"></div>
+        </div>
+
+        <!-- 5. Mobile Number -->
+        <div class="reg-form-group">
+          <label class="reg-form-label" for="mobile">Mobile Number <span class="required-asterisk">*</span></label>
+          <div class="mobile-input-group">
+            <select id="country_code" class="country-code-select">
+              <option value="+91" selected>India (+91)</option>
             </select>
-            <div class="field-hint">Required for flight permit logs</div>
+            <input type="tel" id="mobile" class="reg-form-control" placeholder="Enter mobile number" maxlength="10" required>
+          </div>
+          <div class="field-hint" id="mobile-hint"></div>
+        </div>
+
+        <!-- 6. Username -->
+        <div class="reg-form-group">
+          <label class="reg-form-label" for="username">Username <span class="required-asterisk">*</span></label>
+          <input type="text" id="username" class="reg-form-control" placeholder="Choose a username" minlength="3" maxlength="30" required autocomplete="username">
+          <div class="field-hint" id="username-hint"></div>
+        </div>
+
+        <!-- 7. Password -->
+        <div class="reg-form-group">
+          <label class="reg-form-label" for="password">Password <span class="required-asterisk">*</span></label>
+          <input type="password" id="password" class="reg-form-control" placeholder="Enter your password" required autocomplete="new-password">
+          <div class="password-rules">
+            <div class="rule-item" id="rule-len">○ Min 8 characters</div>
+            <div class="rule-item" id="rule-upper">○ Uppercase letter</div>
+            <div class="rule-item" id="rule-lower">○ Lowercase letter</div>
+            <div class="rule-item" id="rule-num">○ Number (0-9)</div>
+            <div class="rule-item" id="rule-spec" style="grid-column: 1 / -1;">○ Special character (!@#$%^&*...)</div>
           </div>
         </div>
 
-        <!-- 2. Email & Confirm Email -->
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="email">Email Address <span style="color: #ef4444;">*</span></label>
-            <input type="email" id="email" class="form-control" placeholder="name@domain.com" required autocomplete="email">
-            <div class="field-hint" id="email-hint">Valid email for flight updates & OTP</div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="confirm_email">Confirm Email Address <span style="color: #ef4444;">*</span></label>
-            <input type="email" id="confirm_email" class="form-control" placeholder="Re-enter email" required autocomplete="email">
-            <div class="field-hint" id="confirm-email-hint">Must match email exactly</div>
-          </div>
+        <!-- 8. Confirm Password -->
+        <div class="reg-form-group">
+          <label class="reg-form-label" for="confirm_password">Confirm Password <span class="required-asterisk">*</span></label>
+          <input type="password" id="confirm_password" class="reg-form-control" placeholder="Re-enter your password" required autocomplete="new-password">
+          <div class="field-hint" id="confirm-password-hint"></div>
         </div>
 
-        <!-- 3. Country Code & Mobile -->
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="country_code">Country Code <span style="color: #ef4444;">*</span></label>
-            <input type="text" id="country_code" class="form-control" value="+91" readonly style="background: rgba(0,0,0,0.5); cursor: not-allowed;">
-            <div class="field-hint">India (+91) standard</div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="mobile">Mobile Number <span style="color: #ef4444;">*</span></label>
-            <input type="tel" id="mobile" class="form-control" placeholder="10-digit mobile (e.g. 9876543210)" maxlength="10" required>
-            <div class="field-hint" id="mobile-hint">10-digit Indian mobile starting with 6, 7, 8, or 9</div>
-          </div>
-        </div>
-
-        <!-- 4. Username -->
-        <div class="form-group">
-          <label class="form-label" for="username">Username <span style="color: #ef4444;">*</span></label>
-          <input type="text" id="username" class="form-control" placeholder="e.g. vikram_aerial" minlength="3" maxlength="30" required autocomplete="username">
-          <div class="field-hint" id="username-hint">At least 3 characters. Checked in real-time.</div>
-        </div>
-
-        <!-- 5. Password & Confirm Password -->
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="password">Password <span style="color: #ef4444;">*</span></label>
-            <input type="password" id="password" class="form-control" placeholder="Minimum 8 characters" required autocomplete="new-password">
-            <div class="password-rules">
-              <div class="rule-item" id="rule-len">○ Min 8 characters</div>
-              <div class="rule-item" id="rule-upper">○ Uppercase letter</div>
-              <div class="rule-item" id="rule-lower">○ Lowercase letter</div>
-              <div class="rule-item" id="rule-num">○ Number (0-9)</div>
-              <div class="rule-item" id="rule-spec" style="grid-column: 1 / -1;">○ Special character (!@#$%^&*...)</div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="confirm_password">Confirm Password <span style="color: #ef4444;">*</span></label>
-            <input type="password" id="confirm_password" class="form-control" placeholder="Re-enter password" required autocomplete="new-password">
-            <div class="field-hint" id="confirm-password-hint">Must match password</div>
-          </div>
-        </div>
-
-        <!-- 6. OTP Verification Box -->
-        <div class="otp-verification-box">
-          <h4 style="font-family: var(--font-heading); font-size: 1.15rem; color: #fff; margin-bottom: 0.5rem;">
-            Security Verification (One-Time Password)
-          </h4>
-          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-            Select your preferred OTP delivery method. A 6-digit verification code will be sent through the backend.
-          </p>
-
-          <div class="otp-method-selector">
-            <label class="radio-pill-label">
+        <!-- 9. OTP Verification Box -->
+        <div class="reg-otp-box">
+          <div class="reg-otp-title">OTP Verification</div>
+          <div class="reg-otp-methods">
+            <span class="reg-verify-label">Verify using <span class="required-asterisk">*</span></span>
+            <label class="otp-method-label">
               <input type="radio" name="otp_method" value="email" checked>
-              <span>Email OTP (Delivered to registered email)</span>
+              <span>Email</span>
             </label>
-            <label class="radio-pill-label">
+            <label class="otp-method-label">
               <input type="radio" name="otp_method" value="mobile">
-              <span>Mobile OTP (Cellular / Console dispatch)</span>
+              <span>Mobile</span>
             </label>
           </div>
 
-          <div class="otp-actions-row">
-            <div style="flex-grow: 1;">
-              <input type="text" id="otp_code" class="form-control" placeholder="Enter 6-digit OTP code" maxlength="6" style="letter-spacing: 4px; font-size: 1.1rem; font-weight: bold; text-align: center;">
-            </div>
+          <button type="button" id="btn-send-otp" class="btn-otp-action">
+            SEND OTP
+          </button>
 
-            <button type="button" id="btn-send-otp" class="btn btn-secondary">
-              Send OTP
-            </button>
+          <input type="text" id="otp_code" class="reg-otp-input" placeholder="• • • •" maxlength="6">
 
-            <button type="button" id="btn-verify-otp" class="btn btn-primary" disabled>
-              Verify OTP
-            </button>
-          </div>
+          <button type="button" id="btn-verify-otp" class="btn-otp-action" disabled>
+            VERIFY OTP
+          </button>
 
-          <!-- Countdown and Status Message -->
-          <div id="otp-status-message" style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--primary-light);"></div>
+          <!-- Status Message -->
+          <div id="otp-status-message"></div>
 
           <!-- Verified Badge -->
           <div class="otp-verified-badge" id="otp-verified-badge">
@@ -301,13 +521,35 @@
           </div>
         </div>
 
-        <!-- Submit Button -->
-        <button type="submit" id="btn-register-submit" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 1rem;" disabled>
-          Complete Client Registration →
+        <!-- 10. Register Button -->
+        <button type="submit" id="btn-register-submit" class="btn-reg-main" disabled>
+          REGISTER
         </button>
 
-        <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
-          Already have an account? <a href="login.html" style="color: var(--primary-light); font-weight: 600;">Sign in here</a>
+        <!-- 11. Social Divider & Buttons -->
+        <div class="reg-divider">
+          <span>or Register with</span>
+        </div>
+
+        <div class="reg-social-row">
+          <button type="button" class="reg-social-btn" title="Register with Google" onclick="showToast('Google OAuth registration is ready for integration.', 'info')">
+            <svg width="22" height="22" viewBox="0 0 48 48">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+          </button>
+          <button type="button" class="reg-social-btn" title="Register with Facebook" onclick="showToast('Facebook OAuth registration is ready for integration.', 'info')">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="#1877F2">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- 12. Already have an account link -->
+        <p class="reg-login-note">
+          Already have an account? <a href="login.html">Login here</a>
         </p>
       </form>
     </div>
@@ -339,6 +581,17 @@
     const statusMsg = document.getElementById('otp-status-message');
     const verifiedBadge = document.getElementById('otp-verified-badge');
     const verifiedLabel = document.getElementById('verified-destination-label');
+    const genderHidden = document.getElementById('gender');
+
+    // Sync gender radio with hidden input
+    document.querySelectorAll('input[name="gender"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (radio.checked) {
+          genderHidden.value = radio.value;
+          validateForm();
+        }
+      });
+    });
 
     // Reset verification if user changes email or mobile
     function resetOtpVerification(reason = 'Destination modified') {
@@ -348,7 +601,7 @@
         verifiedBadge.style.display = 'none';
         verifyOtpBtn.disabled = false;
         statusMsg.textContent = `${reason}. Please re-send and verify OTP.`;
-        statusMsg.style.color = '#f59e0b';
+        statusMsg.style.color = '#dc2626';
         validateForm();
       }
     }
@@ -435,7 +688,7 @@
     function validateConfirmPassword() {
       const hint = document.getElementById('confirm-password-hint');
       if (!confirmPasswordInput.value) {
-        hint.textContent = 'Must match password';
+        hint.textContent = '';
         hint.className = 'field-hint';
         return;
       }
@@ -452,6 +705,11 @@
     // 4. Confirm Email Match
     confirmEmailInput.addEventListener('input', () => {
       const hint = document.getElementById('confirm-email-hint');
+      if (!confirmEmailInput.value) {
+        hint.textContent = '';
+        hint.className = 'field-hint';
+        return;
+      }
       if (emailInput.value.toLowerCase() === confirmEmailInput.value.toLowerCase()) {
         hint.textContent = '✓ Emails match';
         hint.className = 'field-hint valid';
@@ -482,12 +740,11 @@
         }
       }
 
-      // UX Requirement: Show "PLEASE WAIT..." immediately and disable button
       const originalBtnText = sendOtpBtn.textContent;
       sendOtpBtn.disabled = true;
       sendOtpBtn.textContent = 'PLEASE WAIT...';
       statusMsg.textContent = 'Contacting security dispatch server...';
-      statusMsg.style.color = 'var(--primary-light)';
+      statusMsg.style.color = '#0284c7';
 
       try {
         const res = await API.post('/api/otp/send', {
@@ -500,8 +757,6 @@
           showToast(res.message, 'success');
           verifyOtpBtn.disabled = false;
           otpCodeInput.focus();
-
-          // Start 90-second countdown
           startOtpCountdown(res.countdownSeconds || 90);
         }
       } catch (err) {
@@ -509,7 +764,7 @@
         sendOtpBtn.disabled = false;
         sendOtpBtn.textContent = originalBtnText;
         statusMsg.textContent = err.message || 'OTP dispatch failed.';
-        statusMsg.style.color = '#ef4444';
+        statusMsg.style.color = '#dc2626';
       }
     });
 
@@ -523,13 +778,13 @@
         if (countdownRemaining > 0) {
           sendOtpBtn.textContent = `Resend in ${countdownRemaining}s`;
           statusMsg.textContent = `OTP dispatched. You may request a new code in ${countdownRemaining}s.`;
-          statusMsg.style.color = 'var(--primary-light)';
+          statusMsg.style.color = '#0284c7';
         } else {
           clearInterval(otpCountdownTimer);
           sendOtpBtn.disabled = false;
-          sendOtpBtn.textContent = 'Resend OTP';
-          statusMsg.textContent = 'Did not receive code? Click Resend OTP.';
-          statusMsg.style.color = '#f59e0b';
+          sendOtpBtn.textContent = 'SEND OTP';
+          statusMsg.textContent = 'Did not receive code? Click Send OTP.';
+          statusMsg.style.color = '#d97706';
         }
       }, 1000);
     }
@@ -564,7 +819,7 @@
           
           verifiedBadge.style.display = 'flex';
           verifiedLabel.textContent = `${targetDestination} (${selectedMethod.toUpperCase()})`;
-          verifyOtpBtn.textContent = 'Verified ✓';
+          verifyOtpBtn.textContent = 'VERIFIED ✓';
           verifyOtpBtn.disabled = true;
           sendOtpBtn.disabled = true;
           clearInterval(otpCountdownTimer);
@@ -575,18 +830,18 @@
       } catch (err) {
         showToast(err.message || 'Invalid or expired OTP.', 'error');
         verifyOtpBtn.disabled = false;
-        verifyOtpBtn.textContent = 'Verify OTP';
+        verifyOtpBtn.textContent = 'VERIFY OTP';
         statusMsg.textContent = err.message;
-        statusMsg.style.color = '#ef4444';
+        statusMsg.style.color = '#dc2626';
       }
     });
 
     // 7. Overall Form Validation
     function validateForm() {
       const isNameValid = document.getElementById('full_name').value.trim().length >= 2;
-      const isGenderValid = document.getElementById('gender').value !== '';
+      const isGenderValid = genderHidden.value !== '';
       const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim());
-      const isEmailMatch = emailInput.value.trim().toLowerCase() === confirmEmailInput.value.trim().toLowerCase();
+      const isEmailMatch = emailInput.value.trim().toLowerCase() === confirmEmailInput.value.trim().toLowerCase() && emailInput.value.trim().length > 0;
       const isMobileValid = /^[6-9]\d{9}$/.test(mobileInput.value.trim());
       
       const pwd = passwordInput.value;
@@ -599,7 +854,7 @@
       submitBtn.disabled = !isValid;
     }
 
-    document.querySelectorAll('#registration-form input, #registration-form select').forEach(input => {
+    document.querySelectorAll('#registration-form input').forEach(input => {
       input.addEventListener('input', validateForm);
       input.addEventListener('change', validateForm);
     });
@@ -620,7 +875,7 @@
 
       const payload = {
         full_name: document.getElementById('full_name').value.trim(),
-        gender: document.getElementById('gender').value,
+        gender: genderHidden.value,
         email: emailInput.value.trim(),
         confirm_email: confirmEmailInput.value.trim(),
         country_code: document.getElementById('country_code').value,
@@ -636,7 +891,6 @@
         const res = await API.post('/api/auth/register', payload);
         if (res.success) {
           showToast('Registration successful! Redirecting to login...', 'success');
-          // Requirement: Redirect to Login page after successful registration
           setTimeout(() => {
             window.location.href = 'login.html?registered=true';
           }, 1500);
@@ -644,9 +898,18 @@
       } catch (err) {
         showToast(err.message || 'Registration failed.', 'error');
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Complete Client Registration →';
+        submitBtn.textContent = 'REGISTER';
       }
     });
+
+    // Mobile nav toggle
+    const navToggle = document.getElementById('nav-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    if (navToggle) {
+      navToggle.addEventListener('click', () => {
+        navLinks?.classList.toggle('mobile-open');
+      });
+    }
   </script>
 </body>
 </html>
