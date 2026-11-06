@@ -29,22 +29,171 @@
     .auth-wrapper {
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 3rem 1.25rem 4rem 1.25rem;
+      padding: 2.5rem 1.25rem 3.5rem 1.25rem;
       background: radial-gradient(circle at 50% 15%, #032b56 0%, #011833 60%, #000c1a 100%);
+      position: relative;
+    }
+
+    .auth-top-bar {
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 1.15rem;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .back-home-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #94a3b8;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 0.45rem 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+      transition: all var(--transition-fast);
+    }
+
+    .back-home-btn:hover {
+      color: #38bdf8;
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(14, 165, 233, 0.45);
+      transform: translateX(-3px);
     }
 
     .auth-card {
       background: #ffffff;
       border-radius: 28px;
       padding: 2.75rem 2.25rem 2.5rem;
-      max-width: 520px;
+      max-width: 600px;
       width: 100%;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55);
       color: #1e293b;
       position: relative;
       box-sizing: border-box;
+    }
+
+    /* 2-Column Responsive Form Row */
+    .form-row-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.15rem;
+    }
+
+    @media (max-width: 580px) {
+      .form-row-2col {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+    }
+
+    /* Input Icon Wrappers */
+    .input-icon-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .input-svg-icon {
+      position: absolute;
+      left: 14px;
+      color: #94a3b8;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color var(--transition-fast);
+      z-index: 2;
+    }
+
+    .reg-form-control.has-icon {
+      padding-left: 2.65rem;
+    }
+
+    .input-icon-wrap:focus-within .input-svg-icon {
+      color: #0284c7;
+    }
+
+    /* Password Eye Toggle */
+    .pwd-toggle-btn {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color var(--transition-fast);
+      z-index: 2;
+    }
+
+    .pwd-toggle-btn:hover {
+      color: #0284c7;
+    }
+
+    .reg-form-control.has-toggle {
+      padding-right: 2.65rem;
+    }
+
+    /* Modern OTP Notice Box */
+    .reg-otp-email-notice {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #f0f7ff;
+      border: 1px solid #bae6fd;
+      border-radius: 10px;
+      padding: 0.7rem 0.95rem;
+      margin-bottom: 1rem;
+    }
+
+    .otp-notice-icon {
+      font-size: 1.3rem;
+      line-height: 1;
+    }
+
+    .otp-notice-text {
+      font-size: 0.82rem;
+      color: #0369a1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .otp-notice-text strong {
+      font-size: 0.88rem;
+      color: #002b5c;
+      word-break: break-all;
+    }
+
+    /* Terms note */
+    .auth-terms-note {
+      text-align: center;
+      font-size: 0.78rem;
+      color: #64748b;
+      margin: 1rem 0;
+      line-height: 1.4;
+    }
+
+    .auth-terms-note a {
+      color: #0284c7;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .auth-terms-note a:hover {
+      text-decoration: underline;
     }
 
     .auth-brand-center {
@@ -400,6 +549,14 @@
 
   <!-- Auth Content Wrapper -->
   <div class="auth-wrapper">
+    <!-- Top Back Bar -->
+    <div class="auth-top-bar">
+      <a href="index.html" class="back-home-btn" title="Back to Elite Drone Home">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span>Back to Home</span>
+      </a>
+    </div>
+
     <div class="auth-card">
       <!-- Centered Logo & Brand -->
       <a href="index.html" class="auth-brand-center" title="Elite Drone Home">
@@ -411,97 +568,141 @@
       <h1 class="auth-create-title">CREATE ACCOUNT</h1>
 
       <form id="registration-form" novalidate>
-        <!-- 1. Full Name -->
-        <div class="reg-form-group">
-          <label class="reg-form-label" for="full_name">Full Name <span class="required-asterisk">*</span></label>
-          <input type="text" id="full_name" class="reg-form-control" placeholder="Enter your full name" required>
-          <div class="field-hint" id="name-hint"></div>
-        </div>
-
-        <!-- 2. Gender -->
-        <div class="reg-form-group">
-          <label class="reg-form-label">Gender <span class="required-asterisk">*</span></label>
-          <div class="gender-radio-group">
-            <label class="gender-radio-label">
-              <input type="radio" name="gender" value="Male" required>
-              <span>Male</span>
-            </label>
-            <label class="gender-radio-label">
-              <input type="radio" name="gender" value="Female">
-              <span>Female</span>
-            </label>
-            <label class="gender-radio-label">
-              <input type="radio" name="gender" value="Other">
-              <span>Other</span>
-            </label>
+        <!-- Row 1: Full Name & Gender -->
+        <div class="form-row-2col">
+          <!-- 1. Full Name -->
+          <div class="reg-form-group">
+            <label class="reg-form-label" for="full_name">Full Name <span class="required-asterisk">*</span></label>
+            <div class="input-icon-wrap">
+              <span class="input-svg-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </span>
+              <input type="text" id="full_name" class="reg-form-control has-icon" placeholder="Enter your full name" required>
+            </div>
+            <div class="field-hint" id="name-hint"></div>
           </div>
-          <input type="hidden" id="gender" value="">
+
+          <!-- 2. Gender -->
+          <div class="reg-form-group">
+            <label class="reg-form-label">Gender <span class="required-asterisk">*</span></label>
+            <div class="gender-radio-group">
+              <label class="gender-radio-label">
+                <input type="radio" name="gender" value="Male" required>
+                <span>Male</span>
+              </label>
+              <label class="gender-radio-label">
+                <input type="radio" name="gender" value="Female">
+                <span>Female</span>
+              </label>
+              <label class="gender-radio-label">
+                <input type="radio" name="gender" value="Other">
+                <span>Other</span>
+              </label>
+            </div>
+            <input type="hidden" id="gender" value="">
+          </div>
         </div>
 
-        <!-- 3. Email -->
-        <div class="reg-form-group">
-          <label class="reg-form-label" for="email">Email <span class="required-asterisk">*</span></label>
-          <input type="email" id="email" class="reg-form-control" placeholder="Enter your email" required
-            autocomplete="email">
-          <div class="field-hint" id="email-hint"></div>
+        <!-- Row 2: Email & Confirm Email -->
+        <div class="form-row-2col">
+          <!-- 3. Email -->
+          <div class="reg-form-group">
+            <label class="reg-form-label" for="email">Email <span class="required-asterisk">*</span></label>
+            <div class="input-icon-wrap">
+              <span class="input-svg-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </span>
+              <input type="email" id="email" class="reg-form-control has-icon" placeholder="Enter your email" required autocomplete="email">
+            </div>
+            <div class="field-hint" id="email-hint"></div>
+          </div>
+
+          <!-- 4. Confirm Email -->
+          <div class="reg-form-group">
+            <label class="reg-form-label" for="confirm_email">Confirm Email <span class="required-asterisk">*</span></label>
+            <div class="input-icon-wrap">
+              <span class="input-svg-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </span>
+              <input type="email" id="confirm_email" class="reg-form-control has-icon" placeholder="Re-enter your email" required autocomplete="email">
+            </div>
+            <div class="field-hint" id="confirm-email-hint"></div>
+          </div>
         </div>
 
-        <!-- 4. Confirm Email -->
-        <div class="reg-form-group">
-          <label class="reg-form-label" for="confirm_email">Confirm Email <span
-              class="required-asterisk">*</span></label>
-          <input type="email" id="confirm_email" class="reg-form-control" placeholder="Re-enter your email" required
-            autocomplete="email">
-          <div class="field-hint" id="confirm-email-hint"></div>
-        </div>
-
-        <!-- 5. Username -->
+        <!-- Row 3: Username -->
         <div class="reg-form-group">
           <label class="reg-form-label" for="username">Username <span class="required-asterisk">*</span></label>
-          <input type="text" id="username" class="reg-form-control" placeholder="Choose a username" minlength="3"
-            maxlength="30" required autocomplete="username">
+          <div class="input-icon-wrap">
+            <span class="input-svg-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/></svg>
+            </span>
+            <input type="text" id="username" class="reg-form-control has-icon" placeholder="Choose a unique username" minlength="3" maxlength="30" required autocomplete="username">
+          </div>
           <div class="field-hint" id="username-hint"></div>
         </div>
 
-        <!-- 7. Password -->
-        <div class="reg-form-group">
-          <label class="reg-form-label" for="password">Password <span class="required-asterisk">*</span></label>
-          <input type="password" id="password" class="reg-form-control" placeholder="Enter your password" required
-            autocomplete="new-password">
-          <div class="password-rules">
-            <div class="rule-item" id="rule-len">○ Min 8 characters</div>
-            <div class="rule-item" id="rule-upper">○ Uppercase letter</div>
-            <div class="rule-item" id="rule-lower">○ Lowercase letter</div>
-            <div class="rule-item" id="rule-num">○ Number (0-9)</div>
-            <div class="rule-item" id="rule-spec" style="grid-column: 1 / -1;">○ Special character (!@#$%^&*...)</div>
+        <!-- Row 4: Password & Confirm Password -->
+        <div class="form-row-2col">
+          <!-- 5. Password -->
+          <div class="reg-form-group">
+            <label class="reg-form-label" for="password">Password <span class="required-asterisk">*</span></label>
+            <div class="input-icon-wrap">
+              <span class="input-svg-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <input type="password" id="password" class="reg-form-control has-icon has-toggle" placeholder="Create password" required autocomplete="new-password">
+              <button type="button" class="pwd-toggle-btn" aria-label="Toggle password visibility" data-target="password">
+                <svg class="eye-open" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-closed" style="display:none;" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- 6. Confirm Password -->
+          <div class="reg-form-group">
+            <label class="reg-form-label" for="confirm_password">Confirm Password <span class="required-asterisk">*</span></label>
+            <div class="input-icon-wrap">
+              <span class="input-svg-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <input type="password" id="confirm_password" class="reg-form-control has-icon has-toggle" placeholder="Re-enter password" required autocomplete="new-password">
+              <button type="button" class="pwd-toggle-btn" aria-label="Toggle confirm password visibility" data-target="confirm_password">
+                <svg class="eye-open" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-closed" style="display:none;" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </button>
+            </div>
+            <div class="field-hint" id="confirm-password-hint"></div>
           </div>
         </div>
 
-        <!-- 8. Confirm Password -->
-        <div class="reg-form-group">
-          <label class="reg-form-label" for="confirm_password">Confirm Password <span
-              class="required-asterisk">*</span></label>
-          <input type="password" id="confirm_password" class="reg-form-control" placeholder="Re-enter your password"
-            required autocomplete="new-password">
-          <div class="field-hint" id="confirm-password-hint"></div>
+        <!-- Password Rules Bar -->
+        <div class="password-rules" style="margin-top: -0.35rem; margin-bottom: 1.25rem;">
+          <div class="rule-item" id="rule-len">○ Min 8 characters</div>
+          <div class="rule-item" id="rule-upper">○ Uppercase letter</div>
+          <div class="rule-item" id="rule-lower">○ Lowercase letter</div>
+          <div class="rule-item" id="rule-num">○ Number (0-9)</div>
+          <div class="rule-item" id="rule-spec" style="grid-column: 1 / -1;">○ Special character (!@#$%^&*...)</div>
         </div>
 
-        <!-- 9. OTP Verification Box -->
+        <!-- 7. OTP Verification Box -->
         <div class="reg-otp-box">
           <div class="reg-otp-title">OTP VERIFICATION</div>
-          <div class="reg-otp-methods">
-            <span class="reg-verify-label">Verify using <span class="required-asterisk">*</span></span>
-            <label class="otp-method-label">
-              <input type="radio" name="otp_method" value="email" checked>
-              <span>Email</span>
-            </label>
+          
+          <div class="reg-otp-email-notice">
+            <span class="otp-notice-icon">📧</span>
+            <div class="otp-notice-text">
+              <span>Security verification code will be sent to:</span>
+              <strong id="otp-dest-display">Enter your email above</strong>
+            </div>
           </div>
+          <input type="hidden" name="otp_method" value="email">
 
           <button type="button" id="btn-send-otp" class="btn-otp-action">
             SEND OTP
           </button>
 
-          <input type="text" id="otp_code" class="reg-otp-input" placeholder="• • • •" maxlength="6">
+          <input type="text" id="otp_code" class="reg-otp-input" placeholder="• • • • • •" maxlength="6">
 
           <button type="button" id="btn-verify-otp" class="btn-otp-action" disabled>
             VERIFY OTP
@@ -516,7 +717,12 @@
           </div>
         </div>
 
-        <!-- 10. Register Button -->
+        <!-- Terms note -->
+        <div class="auth-terms-note">
+          By registering, you agree to Elite Drone's <a href="services.html">Terms of Flight</a> and <a href="index.html#contact">Safety Standards</a>.
+        </div>
+
+        <!-- 8. Register Button -->
         <button type="submit" id="btn-register-submit" class="btn-reg-main" disabled>
           REGISTER
         </button>
@@ -607,7 +813,32 @@
       }
     }
 
-    emailInput.addEventListener('input', () => resetOtpVerification('Email address changed'));
+    emailInput.addEventListener('input', () => {
+      resetOtpVerification('Email address changed');
+      const destEl = document.getElementById('otp-dest-display');
+      if (destEl) {
+        destEl.textContent = emailInput.value.trim() || 'Enter your email above';
+      }
+    });
+
+    // Password Visibility Toggle
+    document.querySelectorAll('.pwd-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        const input = document.getElementById(targetId);
+        const openIcon = btn.querySelector('.eye-open');
+        const closedIcon = btn.querySelector('.eye-closed');
+        if (input.type === 'password') {
+          input.type = 'text';
+          if (openIcon) openIcon.style.display = 'none';
+          if (closedIcon) closedIcon.style.display = 'block';
+        } else {
+          input.type = 'password';
+          if (openIcon) openIcon.style.display = 'block';
+          if (closedIcon) closedIcon.style.display = 'none';
+        }
+      });
+    });
 
     // 1. Username Availability Check (Debounced)
     let usernameTimeout = null;
