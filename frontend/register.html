@@ -39,7 +39,7 @@
 
     .auth-top-bar {
       width: 100%;
-      max-width: 600px;
+      max-width: 500px;
       margin-bottom: 1.15rem;
       display: flex;
       justify-content: flex-start;
@@ -72,26 +72,12 @@
       background: #ffffff;
       border-radius: 28px;
       padding: 2.75rem 2.25rem 2.5rem;
-      max-width: 600px;
+      max-width: 500px;
       width: 100%;
       box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55);
       color: #1e293b;
       position: relative;
       box-sizing: border-box;
-    }
-
-    /* 2-Column Responsive Form Row */
-    .form-row-2col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.15rem;
-    }
-
-    @media (max-width: 580px) {
-      .form-row-2col {
-        grid-template-columns: 1fr;
-        gap: 0;
-      }
     }
 
     /* Input Icon Wrappers */
@@ -568,69 +554,63 @@
       <h1 class="auth-create-title">CREATE ACCOUNT</h1>
 
       <form id="registration-form" novalidate>
-        <!-- Row 1: Full Name & Gender -->
-        <div class="form-row-2col">
-          <!-- 1. Full Name -->
-          <div class="reg-form-group">
-            <label class="reg-form-label" for="full_name">Full Name <span class="required-asterisk">*</span></label>
-            <div class="input-icon-wrap">
-              <span class="input-svg-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              </span>
-              <input type="text" id="full_name" class="reg-form-control has-icon" placeholder="Enter your full name" required>
-            </div>
-            <div class="field-hint" id="name-hint"></div>
+        <!-- 1. Full Name -->
+        <div class="reg-form-group">
+          <label class="reg-form-label" for="full_name">Full Name <span class="required-asterisk">*</span></label>
+          <div class="input-icon-wrap">
+            <span class="input-svg-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </span>
+            <input type="text" id="full_name" class="reg-form-control has-icon" placeholder="Enter your full name" required>
           </div>
-
-          <!-- 2. Gender -->
-          <div class="reg-form-group">
-            <label class="reg-form-label">Gender <span class="required-asterisk">*</span></label>
-            <div class="gender-radio-group">
-              <label class="gender-radio-label">
-                <input type="radio" name="gender" value="Male" required>
-                <span>Male</span>
-              </label>
-              <label class="gender-radio-label">
-                <input type="radio" name="gender" value="Female">
-                <span>Female</span>
-              </label>
-              <label class="gender-radio-label">
-                <input type="radio" name="gender" value="Other">
-                <span>Other</span>
-              </label>
-            </div>
-            <input type="hidden" id="gender" value="">
-          </div>
+          <div class="field-hint" id="name-hint"></div>
         </div>
 
-        <!-- Row 2: Email & Confirm Email -->
-        <div class="form-row-2col">
-          <!-- 3. Email -->
-          <div class="reg-form-group">
-            <label class="reg-form-label" for="email">Email <span class="required-asterisk">*</span></label>
-            <div class="input-icon-wrap">
-              <span class="input-svg-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              </span>
-              <input type="email" id="email" class="reg-form-control has-icon" placeholder="Enter your email" required autocomplete="email">
-            </div>
-            <div class="field-hint" id="email-hint"></div>
+        <!-- 2. Gender -->
+        <div class="reg-form-group">
+          <label class="reg-form-label">Gender <span class="required-asterisk">*</span></label>
+          <div class="gender-radio-group">
+            <label class="gender-radio-label">
+              <input type="radio" name="gender" value="Male" required>
+              <span>Male</span>
+            </label>
+            <label class="gender-radio-label">
+              <input type="radio" name="gender" value="Female">
+              <span>Female</span>
+            </label>
+            <label class="gender-radio-label">
+              <input type="radio" name="gender" value="Other">
+              <span>Other</span>
+            </label>
           </div>
-
-          <!-- 4. Confirm Email -->
-          <div class="reg-form-group">
-            <label class="reg-form-label" for="confirm_email">Confirm Email <span class="required-asterisk">*</span></label>
-            <div class="input-icon-wrap">
-              <span class="input-svg-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              </span>
-              <input type="email" id="confirm_email" class="reg-form-control has-icon" placeholder="Re-enter your email" required autocomplete="email">
-            </div>
-            <div class="field-hint" id="confirm-email-hint"></div>
-          </div>
+          <input type="hidden" id="gender" value="">
         </div>
 
-        <!-- Row 3: Username -->
+        <!-- 3. Email -->
+        <div class="reg-form-group">
+          <label class="reg-form-label" for="email">Email <span class="required-asterisk">*</span></label>
+          <div class="input-icon-wrap">
+            <span class="input-svg-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </span>
+            <input type="email" id="email" class="reg-form-control has-icon" placeholder="Enter your email" required autocomplete="email">
+          </div>
+          <div class="field-hint" id="email-hint"></div>
+        </div>
+
+        <!-- 4. Confirm Email -->
+        <div class="reg-form-group">
+          <label class="reg-form-label" for="confirm_email">Confirm Email <span class="required-asterisk">*</span></label>
+          <div class="input-icon-wrap">
+            <span class="input-svg-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </span>
+            <input type="email" id="confirm_email" class="reg-form-control has-icon" placeholder="Re-enter your email" required autocomplete="email">
+          </div>
+          <div class="field-hint" id="confirm-email-hint"></div>
+        </div>
+
+        <!-- 5. Username -->
         <div class="reg-form-group">
           <label class="reg-form-label" for="username">Username <span class="required-asterisk">*</span></label>
           <div class="input-icon-wrap">
@@ -642,38 +622,35 @@
           <div class="field-hint" id="username-hint"></div>
         </div>
 
-        <!-- Row 4: Password & Confirm Password -->
-        <div class="form-row-2col">
-          <!-- 5. Password -->
-          <div class="reg-form-group">
-            <label class="reg-form-label" for="password">Password <span class="required-asterisk">*</span></label>
-            <div class="input-icon-wrap">
-              <span class="input-svg-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              </span>
-              <input type="password" id="password" class="reg-form-control has-icon has-toggle" placeholder="Create password" required autocomplete="new-password">
-              <button type="button" class="pwd-toggle-btn" aria-label="Toggle password visibility" data-target="password">
-                <svg class="eye-open" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                <svg class="eye-closed" style="display:none;" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-              </button>
-            </div>
+        <!-- 6. Password -->
+        <div class="reg-form-group">
+          <label class="reg-form-label" for="password">Password <span class="required-asterisk">*</span></label>
+          <div class="input-icon-wrap">
+            <span class="input-svg-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+            <input type="password" id="password" class="reg-form-control has-icon has-toggle" placeholder="Create password" required autocomplete="new-password">
+            <button type="button" class="pwd-toggle-btn" aria-label="Toggle password visibility" data-target="password">
+              <svg class="eye-open" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="eye-closed" style="display:none;" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
           </div>
+        </div>
 
-          <!-- 6. Confirm Password -->
-          <div class="reg-form-group">
-            <label class="reg-form-label" for="confirm_password">Confirm Password <span class="required-asterisk">*</span></label>
-            <div class="input-icon-wrap">
-              <span class="input-svg-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              </span>
-              <input type="password" id="confirm_password" class="reg-form-control has-icon has-toggle" placeholder="Re-enter password" required autocomplete="new-password">
-              <button type="button" class="pwd-toggle-btn" aria-label="Toggle confirm password visibility" data-target="confirm_password">
-                <svg class="eye-open" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                <svg class="eye-closed" style="display:none;" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-              </button>
-            </div>
-            <div class="field-hint" id="confirm-password-hint"></div>
+        <!-- 7. Confirm Password -->
+        <div class="reg-form-group">
+          <label class="reg-form-label" for="confirm_password">Confirm Password <span class="required-asterisk">*</span></label>
+          <div class="input-icon-wrap">
+            <span class="input-svg-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+            <input type="password" id="confirm_password" class="reg-form-control has-icon has-toggle" placeholder="Re-enter password" required autocomplete="new-password">
+            <button type="button" class="pwd-toggle-btn" aria-label="Toggle confirm password visibility" data-target="confirm_password">
+              <svg class="eye-open" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="eye-closed" style="display:none;" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
           </div>
+          <div class="field-hint" id="confirm-password-hint"></div>
         </div>
 
         <!-- Password Rules Bar -->
