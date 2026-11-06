@@ -1,162 +1,556 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Customer & Admin Sign In | Elite Drone Service</title>
-  <meta name="description" content="Sign in to your Elite Drone Service client portal to manage flight bookings, download deliverables, and review proposals.">
-  
+  <title>Account Sign In | Elite Drone Service</title>
+  <meta name="description"
+    content="Sign in to your Elite Drone Service account to manage flight bookings, review flight plans, and access aerial shoot deliverables.">
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="images/favicon.png">
   <link rel="apple-touch-icon" href="images/logo.png">
 
   <link rel="stylesheet" href="css/style.css">
   <style>
+    body {
+      background: #01152d;
+      min-height: 100vh;
+    }
+
     .auth-wrapper {
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 7rem 1.5rem 4rem 1.5rem;
-      background: radial-gradient(circle at 50% 25%, rgba(14, 165, 233, 0.12) 0%, transparent 60%),
-                  linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      padding: 2.5rem 1.25rem 3.5rem 1.25rem;
+      background: radial-gradient(circle at 50% 15%, #032b56 0%, #011833 60%, #000c1a 100%);
+      position: relative;
     }
-    .auth-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 3rem;
-      max-width: 480px;
+
+    .auth-top-bar {
       width: 100%;
-      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(16px);
-      position: relative;
+      max-width: 500px;
+      margin-bottom: 1.15rem;
+      display: flex;
+      justify-content: flex-start;
     }
-    .password-input-wrap {
-      position: relative;
+
+    .back-home-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #94a3b8;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 0.45rem 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+      transition: all var(--transition-fast);
     }
-    .toggle-pwd-btn {
+
+    .back-home-btn:hover {
+      color: #38bdf8;
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(14, 165, 233, 0.45);
+      transform: translateX(-3px);
+    }
+
+    .auth-card {
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 2.75rem 2.25rem 2.5rem;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55);
+      color: #1e293b;
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    .auth-brand-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      text-decoration: none;
+    }
+
+    .auth-brand-center img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .auth-brand-center span {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #002b5c;
+      letter-spacing: 1.5px;
+    }
+
+    .auth-create-title {
+      font-family: var(--font-heading);
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: #002b5c;
+      text-align: center;
+      letter-spacing: 2.5px;
+      margin-bottom: 1.75rem;
+    }
+
+    /* Alerts */
+    .auth-alert {
+      padding: 0.85rem 1.15rem;
+      border-radius: 10px;
+      font-size: 0.86rem;
+      margin-bottom: 1.35rem;
+      display: none;
+      line-height: 1.45;
+    }
+
+    .auth-alert-success {
+      background: #f0fdf4;
+      border: 1.5px solid #86efac;
+      color: #15803d;
+      font-weight: 600;
+    }
+
+    .auth-alert-error {
+      background: #fef2f2;
+      border: 1.5px solid #fca5a5;
+      color: #b91c1c;
+      font-weight: 600;
+    }
+
+    .reg-form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .reg-form-label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 0.45rem;
+    }
+
+    .required-asterisk {
+      color: #0284c7;
+      font-weight: 800;
+      margin-left: 2px;
+    }
+
+    /* Input Icon Wrappers */
+    .input-icon-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .input-svg-icon {
+      position: absolute;
+      left: 14px;
+      color: #94a3b8;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color var(--transition-fast);
+      z-index: 2;
+    }
+
+    .reg-form-control {
+      width: 100%;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 0.82rem 1rem;
+      font-size: 0.95rem;
+      color: #0f172a;
+      font-family: var(--font-sans);
+      transition: all var(--transition-fast);
+      box-sizing: border-box;
+    }
+
+    .reg-form-control.has-icon {
+      padding-left: 2.65rem;
+    }
+
+    .reg-form-control.has-toggle {
+      padding-right: 2.65rem;
+    }
+
+    .input-icon-wrap:focus-within .input-svg-icon {
+      color: #0284c7;
+    }
+
+    .reg-form-control:focus {
+      border-color: #0284c7;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+      outline: none;
+    }
+
+    .reg-form-control::placeholder {
+      color: #94a3b8;
+      font-weight: 400;
+    }
+
+    /* Password Eye Toggle */
+    .pwd-toggle-btn {
       position: absolute;
       right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: transparent;
+      background: none;
       border: none;
-      color: var(--text-muted);
+      color: #94a3b8;
       cursor: pointer;
-      font-size: 1.1rem;
       padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color var(--transition-fast);
+      z-index: 2;
     }
-    .toggle-pwd-btn:hover {
-      color: #fff;
+
+    .pwd-toggle-btn:hover {
+      color: #0284c7;
     }
-    .auth-alert {
-      padding: 0.85rem 1.25rem;
-      border-radius: var(--radius-sm);
+
+    /* Options Row */
+    .login-options-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 1.15rem 0 1.5rem;
+      font-size: 0.86rem;
+    }
+
+    .remember-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: #475569;
+      cursor: pointer;
+      font-weight: 500;
+      user-select: none;
+    }
+
+    .remember-label input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: #0284c7;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .forgot-link {
+      color: #0284c7;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color var(--transition-fast);
+    }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+      color: #0369a1;
+    }
+
+    /* Main Action Button */
+    .btn-reg-main {
+      background: #003366;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 0.95rem;
+      border-radius: 10px;
+      width: 100%;
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      box-shadow: 0 4px 14px rgba(0, 51, 102, 0.35);
+      font-family: var(--font-heading);
+    }
+
+    .btn-reg-main:hover:not(:disabled) {
+      background: #002244;
+      box-shadow: 0 6px 20px rgba(0, 51, 102, 0.45);
+      transform: translateY(-1px);
+    }
+
+    .btn-reg-main:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Social Divider & Buttons */
+    .reg-divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 1.75rem 0 1.25rem;
+      color: #64748b;
       font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .reg-divider::before,
+    .reg-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .reg-divider span {
+      padding: 0 0.85rem;
+    }
+
+    .reg-social-row {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
       margin-bottom: 1.5rem;
-      display: none;
     }
-    .auth-alert-success {
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid rgba(16, 185, 129, 0.4);
-      color: #34d399;
+
+    .reg-social-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 1.5px solid #e2e8f0;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
-    .auth-alert-error {
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.4);
-      color: #f87171;
+
+    .reg-social-btn:hover {
+      border-color: #0284c7;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
+    }
+
+    .reg-login-note {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #64748b;
+      margin: 0;
+    }
+
+    .reg-login-note a {
+      color: #0284c7;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .reg-login-note a:hover {
+      text-decoration: underline;
+    }
+
+    /* Quick Admin Badge */
+    .admin-quick-badge {
+      margin-top: 1.75rem;
+      padding: 0.85rem 1rem;
+      background: #f8fafc;
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      box-sizing: border-box;
+    }
+
+    .admin-quick-text {
+      line-height: 1.4;
+    }
+
+    .admin-quick-text strong {
+      color: #002b5c;
+      display: block;
+      font-size: 0.84rem;
+    }
+
+    .admin-quick-text code {
+      color: #0284c7;
+      font-weight: 700;
+      background: #e0f2fe;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    .btn-quick-fill {
+      background: #e0f2fe;
+      border: 1px solid #bae6fd;
+      color: #0369a1;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.45rem 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-quick-fill:hover {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #0284c7;
     }
   </style>
 </head>
+
 <body>
 
-  <!-- Site Header -->
-  <header class="site-header">
-    <div class="container">
-      <nav class="navbar">
-        <a href="index.html" class="brand-logo">
-          <img src="images/logo.png" alt="Elite Drone Logo" class="brand-logo-img">
-          <span>ELITE DRONE</span>
-        </a>
-
-        <ul class="nav-links">
-          <li><a href="index.html" class="nav-link">Home</a></li>
-          <li><a href="services.html" class="nav-link">Services</a></li>
-          <li><a href="gallery.html" class="nav-link">Gallery</a></li>
-          <li><a href="booking.html" class="nav-link">Book Now</a></li>
-        </ul>
-
-        <div class="nav-actions">
-          <a href="register.html" class="btn btn-nav-register">Register</a>
-          <a href="booking.html" class="btn btn-nav-book"><span>BOOK SHOOT</span> <span>✦</span></a>
-        </div>
-
-        <button class="nav-toggle" id="nav-toggle">☰</button>
-      </nav>
-    </div>
-  </header>
-
-  <!-- Login Main -->
+  <!-- Auth Content Wrapper -->
   <div class="auth-wrapper">
+    <!-- Top Back Bar -->
+    <div class="auth-top-bar">
+      <a href="index.html" class="back-home-btn" title="Back to Elite Drone Home">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+        <span>Back to Home</span>
+      </a>
+    </div>
+
     <div class="auth-card">
-      <div class="auth-header" style="text-align: center; margin-bottom: 2rem;">
-        <span class="section-tag">Client Portal</span>
-        <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">Account Sign In</h1>
-        <p style="color: var(--text-muted); font-size: 0.9rem;">
-          Access your shoot bookings, live flight clearance status, and 4K deliverables.
-        </p>
-      </div>
+      <!-- Centered Logo & Brand -->
+      <a href="index.html" class="auth-brand-center" title="Elite Drone Home">
+        <img src="images/logo.png" alt="Elite Drone Logo" class="brand-logo-img">
+        <span>ELITE DRONE</span>
+      </a>
+
+      <!-- Account Sign In Title -->
+      <h1 class="auth-create-title">ACCOUNT SIGN IN</h1>
 
       <!-- Alerts -->
       <div id="alert-box" class="auth-alert"></div>
 
-      <form id="login-form">
-        <!-- Login Identifier -->
-        <div class="form-group">
-          <label class="form-label" for="login_identifier">Email Address or Username</label>
-          <input type="text" id="login_identifier" class="form-control" placeholder="name@domain.com or username" required autofocus autocomplete="username">
-        </div>
-
-        <!-- Password -->
-        <div class="form-group">
-          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.4rem;">
-            <label class="form-label" for="password" style="margin-bottom: 0;">Password</label>
-            <a href="#" id="forgot-password-link" style="font-size: 0.8rem; color: var(--primary-light);">Forgot Password?</a>
-          </div>
-          <div class="password-input-wrap">
-            <input type="password" id="password" class="form-control" placeholder="Enter your password" required autocomplete="current-password" style="padding-right: 60px;">
-            <button type="button" class="toggle-pwd-btn" id="toggle-pwd-btn" title="Show / Hide Password" style="font-size: 0.75rem; font-weight: 700; color: var(--primary-light); text-transform: uppercase;">Show</button>
+      <form id="login-form" novalidate>
+        <!-- 1. Email or Username -->
+        <div class="reg-form-group">
+          <label class="reg-form-label" for="login_identifier">Email Address or Username <span class="required-asterisk">*</span></label>
+          <div class="input-icon-wrap">
+            <span class="input-svg-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="4" />
+                <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94" />
+              </svg>
+            </span>
+            <input type="text" id="login_identifier" class="reg-form-control has-icon"
+              placeholder="Enter your email or username" required autofocus autocomplete="username">
           </div>
         </div>
 
-        <!-- Remember Me -->
-        <div style="display: flex; align-items: center; justify-content: space-between; margin: 1.25rem 0;">
-          <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-muted); cursor: pointer;">
+        <!-- 2. Password -->
+        <div class="reg-form-group">
+          <label class="reg-form-label" for="password">Password <span class="required-asterisk">*</span></label>
+          <div class="input-icon-wrap">
+            <span class="input-svg-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </span>
+            <input type="password" id="password" class="reg-form-control has-icon has-toggle"
+              placeholder="Enter your password" required autocomplete="current-password">
+            <button type="button" class="pwd-toggle-btn" id="toggle-pwd-btn" aria-label="Toggle password visibility">
+              <svg class="eye-open" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              <svg class="eye-closed" style="display:none;" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <path
+                  d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                <line x1="1" y1="1" x2="23" y2="23" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember Me & Forgot Password -->
+        <div class="login-options-row">
+          <label class="remember-label">
             <input type="checkbox" id="remember_me">
             <span>Keep me signed in</span>
           </label>
+          <a href="#" id="forgot-password-link" class="forgot-link">Forgot Password?</a>
         </div>
 
         <!-- Submit Button -->
-        <button type="submit" id="btn-login-submit" class="btn btn-primary btn-lg" style="width: 100%;">
-          Sign In to Portal →
+        <button type="submit" id="btn-login-submit" class="btn-reg-main">
+          SIGN IN
         </button>
 
-        <p style="text-align: center; margin-top: 1.75rem; font-size: 0.9rem; color: var(--text-muted);">
-          Don't have an account yet? <a href="register.html" style="color: var(--primary-light); font-weight: 600;">Register here</a>
+        <!-- Social Divider & Buttons -->
+        <div class="reg-divider">
+          <span>or Sign in with</span>
+        </div>
+
+        <div class="reg-social-row">
+          <button type="button" class="reg-social-btn" title="Sign in with Google"
+            onclick="showToast('Google OAuth sign in is ready for integration.', 'info')">
+            <svg width="22" height="22" viewBox="0 0 48 48">
+              <path fill="#EA4335"
+                d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+              <path fill="#4285F4"
+                d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+              <path fill="#FBBC05"
+                d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+              <path fill="#34A853"
+                d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+            </svg>
+          </button>
+          <button type="button" class="reg-social-btn" title="Sign in with Facebook"
+            onclick="showToast('Facebook OAuth sign in is ready for integration.', 'info')">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="#1877F2">
+              <path
+                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Don't have an account link -->
+        <p class="reg-login-note">
+          Don't have an account yet? <a href="register.html">Register here</a>
         </p>
       </form>
 
-      <!-- Quick Demo Credentials Banner for Testing -->
-      <div style="margin-top: 2rem; padding: 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); font-size: 0.8rem; color: var(--text-muted);">
-        <strong style="color: #fff; display: block; margin-bottom: 0.25rem;">Administrator Quick Sign In:</strong>
-        Username: <code style="color: var(--primary-light);">admin</code> | Password: <code style="color: var(--primary-light);">Admin@Elite2026!</code>
+      <!-- Administrator Quick Sign In Banner -->
+      <div class="admin-quick-badge">
+        <div class="admin-quick-text">
+          <strong>Admin Quick Sign In</strong>
+          <span>User: <code>admin</code> | Pass: <code>Admin@Elite2026!</code></span>
+        </div>
+        <button type="button" id="btn-quick-fill-admin" class="btn-quick-fill" title="Autofill Administrator credentials">
+          Quick Fill
+        </button>
       </div>
     </div>
   </div>
@@ -174,29 +568,44 @@
       // Show alert if redirected from registration
       if (urlParams.get('registered') === 'true') {
         alertBox.className = 'auth-alert auth-alert-success';
-        alertBox.textContent = 'Account created successfully! Please enter your credentials to sign in.';
+        alertBox.textContent = '✓ Account created successfully! Please sign in with your credentials.';
         alertBox.style.display = 'block';
       }
 
       // Show alert if redirected from protected route
       if (urlParams.get('unauthorized') === 'true') {
         alertBox.className = 'auth-alert auth-alert-error';
-        alertBox.textContent = 'Please log in to your account to book a drone shoot.';
+        alertBox.textContent = 'Please sign in to your account to book a drone shoot.';
         alertBox.style.display = 'block';
       }
 
-      // Show/Hide password toggle
+      // Password visibility toggle with SVG icons
       const pwdInput = document.getElementById('password');
       const toggleBtn = document.getElementById('toggle-pwd-btn');
+      const openIcon = toggleBtn.querySelector('.eye-open');
+      const closedIcon = toggleBtn.querySelector('.eye-closed');
+
       toggleBtn.addEventListener('click', () => {
         if (pwdInput.type === 'password') {
           pwdInput.type = 'text';
-          toggleBtn.textContent = 'Hide';
+          openIcon.style.display = 'none';
+          closedIcon.style.display = 'block';
         } else {
           pwdInput.type = 'password';
-          toggleBtn.textContent = 'Show';
+          openIcon.style.display = 'block';
+          closedIcon.style.display = 'none';
         }
       });
+
+      // Quick fill admin credentials
+      const quickFillBtn = document.getElementById('btn-quick-fill-admin');
+      if (quickFillBtn) {
+        quickFillBtn.addEventListener('click', () => {
+          document.getElementById('login_identifier').value = 'admin';
+          pwdInput.value = 'Admin@Elite2026!';
+          showToast('Admin credentials filled!', 'info');
+        });
+      }
 
       // Forgot password prompt
       document.getElementById('forgot-password-link').addEventListener('click', (e) => {
@@ -211,12 +620,23 @@
       loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         alertBox.style.display = 'none';
+
+        const identifierVal = document.getElementById('login_identifier').value.trim();
+        const pwdVal = pwdInput.value;
+
+        if (!identifierVal || !pwdVal) {
+          alertBox.className = 'auth-alert auth-alert-error';
+          alertBox.textContent = 'Please enter both your username/email and password.';
+          alertBox.style.display = 'block';
+          return;
+        }
+
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Authenticating...';
+        submitBtn.textContent = 'Signing in...';
 
         const payload = {
-          login_identifier: document.getElementById('login_identifier').value.trim(),
-          password: pwdInput.value,
+          login_identifier: identifierVal,
+          password: pwdVal,
           remember_me: document.getElementById('remember_me').checked,
         };
 
@@ -240,10 +660,11 @@
           alertBox.textContent = err.message || 'Invalid username/email or password.';
           alertBox.style.display = 'block';
           submitBtn.disabled = false;
-          submitBtn.textContent = 'Sign In to Portal →';
+          submitBtn.textContent = 'SIGN IN';
         }
       });
     });
   </script>
 </body>
+
 </html>
