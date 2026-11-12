@@ -128,8 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
       window.Lightbox.open(
         'images/logo.png',
         'image',
-        'ELITE DRONE',
-        'Official Brand Emblem • Aerial Photography & Videography',
+        '',
+        '',
         true
       );
     }

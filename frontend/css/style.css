@@ -2014,31 +2014,32 @@ button, input, select, textarea {
 }
 
 /* ==========================================================================
-   LOGO PREVIEW LIGHTBOX MODAL
+   LOGO PREVIEW LIGHTBOX MODAL (JUST LOGO ONLY)
    ========================================================================== */
 .modal-box.logo-preview-mode {
-  max-width: 480px;
-  background: radial-gradient(circle at 50% 20%, #032b56 0%, #011833 65%, #000c1a 100%);
+  max-width: 380px;
+  background: radial-gradient(circle at 50% 50%, #032b56 0%, #011833 65%, #000c1a 100%);
   border: 1.5px solid rgba(14, 165, 233, 0.45);
-  box-shadow: 0 0 50px rgba(14, 165, 233, 0.3), 0 30px 60px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 0 50px rgba(14, 165, 233, 0.35), 0 30px 60px rgba(0, 0, 0, 0.9);
   text-align: center;
+  border-radius: 28px;
 }
 
 .modal-box.logo-preview-mode .modal-media-container {
   background: transparent;
   min-height: auto;
-  padding: 3rem 2rem 1.5rem;
+  padding: 3rem 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .lightbox-logo-img {
-  width: 240px;
-  height: 240px;
+  width: 260px;
+  height: 260px;
   border-radius: 50%;
   object-fit: cover;
-  box-shadow: 0 0 40px rgba(14, 165, 233, 0.45);
+  box-shadow: 0 0 45px rgba(14, 165, 233, 0.5);
   border: 3px solid rgba(255, 255, 255, 0.25);
   animation: logoGlowPulse 3s ease-in-out infinite;
   transition: transform 0.3s ease;
@@ -2060,24 +2061,7 @@ button, input, select, textarea {
 }
 
 .modal-box.logo-preview-mode .modal-info-panel {
-  background: rgba(0, 12, 26, 0.85);
-  border-top: 1px solid rgba(14, 165, 233, 0.2);
-  padding: 1.5rem 2rem 2rem;
-}
-
-.modal-box.logo-preview-mode .modal-title {
-  font-family: var(--font-heading);
-  font-size: 1.6rem;
-  font-weight: 800;
-  letter-spacing: 2.5px;
-  color: #fff;
-  margin-bottom: 0.5rem;
-}
-
-.modal-box.logo-preview-mode .modal-caption {
-  font-size: 0.9rem;
-  color: #94a3b8;
-  letter-spacing: 0.5px;
+  display: none !important;
 }
 
 /* ==========================================================================
