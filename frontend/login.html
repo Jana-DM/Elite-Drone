@@ -193,55 +193,48 @@
       padding-left: 2.65rem;
     }
 
-    .reg-form-control.has-logo-toggle {
-      padding-right: 3.25rem;
+    .reg-form-control.has-toggle {
+      padding-right: 4.8rem;
     }
 
-    /* Branded Elite Drone Logo Toggle Button */
-    .pwd-logo-toggle-btn {
+    /* Clean Show/Hide Text Button */
+    .pwd-text-toggle-btn {
       position: absolute;
       right: 10px;
       top: 50%;
       transform: translateY(-50%);
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      padding: 0;
-      border: 1.5px solid #cbd5e1;
-      background: #ffffff;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #0284c7;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all var(--transition-fast);
+      font-family: var(--font-sans);
+      line-height: 1;
+      user-select: none;
       z-index: 2;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     }
 
-    .pwd-logo-toggle-btn:hover {
+    .pwd-text-toggle-btn:hover {
+      background: #0284c7;
+      color: #ffffff;
       border-color: #0284c7;
-      box-shadow: 0 0 10px rgba(2, 132, 199, 0.4);
-      transform: translateY(-50%) scale(1.1);
     }
 
-    .toggle-drone-logo {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 50%;
-      pointer-events: none;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    .pwd-text-toggle-btn.is-active {
+      background: #e2e8f0;
+      color: #475569;
+      border-color: #94a3b8;
     }
 
-    .pwd-logo-toggle-btn.is-active {
+    .pwd-text-toggle-btn.is-active:hover {
+      background: #0284c7;
+      color: #ffffff;
       border-color: #0284c7;
-      box-shadow: 0 0 12px rgba(2, 132, 199, 0.6);
-      background: #f0f9ff;
-    }
-
-    .pwd-logo-toggle-btn.is-active .toggle-drone-logo {
-      transform: rotate(180deg) scale(1.05);
     }
 
     /* Hide browser default password reveal and clear buttons (Microsoft Edge, IE, Chrome) */
@@ -510,11 +503,9 @@
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
             </span>
-            <input type="password" id="password" class="reg-form-control has-icon has-logo-toggle"
+            <input type="password" id="password" class="reg-form-control has-icon has-toggle"
               placeholder="Enter your password" required autocomplete="current-password">
-            <button type="button" class="pwd-logo-toggle-btn" data-target="password" title="Click Elite Drone logo to show/hide password" aria-label="Toggle password visibility">
-              <img src="images/logo.png" alt="Elite Drone Logo" class="toggle-drone-logo">
-            </button>
+            <button type="button" class="pwd-text-toggle-btn" data-target="password" aria-label="Toggle password visibility">Show</button>
           </div>
         </div>
 
@@ -605,20 +596,20 @@
 
       const pwdInput = document.getElementById('password');
 
-      // Elite Drone Logo Password Visibility Toggle
-      document.querySelectorAll('.pwd-logo-toggle-btn').forEach(btn => {
+      // Show / Hide Password Visibility Toggle
+      document.querySelectorAll('.pwd-text-toggle-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const targetId = btn.getAttribute('data-target');
           const input = document.getElementById(targetId);
           if (!input) return;
           if (input.type === 'password') {
             input.type = 'text';
+            btn.textContent = 'Hide';
             btn.classList.add('is-active');
-            btn.setAttribute('title', 'Click Elite Drone logo to hide password');
           } else {
             input.type = 'password';
+            btn.textContent = 'Show';
             btn.classList.remove('is-active');
-            btn.setAttribute('title', 'Click Elite Drone logo to show password');
           }
         });
       });
