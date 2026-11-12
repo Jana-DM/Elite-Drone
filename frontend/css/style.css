@@ -2348,3 +2348,9 @@ button, input, select, textarea {
     border-bottom: none;
   }
 }
+
+/* Hide browser native password reveal eye (Microsoft Edge, IE, Chrome) */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none !important;
+}
