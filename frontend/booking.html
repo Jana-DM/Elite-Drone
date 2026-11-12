@@ -301,18 +301,33 @@
     let servicesData = [];
 
     document.addEventListener('DOMContentLoaded', async () => {
-      // 1. Guard route: Only authenticated customers can book services
+      // 1. Check user login state
       const user = Auth.getUser();
-      if (!user) {
-        window.location.href = 'login.html?unauthorized=true&redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
-        return;
+
+      // Pre-fill user data if logged in
+      if (user) {
+        document.getElementById('customer_name').value = user.full_name || '';
+        document.getElementById('email').value = user.email || '';
+        if (user.mobile) {
+          document.getElementById('mobile').value = user.mobile;
+        }
       }
 
-      // Pre-fill user data
-      document.getElementById('customer_name').value = user.full_name || '';
-      document.getElementById('email').value = user.email || '';
-      if (user.mobile) {
-        document.getElementById('mobile').value = user.mobile;
+      // Restore saved form state if returning from login redirect
+      const savedPending = sessionStorage.getItem('pending_booking');
+      if (savedPending) {
+        try {
+          const parsed = JSON.parse(savedPending);
+          if (parsed.customer_name && !user) document.getElementById('customer_name').value = parsed.customer_name;
+          if (parsed.email && !user) document.getElementById('email').value = parsed.email;
+          if (parsed.mobile && !user) document.getElementById('mobile').value = parsed.mobile;
+          if (parsed.event_type) document.getElementById('event_type').value = parsed.event_type;
+          if (parsed.event_date) document.getElementById('event_date').value = parsed.event_date;
+          if (parsed.event_time) document.getElementById('event_time').value = parsed.event_time;
+          if (parsed.event_location) document.getElementById('event_location').value = parsed.event_location;
+          if (parsed.complete_address) document.getElementById('complete_address').value = parsed.complete_address;
+          if (parsed.additional_requirements) document.getElementById('additional_requirements').value = parsed.additional_requirements;
+        } catch (e) {}
       }
 
       // Minimum date is tomorrow
@@ -320,11 +335,26 @@
       tomorrow.setDate(tomorrow.getDate() + 1);
       const minDateStr = tomorrow.toISOString().split('T')[0];
       document.getElementById('event_date').min = minDateStr;
-      document.getElementById('event_date').value = minDateStr;
-      document.getElementById('event_time').value = '10:00';
+      if (!document.getElementById('event_date').value) {
+        document.getElementById('event_date').value = minDateStr;
+      }
+      if (!document.getElementById('event_time').value) {
+        document.getElementById('event_time').value = '10:00';
+      }
 
       // 2. Fetch Services and Packages to populate dropdowns
       await loadServicesDropdown();
+
+      // Restore selected service / package from savedPending if available
+      if (savedPending) {
+        try {
+          const parsed = JSON.parse(savedPending);
+          if (parsed.service_id) {
+            document.getElementById('service_id').value = parsed.service_id;
+            updatePackageOptions(parseInt(parsed.service_id, 10), parsed.package_id);
+          }
+        } catch (e) {}
+      }
 
       // 3. Handle Service Change to update Package options
       const serviceSelect = document.getElementById('service_id');
@@ -374,8 +404,6 @@
 
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Submitting Booking...';
 
         const payload = {
           customer_name: document.getElementById('customer_name').value.trim(),
@@ -391,9 +419,24 @@
           additional_requirements: document.getElementById('additional_requirements').value.trim(),
         };
 
+        // If not logged in, save form data and redirect to login
+        const currentUser = Auth.getUser();
+        if (!currentUser) {
+          sessionStorage.setItem('pending_booking', JSON.stringify(payload));
+          showToast('Please sign in to confirm your flight booking.', 'info');
+          setTimeout(() => {
+            window.location.href = 'login.html?unauthorized=true&redirect=' + encodeURIComponent('booking.html');
+          }, 900);
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting Booking...';
+
         try {
           const res = await API.post('/api/bookings', payload);
           if (res.success) {
+            sessionStorage.removeItem('pending_booking');
             showToast('Booking submitted successfully!', 'success');
             document.getElementById('booking-form-view').style.display = 'none';
             document.getElementById('booking-confirmation-view').style.display = 'block';
