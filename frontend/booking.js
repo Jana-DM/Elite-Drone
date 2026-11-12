@@ -80,9 +80,9 @@ let calculationTimeout = null;
 function getAuthenticatedUser() {
     try {
         const stored = localStorage.getItem("elite_drone_user") ||
-                       localStorage.getItem("eliteDroneUser") ||
-                       sessionStorage.getItem("elite_drone_user") ||
-                       sessionStorage.getItem("eliteDroneUser");
+            localStorage.getItem("eliteDroneUser") ||
+            sessionStorage.getItem("elite_drone_user") ||
+            sessionStorage.getItem("eliteDroneUser");
         if (stored) {
             const parsed = JSON.parse(stored);
             if (parsed && typeof parsed === "object") return parsed;
@@ -907,7 +907,7 @@ function completeBooking(paymentStatus) {
         : (eventInput ? eventInput.value : "Aerial Shoot");
 
     const timeElement = document.getElementById("bookingTime") ||
-                        document.querySelector('[name="bookingTime"], [name="time"], #time');
+        document.querySelector('[name="bookingTime"], [name="time"], #time');
     const bookingTime = timeElement ? String(timeElement.value || "").trim() : "10:00 AM";
 
     const bookingData = {
@@ -1206,3 +1206,4 @@ document.addEventListener("DOMContentLoaded", function () {
     loadWelcomeUser();
     calculateDays();
 });
+
