@@ -1,501 +1,1201 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Book a Drone Shoot | Elite Drone Service</title>
-  <meta name="description" content="Schedule your drone photography and 4K aerial videography shoot with certified commercial pilots.">
-  
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="images/favicon.png">
-  <link rel="apple-touch-icon" href="images/logo.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELITE DRONE SERVICE - Booking</title>
 
-  <link rel="stylesheet" href="css/style.css">
-  <style>
-    .navbar .btn-nav-book {
-      display: none !important;
-    }
-    .booking-wrapper {
-      min-height: 100vh;
-      padding: 8rem 1.5rem 5rem 1.5rem;
-      background: radial-gradient(circle at 50% 15%, rgba(14, 165, 233, 0.12) 0%, transparent 60%),
-                  linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-    }
-    .booking-container {
-      max-width: 900px;
-      margin: 0 auto;
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 3.5rem;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(16px);
-      position: relative;
-    }
-    .booking-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-    }
-    .form-section-title {
-      grid-column: 1 / -1;
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #fff;
-      border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 0.5rem;
-      margin-top: 1rem;
-      margin-bottom: 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .notice-box {
-      grid-column: 1 / -1;
-      background: rgba(245, 158, 11, 0.08);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      padding: 1rem 1.25rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.85rem;
-      color: #fbbf24;
-      line-height: 1.6;
-    }
-    /* Confirmation Overlay */
-    .confirmation-card {
-      display: none;
-      text-align: center;
-      padding: 3rem 2rem;
-    }
-    .confirmation-icon {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: rgba(16, 185, 129, 0.15);
-      border: 2px solid #10b981;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      color: #34d399;
-      margin: 0 auto 1.5rem auto;
-    }
-    .reference-box {
-      background: rgba(14, 165, 233, 0.1);
-      border: 1px dashed var(--border-glow);
-      border-radius: var(--radius-md);
-      padding: 1.25rem;
-      margin: 2rem auto;
-      max-width: 420px;
-    }
-    .reference-code {
-      font-family: var(--font-heading);
-      font-size: 1.75rem;
-      font-weight: 800;
-      color: var(--primary-light);
-      letter-spacing: 2px;
-      margin-top: 0.25rem;
-    }
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="apple-touch-icon" href="images/logo.png">
 
-    @media (max-width: 768px) {
-      .booking-container {
-        padding: 2rem 1.5rem;
-      }
-      .booking-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+    <link rel="stylesheet" href="booking.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap"
+        rel="stylesheet"
+    >
 </head>
+
 <body>
 
-  <!-- Site Header -->
-  <header class="site-header">
-    <div class="container">
-      <nav class="navbar">
-        <a href="index.html" class="brand-logo">
-          <img src="images/logo.png" alt="Elite Drone Logo" class="brand-logo-img">
-          <span>ELITE DRONE</span>
+<main class="booking-page">
+
+    <div class="booking-top-bar">
+        <a href="index.html" class="back-home-link">
+            ← Back to Home
         </a>
-
-        <div class="nav-actions" id="nav-actions">
-          <!-- Auth buttons dynamically rendered -->
-        </div>
-
-        <button class="nav-toggle" id="nav-toggle">☰</button>
-      </nav>
     </div>
-  </header>
 
-  <div class="booking-wrapper">
-    <div class="booking-container">
-      
-      <!-- Booking Form View -->
-      <div id="booking-form-view">
-        <div style="text-align: center; margin-bottom: 2rem;">
-          <span class="section-tag">Flight Dispatch Scheduling</span>
-          <h1 style="font-size: 2.4rem; margin-bottom: 0.5rem;">Book Your Aerial Mission</h1>
-          <p style="color: var(--text-muted); font-size: 0.95rem;">
-            Provide your event requirements below. Your shoot request will be submitted to flight dispatch for airspace feasibility review.
-          </p>
-        </div>
+    <section class="booking-container">
 
-        <!-- Visual Progress Stepper -->
-        <div class="booking-stepper">
-          <div class="stepper-step active" id="step-nav-1">
-            <div class="stepper-circle">1</div>
-            <div class="stepper-label">
-              <span>Step 1</span>
-              <strong>Client Information</strong>
-            </div>
-          </div>
-          <div class="stepper-line"></div>
-          <div class="stepper-step" id="step-nav-2">
-            <div class="stepper-circle">2</div>
-            <div class="stepper-label">
-              <span>Step 2</span>
-              <strong>Mission Offering</strong>
-            </div>
-          </div>
-          <div class="stepper-line"></div>
-          <div class="stepper-step" id="step-nav-3">
-            <div class="stepper-circle">3</div>
-            <div class="stepper-label">
-              <span>Step 3</span>
-              <strong>Venue & Schedule</strong>
-            </div>
-          </div>
-        </div>
+        <!-- =====================================================
+             HEADER
+        ====================================================== -->
 
-        <form id="drone-booking-form">
-          <div class="booking-grid">
-            
-            <!-- Section 1: Customer Contact -->
-            <div class="form-section-title">
-              1. Customer Information
+        <header class="booking-header">
+
+            <div class="booking-brand">
+                <a href="index.html" title="Go to Home Page">
+                    <img src="images/logo.jpeg" alt="Elite Drone Service Logo" class="booking-logo">
+                </a>
+    
+                <h1>ELITE DRONE SERVICE</h1>
+
+                <p>
+                    Book your professional drone service
+                </p>
+
+                <div
+                    id="welcomeMessage"
+                    class="welcome-message"
+                    aria-live="polite"
+                ></div>
+
             </div>
+
+        </header>
+
+        <!-- =====================================================
+             BOOKING FORM
+        ====================================================== -->
+
+        <form
+            id="bookingForm"
+            novalidate
+        >
+
+            <!-- NAME -->
 
             <div class="form-group">
-              <label class="form-label" for="customer_name">Full Contact Name <span style="color: #ef4444;">*</span></label>
-              <input type="text" id="customer_name" class="form-control" placeholder="e.g. Vikram Malhotra" required>
+
+                <label for="name">
+                    Name <span>*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="Enter your name"
+                    autocomplete="name"
+                >
+
+                <div
+                    id="nameError"
+                    class="field-error"
+                ></div>
+
             </div>
+
+            <!-- GENDER -->
 
             <div class="form-group">
-              <label class="form-label" for="email">Email Address <span style="color: #ef4444;">*</span></label>
-              <input type="email" id="email" class="form-control" placeholder="name@domain.com" required>
+
+                <label for="gender">
+                    Gender <span>*</span>
+                </label>
+
+                <select
+                    id="gender"
+                    name="gender"
+                >
+
+                    <option value="">
+                        Select Gender
+                    </option>
+
+                    <option value="Male">
+                        Male
+                    </option>
+
+                    <option value="Female">
+                        Female
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+                <div
+                    id="genderError"
+                    class="field-error"
+                ></div>
+
             </div>
 
-            <div class="form-group" style="grid-column: 1 / -1;">
-              <label class="form-label" for="mobile">Primary Mobile Phone <span style="color: #ef4444;">*</span></label>
-              <input type="tel" id="mobile" class="form-control" placeholder="10-digit mobile number" required>
-            </div>
-
-            <!-- Section 2: Service & Package Selection -->
-            <div class="form-section-title">
-              2. Flight Service & Package Details
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="service_id">Drone Service Offering <span style="color: #ef4444;">*</span></label>
-              <select id="service_id" class="form-control" style="background: #0c1220;" required>
-                <option value="">Select Service...</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="package_id">Package Tier</label>
-              <select id="package_id" class="form-control" style="background: #0c1220;">
-                <option value="">Select Package Tier (Optional)...</option>
-              </select>
-            </div>
-
-            <div class="form-group" style="grid-column: 1 / -1;">
-              <label class="form-label" for="event_type">Event / Shoot Type <span style="color: #ef4444;">*</span></label>
-              <input type="text" id="event_type" class="form-control" placeholder="e.g. Palace Wedding Ceremony, Villa Promotional Video, Music Festival, Corporate Ad" required>
-            </div>
-
-            <!-- Section 3: Date & Location -->
-            <div class="form-section-title">
-              3. Mission Schedule & Coordinates
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="event_date">Flight Date <span style="color: #ef4444;">*</span></label>
-              <input type="date" id="event_date" class="form-control" required style="color-scheme: dark;">
-            </div>
+            <!-- AGE -->
 
             <div class="form-group">
-              <label class="form-label" for="event_time">Reporting Time <span style="color: #ef4444;">*</span></label>
-              <input type="time" id="event_time" class="form-control" required style="color-scheme: dark;">
+
+                <label for="age">
+                    Age <span>*</span>
+                </label>
+
+                <input
+                    type="number"
+                    id="age"
+                    name="age"
+                    min="1"
+                    max="120"
+                    step="1"
+                    placeholder="Enter your age"
+                >
+
+                <div
+                    id="ageError"
+                    class="field-error"
+                ></div>
+
             </div>
 
-            <div class="form-group" style="grid-column: 1 / -1;">
-              <label class="form-label" for="event_location">City / Venue Landmark <span style="color: #ef4444;">*</span></label>
-              <input type="text" id="event_location" class="form-control" placeholder="e.g. The Leela Palace, Udaipur / Bengaluru Tech Park" required>
+            <!-- =================================================
+                 EVENT / FUNCTION
+            ================================================== -->
+
+            <div class="form-group">
+
+                <label for="eventType">
+                    Event / Function <span>*</span>
+                </label>
+
+                <select
+                    id="eventType"
+                    name="eventType"
+                >
+
+                    <option value="">
+                        Select Event / Function
+                    </option>
+
+                    <option value="Wedding">
+                        Wedding
+                    </option>
+
+                    <option value="Pre-Wedding">
+                        Pre-Wedding
+                    </option>
+
+                    <option value="Engagement">
+                        Engagement
+                    </option>
+
+                    <option value="Reception">
+                        Reception
+                    </option>
+
+                    <option value="Birthday">
+                        Birthday
+                    </option>
+
+                    <option value="Anniversary">
+                        Anniversary
+                    </option>
+
+                    <option value="Baby Shower">
+                        Baby Shower
+                    </option>
+
+                    <option value="Maternity">
+                        Maternity
+                    </option>
+
+                    <option value="Housewarming">
+                        Housewarming
+                    </option>
+
+                    <option value="Naming Ceremony">
+                        Naming Ceremony
+                    </option>
+
+                    <option value="Traditional Function">
+                        Traditional Function
+                    </option>
+
+                    <option value="Temple Function">
+                        Temple Function
+                    </option>
+
+                    <option value="Festival">
+                        Festival
+                    </option>
+
+                    <option value="Cultural Event">
+                        Cultural Event
+                    </option>
+
+                    <option value="School Function">
+                        School Function
+                    </option>
+
+                    <option value="College Function">
+                        College Function
+                    </option>
+
+                    <option value="College Fest">
+                        College Fest
+                    </option>
+
+                    <option value="Sports Event">
+                        Sports Event
+                    </option>
+
+                    <option value="Corporate Event">
+                        Corporate Event
+                    </option>
+
+                    <option value="Business Event">
+                        Business Event
+                    </option>
+
+                    <option value="Product Launch">
+                        Product Launch
+                    </option>
+
+                    <option value="Company Anniversary">
+                        Company Anniversary
+                    </option>
+
+                    <option value="Award Ceremony">
+                        Award Ceremony
+                    </option>
+
+                    <option value="Conference">
+                        Conference
+                    </option>
+
+                    <option value="Seminar">
+                        Seminar
+                    </option>
+
+                    <option value="Exhibition">
+                        Exhibition
+                    </option>
+
+                    <option value="Trade Show">
+                        Trade Show
+                    </option>
+
+                    <option value="Political Event">
+                        Political Event
+                    </option>
+
+                    <option value="Public Event">
+                        Public Event
+                    </option>
+
+                    <option value="Real Estate">
+                        Real Estate
+                    </option>
+
+                    <option value="Property Showcase">
+                        Property Showcase
+                    </option>
+
+                    <option value="Construction">
+                        Construction
+                    </option>
+
+                    <option value="Construction Inspection">
+                        Construction Inspection
+                    </option>
+
+                    <option value="Building Inspection">
+                        Building Inspection
+                    </option>
+
+                    <option value="Land Surveying">
+                        Land Surveying
+                    </option>
+
+                    <option value="Surveying">
+                        Surveying
+                    </option>
+
+                    <option value="Agriculture">
+                        Agriculture
+                    </option>
+
+                    <option value="Farm Monitoring">
+                        Farm Monitoring
+                    </option>
+
+                    <option value="Crop Monitoring">
+                        Crop Monitoring
+                    </option>
+
+                    <option value="Industrial Inspection">
+                        Industrial Inspection
+                    </option>
+
+                    <option value="Solar Panel Inspection">
+                        Solar Panel Inspection
+                    </option>
+
+                    <option value="Roof Inspection">
+                        Roof Inspection
+                    </option>
+
+                    <option value="Cinematic">
+                        Cinematic
+                    </option>
+
+                    <option value="Short Film">
+                        Short Film
+                    </option>
+
+                    <option value="Movie Production">
+                        Movie Production
+                    </option>
+
+                    <option value="Music Video">
+                        Music Video
+                    </option>
+
+                    <option value="Advertisement">
+                        Advertisement
+                    </option>
+
+                    <option value="Documentary">
+                        Documentary
+                    </option>
+
+                    <option value="Travel / Tourism">
+                        Travel / Tourism
+                    </option>
+
+                    <option value="Resort Promotion">
+                        Resort Promotion
+                    </option>
+
+                    <option value="Hotel Promotion">
+                        Hotel Promotion
+                    </option>
+
+                    <option value="Nature Photography">
+                        Nature Photography
+                    </option>
+
+                    <option value="Wildlife Photography">
+                        Wildlife Photography
+                    </option>
+
+                    <option value="Aerial Photography">
+                        Aerial Photography
+                    </option>
+
+                    <option value="Drone Videography">
+                        Drone Videography
+                    </option>
+
+                    <option value="Landscape Photography">
+                        Landscape Photography
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+                <div
+                    id="eventError"
+                    class="field-error"
+                ></div>
+
             </div>
 
-            <div class="form-group" style="grid-column: 1 / -1;">
-              <label class="form-label" for="complete_address">Complete Operational Address <span style="color: #ef4444;">*</span></label>
-              <textarea id="complete_address" class="form-control" rows="3" placeholder="Full street address and pin code (Required by DGCA for Digital Sky flight zone clearance)" required></textarea>
+            <!-- OTHER EVENT -->
+
+            <div
+                id="otherEventGroup"
+                class="form-group hidden"
+            >
+
+                <label for="otherEvent">
+                    Specify Requirement <span>*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="otherEvent"
+                    name="otherEvent"
+                    placeholder="Enter your requirement"
+                >
+
+                <div
+                    id="otherEventError"
+                    class="field-error"
+                ></div>
+
             </div>
 
-            <div class="form-group" style="grid-column: 1 / -1;">
-              <label class="form-label" for="additional_requirements">Special Directives & Requirements (Optional)</label>
-              <textarea id="additional_requirements" class="form-control" rows="3" placeholder="e.g. Need FPV indoor fly-through, live HDMI feed for venue monitors, sunset golden hour shoot..."></textarea>
+            <!-- =================================================
+                 DATE RANGE
+            ================================================== -->
+
+            <div class="date-range-grid">
+
+                <!-- START DATE -->
+
+                <div class="form-group">
+
+                    <label for="startDate">
+                        Start Date <span>*</span>
+                    </label>
+
+                    <input
+                        type="date"
+                        id="startDate"
+                        name="startDate"
+                    >
+
+                    <div
+                        id="startDateError"
+                        class="field-error"
+                    ></div>
+
+                </div>
+
+                <!-- END DATE -->
+
+                <div class="form-group">
+
+                    <label for="endDate">
+                        End Date <span>*</span>
+                    </label>
+
+                    <input
+                        type="date"
+                        id="endDate"
+                        name="endDate"
+                    >
+
+                    <div
+                        id="endDateError"
+                        class="field-error"
+                    ></div>
+
+                </div>
+
             </div>
 
-            <div class="notice-box">
-              <strong>Flight Safety Notice:</strong> All booking requests are initialized in <strong>Pending</strong> status until our certified flight controller evaluates weather, airspace classifications (Digital Sky Red/Yellow/Green zones), and local permissions.
+            <!-- NUMBER OF DAYS -->
+
+            <div class="form-group">
+
+                <label for="numberOfDays">
+                    Number of Days
+                </label>
+
+                <input
+                    type="text"
+                    id="numberOfDays"
+                    name="numberOfDays"
+                    placeholder="Automatically calculated"
+                    readonly
+                >
+
+                <div
+                    id="daysError"
+                    class="field-error"
+                ></div>
+
             </div>
 
-            <div style="grid-column: 1 / -1; margin-top: 1rem;">
-              <button type="submit" id="btn-submit-booking" class="btn btn-primary btn-lg" style="width: 100%;">
-                Submit Flight Booking Request →
-              </button>
+            <!-- =================================================
+                 EVENT ADDRESS
+            ================================================== -->
+
+            <div class="form-group">
+
+                <label for="address">
+                    Event / Function Address <span>*</span>
+                </label>
+
+                <textarea
+                    id="address"
+                    name="address"
+                    rows="4"
+                    placeholder="Enter the event / function address"
+                ></textarea>
+
+                <div
+                    id="addressError"
+                    class="field-error"
+                ></div>
+
             </div>
-          </div>
+
+            <!-- =================================================
+                 MOBILE
+            ================================================== -->
+
+            <div class="form-group">
+                <label for="mobile">Mobile Number <span class="required-star">*</span></label>
+                <div class="mobile-wrapper">
+                    <div class="country-code-wrapper">
+                        <select id="countryCode" name="countryCode" required aria-label="Country Code">
+                            <option value="+93">Afghanistan (+93)</option>
+                            <option value="+355">Albania (+355)</option>
+                            <option value="+213">Algeria (+213)</option>
+                            <option value="+1684">American Samoa (+1684)</option>
+                            <option value="+376">Andorra (+376)</option>
+                            <option value="+244">Angola (+244)</option>
+                            <option value="+1264">Anguilla (+1264)</option>
+                            <option value="+1268">Antigua and Barbuda (+1268)</option>
+                            <option value="+54">Argentina (+54)</option>
+                            <option value="+374">Armenia (+374)</option>
+                            <option value="+297">Aruba (+297)</option>
+                            <option value="+61">Australia (+61)</option>
+                            <option value="+43">Austria (+43)</option>
+                            <option value="+994">Azerbaijan (+994)</option>
+                            <option value="+1242">Bahamas (+1242)</option>
+                            <option value="+973">Bahrain (+973)</option>
+                            <option value="+880">Bangladesh (+880)</option>
+                            <option value="+1246">Barbados (+1246)</option>
+                            <option value="+375">Belarus (+375)</option>
+                            <option value="+32">Belgium (+32)</option>
+                            <option value="+501">Belize (+501)</option>
+                            <option value="+229">Benin (+229)</option>
+                            <option value="+1441">Bermuda (+1441)</option>
+                            <option value="+975">Bhutan (+975)</option>
+                            <option value="+591">Bolivia (+591)</option>
+                            <option value="+387">Bosnia and Herzegovina (+387)</option>
+                            <option value="+267">Botswana (+267)</option>
+                            <option value="+55">Brazil (+55)</option>
+                            <option value="+246">British Indian Ocean Territory (+246)</option>
+                            <option value="+1284">British Virgin Islands (+1284)</option>
+                            <option value="+673">Brunei (+673)</option>
+                            <option value="+359">Bulgaria (+359)</option>
+                            <option value="+226">Burkina Faso (+226)</option>
+                            <option value="+257">Burundi (+257)</option>
+                            <option value="+855">Cambodia (+855)</option>
+                            <option value="+237">Cameroon (+237)</option>
+                            <option value="+1">Canada (+1)</option>
+                            <option value="+238">Cape Verde (+238)</option>
+                            <option value="+1345">Cayman Islands (+1345)</option>
+                            <option value="+236">Central African Republic (+236)</option>
+                            <option value="+235">Chad (+235)</option>
+                            <option value="+56">Chile (+56)</option>
+                            <option value="+86">China (+86)</option>
+                            <option value="+61">Christmas Island (+61)</option>
+                            <option value="+61">Cocos Islands (+61)</option>
+                            <option value="+57">Colombia (+57)</option>
+                            <option value="+269">Comoros (+269)</option>
+                            <option value="+242">Congo (+242)</option>
+                            <option value="+243">Congo (DRC) (+243)</option>
+                            <option value="+682">Cook Islands (+682)</option>
+                            <option value="+506">Costa Rica (+506)</option>
+                            <option value="+385">Croatia (+385)</option>
+                            <option value="+53">Cuba (+53)</option>
+                            <option value="+599">Curaçao (+599)</option>
+                            <option value="+357">Cyprus (+357)</option>
+                            <option value="+420">Czech Republic (+420)</option>
+                            <option value="+45">Denmark (+45)</option>
+                            <option value="+253">Djibouti (+253)</option>
+                            <option value="+1767">Dominica (+1767)</option>
+                            <option value="+1809">Dominican Republic (+1809)</option>
+                            <option value="+593">Ecuador (+593)</option>
+                            <option value="+20">Egypt (+20)</option>
+                            <option value="+503">El Salvador (+503)</option>
+                            <option value="+240">Equatorial Guinea (+240)</option>
+                            <option value="+291">Eritrea (+291)</option>
+                            <option value="+372">Estonia (+372)</option>
+                            <option value="+251">Ethiopia (+251)</option>
+                            <option value="+500">Falkland Islands (+500)</option>
+                            <option value="+298">Faroe Islands (+298)</option>
+                            <option value="+679">Fiji (+679)</option>
+                            <option value="+358">Finland (+358)</option>
+                            <option value="+33">France (+33)</option>
+                            <option value="+594">French Guiana (+594)</option>
+                            <option value="+689">French Polynesia (+689)</option>
+                            <option value="+241">Gabon (+241)</option>
+                            <option value="+220">Gambia (+220)</option>
+                            <option value="+995">Georgia (+995)</option>
+                            <option value="+49">Germany (+49)</option>
+                            <option value="+233">Ghana (+233)</option>
+                            <option value="+350">Gibraltar (+350)</option>
+                            <option value="+30">Greece (+30)</option>
+                            <option value="+299">Greenland (+299)</option>
+                            <option value="+1473">Grenada (+1473)</option>
+                            <option value="+590">Guadeloupe (+590)</option>
+                            <option value="+1671">Guam (+1671)</option>
+                            <option value="+502">Guatemala (+502)</option>
+                            <option value="+44">Guernsey (+44)</option>
+                            <option value="+224">Guinea (+224)</option>
+                            <option value="+245">Guinea-Bissau (+245)</option>
+                            <option value="+592">Guyana (+592)</option>
+                            <option value="+509">Haiti (+509)</option>
+                            <option value="+504">Honduras (+504)</option>
+                            <option value="+852">Hong Kong (+852)</option>
+                            <option value="+36">Hungary (+36)</option>
+                            <option value="+354">Iceland (+354)</option>
+                            <option value="+91" selected>India (+91)</option>
+                            <option value="+62">Indonesia (+62)</option>
+                            <option value="+98">Iran (+98)</option>
+                            <option value="+964">Iraq (+964)</option>
+                            <option value="+353">Ireland (+353)</option>
+                            <option value="+44">Isle of Man (+44)</option>
+                            <option value="+972">Israel (+972)</option>
+                            <option value="+39">Italy (+39)</option>
+                            <option value="+225">Ivory Coast (+225)</option>
+                            <option value="+1876">Jamaica (+1876)</option>
+                            <option value="+81">Japan (+81)</option>
+                            <option value="+44">Jersey (+44)</option>
+                            <option value="+962">Jordan (+962)</option>
+                            <option value="+7">Kazakhstan (+7)</option>
+                            <option value="+254">Kenya (+254)</option>
+                            <option value="+686">Kiribati (+686)</option>
+                            <option value="+383">Kosovo (+383)</option>
+                            <option value="+965">Kuwait (+965)</option>
+                            <option value="+996">Kyrgyzstan (+996)</option>
+                            <option value="+856">Laos (+856)</option>
+                            <option value="+371">Latvia (+371)</option>
+                            <option value="+961">Lebanon (+961)</option>
+                            <option value="+266">Lesotho (+266)</option>
+                            <option value="+231">Liberia (+231)</option>
+                            <option value="+218">Libya (+218)</option>
+                            <option value="+423">Liechtenstein (+423)</option>
+                            <option value="+370">Lithuania (+370)</option>
+                            <option value="+352">Luxembourg (+352)</option>
+                            <option value="+853">Macau (+853)</option>
+                            <option value="+389">North Macedonia (+389)</option>
+                            <option value="+261">Madagascar (+261)</option>
+                            <option value="+265">Malawi (+265)</option>
+                            <option value="+60">Malaysia (+60)</option>
+                            <option value="+960">Maldives (+960)</option>
+                            <option value="+223">Mali (+223)</option>
+                            <option value="+356">Malta (+356)</option>
+                            <option value="+692">Marshall Islands (+692)</option>
+                            <option value="+596">Martinique (+596)</option>
+                            <option value="+222">Mauritania (+222)</option>
+                            <option value="+230">Mauritius (+230)</option>
+                            <option value="+263">Mayotte (+263)</option>
+                            <option value="+52">Mexico (+52)</option>
+                            <option value="+691">Micronesia (+691)</option>
+                            <option value="+373">Moldova (+373)</option>
+                            <option value="+377">Monaco (+377)</option>
+                            <option value="+976">Mongolia (+976)</option>
+                            <option value="+382">Montenegro (+382)</option>
+                            <option value="+1664">Montserrat (+1664)</option>
+                            <option value="+212">Morocco (+212)</option>
+                            <option value="+258">Mozambique (+258)</option>
+                            <option value="+95">Myanmar (+95)</option>
+                            <option value="+264">Namibia (+264)</option>
+                            <option value="+674">Nauru (+674)</option>
+                            <option value="+977">Nepal (+977)</option>
+                            <option value="+31">Netherlands (+31)</option>
+                            <option value="+687">New Caledonia (+687)</option>
+                            <option value="+64">New Zealand (+64)</option>
+                            <option value="+505">Nicaragua (+505)</option>
+                            <option value="+227">Niger (+227)</option>
+                            <option value="+234">Nigeria (+234)</option>
+                            <option value="+683">Niue (+683)</option>
+                            <option value="+850">North Korea (+850)</option>
+                            <option value="+1670">Northern Mariana Islands (+1670)</option>
+                            <option value="+47">Norway (+47)</option>
+                            <option value="+968">Oman (+968)</option>
+                            <option value="+92">Pakistan (+92)</option>
+                            <option value="+680">Palau (+680)</option>
+                            <option value="+970">Palestine (+970)</option>
+                            <option value="+507">Panama (+507)</option>
+                            <option value="+675">Papua New Guinea (+675)</option>
+                            <option value="+595">Paraguay (+595)</option>
+                            <option value="+51">Peru (+51)</option>
+                            <option value="+63">Philippines (+63)</option>
+                            <option value="+48">Poland (+48)</option>
+                            <option value="+351">Portugal (+351)</option>
+                            <option value="+1787">Puerto Rico (+1787)</option>
+                            <option value="+974">Qatar (+974)</option>
+                            <option value="+262">Réunion (+262)</option>
+                            <option value="+40">Romania (+40)</option>
+                            <option value="+7">Russia (+7)</option>
+                            <option value="+250">Rwanda (+250)</option>
+                            <option value="+590">Saint Barthélemy (+590)</option>
+                            <option value="+290">Saint Helena (+290)</option>
+                            <option value="+1869">Saint Kitts and Nevis (+1869)</option>
+                            <option value="+1758">Saint Lucia (+1758)</option>
+                            <option value="+590">Saint Martin (+590)</option>
+                            <option value="+508">Saint Pierre and Miquelon (+508)</option>
+                            <option value="+1784">Saint Vincent & Grenadines (+1784)</option>
+                            <option value="+685">Samoa (+685)</option>
+                            <option value="+378">San Marino (+378)</option>
+                            <option value="+239">Sao Tome and Principe (+239)</option>
+                            <option value="+966">Saudi Arabia (+966)</option>
+                            <option value="+221">Senegal (+221)</option>
+                            <option value="+381">Serbia (+381)</option>
+                            <option value="+248">Seychelles (+248)</option>
+                            <option value="+232">Sierra Leone (+232)</option>
+                            <option value="+65">Singapore (+65)</option>
+                            <option value="+1721">Sint Maarten (+1721)</option>
+                            <option value="+421">Slovakia (+421)</option>
+                            <option value="+386">Slovenia (+386)</option>
+                            <option value="+677">Solomon Islands (+677)</option>
+                            <option value="+252">Somalia (+252)</option>
+                            <option value="+27">South Africa (+27)</option>
+                            <option value="+82">South Korea (+82)</option>
+                            <option value="+211">South Sudan (+211)</option>
+                            <option value="+34">Spain (+34)</option>
+                            <option value="+94">Sri Lanka (+94)</option>
+                            <option value="+249">Sudan (+249)</option>
+                            <option value="+597">Suriname (+597)</option>
+                            <option value="+268">Eswatini (+268)</option>
+                            <option value="+46">Sweden (+46)</option>
+                            <option value="+41">Switzerland (+41)</option>
+                            <option value="+963">Syria (+963)</option>
+                            <option value="+886">Taiwan (+886)</option>
+                            <option value="+992">Tajikistan (+992)</option>
+                            <option value="+255">Tanzania (+255)</option>
+                            <option value="+66">Thailand (+66)</option>
+                            <option value="+670">Timor-Leste (+670)</option>
+                            <option value="+228">Togo (+228)</option>
+                            <option value="+690">Tokelau (+690)</option>
+                            <option value="+676">Tonga (+676)</option>
+                            <option value="+1868">Trinidad and Tobago (+1868)</option>
+                            <option value="+216">Tunisia (+216)</option>
+                            <option value="+90">Turkey (+90)</option>
+                            <option value="+993">Turkmenistan (+993)</option>
+                            <option value="+1649">Turks and Caicos Islands (+1649)</option>
+                            <option value="+688">Tuvalu (+688)</option>
+                            <option value="+256">Uganda (+256)</option>
+                            <option value="+380">Ukraine (+380)</option>
+                            <option value="+971">United Arab Emirates (+971)</option>
+                            <option value="+44">United Kingdom (+44)</option>
+                            <option value="+1">United States (+1)</option>
+                            <option value="+598">Uruguay (+598)</option>
+                            <option value="+998">Uzbekistan (+998)</option>
+                            <option value="+678">Vanuatu (+678)</option>
+                            <option value="+39">Vatican City (+39)</option>
+                            <option value="+58">Venezuela (+58)</option>
+                            <option value="+84">Vietnam (+84)</option>
+                            <option value="+1340">Virgin Islands (U.S.) (+1340)</option>
+                            <option value="+681">Wallis and Futuna (+681)</option>
+                            <option value="+967">Yemen (+967)</option>
+                            <option value="+260">Zambia (+260)</option>
+                            <option value="+263">Zimbabwe (+263)</option>
+                        </select>
+                    </div>
+
+                    <input
+                        type="tel"
+                        id="mobile"
+                        name="mobile"
+                        inputmode="numeric"
+                        maxlength="10"
+                        placeholder="Enter mobile number"
+                        autocomplete="tel"
+                        required
+                    >
+                </div>
+
+                <div
+                    id="mobileError"
+                    class="field-error"
+                ></div>
+
+            </div>
+
+            <!-- =================================================
+                 OTP
+            ================================================== -->
+
+            <section class="otp-card">
+
+                <div class="otp-heading">
+
+                    <h3>
+                        OTP Verification
+                    </h3>
+
+                    <p>
+                        Verify your mobile number
+                    </p>
+
+                </div>
+
+                <div class="otp-row">
+
+                    <input
+                        type="text"
+                        id="otp"
+                        maxlength="4"
+                        inputmode="numeric"
+                        placeholder="4 digit OTP"
+                        autocomplete="one-time-code"
+                    >
+
+                    <button
+                        type="button"
+                        id="sendOtpBtn"
+                        class="secondary-btn"
+                    >
+                        Send OTP
+                    </button>
+
+                </div>
+
+                <div class="otp-action-row">
+
+                    <div
+                        id="otpTimer"
+                        class="otp-timer"
+                        aria-live="polite"
+                    ></div>
+
+                    <button
+                        type="button"
+                        id="verifyOtpBtn"
+                        class="verify-btn"
+                    >
+                        Verify OTP
+                    </button>
+
+                </div>
+
+                <div
+                    id="otpError"
+                    class="field-error"
+                ></div>
+
+                <div
+                    id="otpSuccess"
+                    class="otp-success"
+                >
+
+                    <span class="success-tick">
+                        ✓
+                    </span>
+
+                    <span>
+                        Your OTP is correct
+                    </span>
+
+                </div>
+
+            </section>
+
+            <!-- =================================================
+                 AMOUNT
+            ================================================== -->
+
+            <section class="amount-card">
+
+                <div class="amount-title">
+                    Estimated Booking Amount
+                </div>
+
+                <div
+                    id="calculationLoading"
+                    class="calculation-loading hidden"
+                >
+                    Loading...
+                </div>
+
+                <div
+                    id="amountBox"
+                    class="amount-box"
+                >
+                    ₹0
+                </div>
+
+                <p class="rate-text">
+                    ₹1999 per day
+                </p>
+
+            </section>
+
+            <!-- =================================================
+                 PAYMENT
+            ================================================== -->
+
+            <section class="payment-section">
+
+                <h2>
+                    Payment Method
+                </h2>
+
+                <div class="payment-choice-container">
+
+                    <label class="payment-choice">
+
+                        <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="online"
+                        >
+
+                        <span>
+                            Online Payment
+                        </span>
+
+                    </label>
+
+                    <label class="payment-choice">
+
+                        <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="offline"
+                        >
+
+                        <span>
+                            Offline Payment
+                        </span>
+
+                    </label>
+
+                </div>
+
+                <div
+                    id="paymentError"
+                    class="payment-error"
+                ></div>
+
+                <!-- ONLINE -->
+
+                <div
+                    id="onlinePaymentSection"
+                    class="online-payment-section hidden"
+                >
+
+                    <div class="payment-header">
+
+                        <h3>
+                            Online Payment
+                        </h3>
+
+                        <p>
+                            Scan the QR code or select a UPI app
+                        </p>
+
+                    </div>
+
+                    <div class="payment-amount-display">
+
+                        <span>
+                            Total Amount
+                        </span>
+
+                        <strong id="paymentAmount">
+                            ₹0
+                        </strong>
+
+                    </div>
+
+                    <!-- QR CODE -->
+
+                    <div class="qr-card">
+
+                        <div class="qr-title">
+                            Scan & Pay
+                        </div>
+
+                        <img
+                            src="images/payment-qr.png"
+                            alt="Elite Drone Service UPI Payment QR"
+                            class="payment-qr"
+                        >
+
+                        <p class="qr-text">
+                            Scan to pay with any UPI app
+                        </p>
+
+                    </div>
+
+                    <!-- UPI APPS -->
+
+                    <div class="upi-payment-area">
+
+                        <h4>
+                            Pay using UPI
+                        </h4>
+
+                        <div class="upi-buttons">
+
+                            <button
+                                type="button"
+                                class="upi-app-btn"
+                                data-app="gpay"
+                            >
+
+                                <span class="app-logo gpay-logo">
+                                    G
+                                </span>
+
+                                <span>
+                                    Google Pay
+                                </span>
+
+                            </button>
+
+                            <button
+                                type="button"
+                                class="upi-app-btn"
+                                data-app="phonepe"
+                            >
+
+                                <span class="app-logo phonepe-logo">
+                                    P
+                                </span>
+
+                                <span>
+                                    PhonePe
+                                </span>
+
+                            </button>
+
+                            <button
+                                type="button"
+                                class="upi-app-btn"
+                                data-app="paytm"
+                            >
+
+                                <span class="app-logo paytm-logo">
+                                    Pay
+                                </span>
+
+                                <span>
+                                    Paytm
+                                </span>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <!-- CARD -->
+
+                    <div class="card-payment-area">
+
+                        <h4>
+                            Other Payment Options
+                        </h4>
+
+                        <div class="card-buttons">
+
+                            <button
+                                type="button"
+                                class="card-payment-btn"
+                                data-card="debit"
+                            >
+                                Debit Card
+                            </button>
+
+                            <button
+                                type="button"
+                                class="card-payment-btn"
+                                data-card="credit"
+                            >
+                                Credit Card
+                            </button>
+
+                            <button
+                                type="button"
+                                class="card-payment-btn"
+                                data-card="atm"
+                            >
+                                ATM Card
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="paymentNetworkError"
+                        class="payment-network-error"
+                    ></div>
+
+                    <button
+                        type="button"
+                        id="onlinePaymentBtn"
+                        class="main-payment-btn"
+                    >
+                        Continue Online Payment
+                    </button>
+
+                </div>
+
+                <!-- OFFLINE -->
+
+                <div
+                    id="offlinePaymentSection"
+                    class="offline-payment-section hidden"
+                >
+
+                    <div class="offline-box">
+
+                        <div class="offline-icon">
+                            ✓
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Offline Payment Selected
+                            </h3>
+
+                            <p>
+                                Elite Drone Service will contact you
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- =================================================
+                 BOOK NOW
+            ================================================== -->
+
+            <button
+                type="submit"
+                id="bookNowBtn"
+                class="book-now-btn"
+            >
+                Book Now
+            </button>
+
+            <!-- =================================================
+                 BOOKING SUCCESS SYSTEM
+            ================================================== -->
+            <div
+                id="bookingSuccess"
+                class="booking-success hidden"
+                role="status"
+                aria-live="polite"
+            >
+                <div class="booking-success-card">
+                    <div class="big-success-tick" aria-hidden="true"><span>✓</span></div>
+                    <h2>Booking Confirmed!</h2>
+                    <p>Your drone shoot has been successfully booked.</p>
+                    <div id="bookingSuccessDetails" class="booking-success-details"></div>
+                    <div id="bookingSuccessError" class="booking-success-error" aria-live="assertive"></div>
+                    <div class="booking-success-progress" aria-hidden="true"><span></span></div>
+                    <p class="booking-success-redirect">Returning to Elite Drone...</p>
+                </div>
+                <div id="bookingNotificationFlyer" class="booking-notification-flyer" aria-hidden="true">
+                    <span class="flyer-check">✓</span>
+                    <span>New Booking</span>
+                </div>
+            </div>
+
         </form>
-      </div>
 
-      <!-- Confirmation Screen View -->
-      <div id="booking-confirmation-view" class="confirmation-card">
-        <div class="confirmation-icon">✓</div>
-        <h2 style="font-size: 2.2rem; margin-bottom: 0.5rem; color: #fff;">Booking Submitted!</h2>
-        <p style="color: var(--text-muted); font-size: 1.05rem; max-width: 550px; margin: 0 auto;">
-          Your drone shoot request has been recorded in the flight operations registry. Our operations director is reviewing your location coordinates.
-        </p>
+    </section>
 
-        <div class="reference-box">
-          <div style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px;">Unique Booking Reference</div>
-          <div class="reference-code" id="confirmed-reference-code">ELD-20261101-ABCD</div>
-          <div style="font-size: 0.8rem; color: #f59e0b; margin-top: 0.5rem;">Status: <strong>PENDING BUSINESS APPROVAL</strong></div>
-        </div>
+</main>
 
-        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-          <a href="dashboard.html" class="btn btn-primary btn-lg">
-            View in Customer Dashboard
-          </a>
-          <a href="index.html" class="btn btn-secondary btn-lg">
-            Return to Homepage
-          </a>
-        </div>
-      </div>
+<script src="booking.js"></script>
 
-    </div>
-  </div>
-
-  <div class="toast-container"></div>
-
-  <!-- Scripts -->
-  <script src="js/api.js"></script>
-  <script src="js/auth.js"></script>
-  <script>
-    let servicesData = [];
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      // 1. Check user login state
-      const user = Auth.getUser();
-
-      // Pre-fill user data if logged in
-      if (user) {
-        document.getElementById('customer_name').value = user.full_name || '';
-        document.getElementById('email').value = user.email || '';
-        if (user.mobile) {
-          document.getElementById('mobile').value = user.mobile;
-        }
-      }
-
-      // Restore saved form state if returning from login redirect
-      const savedPending = sessionStorage.getItem('pending_booking');
-      if (savedPending) {
-        try {
-          const parsed = JSON.parse(savedPending);
-          if (parsed.customer_name && !user) document.getElementById('customer_name').value = parsed.customer_name;
-          if (parsed.email && !user) document.getElementById('email').value = parsed.email;
-          if (parsed.mobile && !user) document.getElementById('mobile').value = parsed.mobile;
-          if (parsed.event_type) document.getElementById('event_type').value = parsed.event_type;
-          if (parsed.event_date) document.getElementById('event_date').value = parsed.event_date;
-          if (parsed.event_time) document.getElementById('event_time').value = parsed.event_time;
-          if (parsed.event_location) document.getElementById('event_location').value = parsed.event_location;
-          if (parsed.complete_address) document.getElementById('complete_address').value = parsed.complete_address;
-          if (parsed.additional_requirements) document.getElementById('additional_requirements').value = parsed.additional_requirements;
-        } catch (e) {}
-      }
-
-      // Minimum date is tomorrow
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      const minDateStr = tomorrow.toISOString().split('T')[0];
-      document.getElementById('event_date').min = minDateStr;
-      if (!document.getElementById('event_date').value) {
-        document.getElementById('event_date').value = minDateStr;
-      }
-      if (!document.getElementById('event_time').value) {
-        document.getElementById('event_time').value = '10:00';
-      }
-
-      // 2. Fetch Services and Packages to populate dropdowns
-      await loadServicesDropdown();
-
-      // Restore selected service / package from savedPending if available
-      if (savedPending) {
-        try {
-          const parsed = JSON.parse(savedPending);
-          if (parsed.service_id) {
-            document.getElementById('service_id').value = parsed.service_id;
-            updatePackageOptions(parseInt(parsed.service_id, 10), parsed.package_id);
-          }
-        } catch (e) {}
-      }
-
-      // 3. Handle Service Change to update Package options
-      const serviceSelect = document.getElementById('service_id');
-      const packageSelect = document.getElementById('package_id');
-
-      serviceSelect.addEventListener('change', () => {
-        const selectedId = parseInt(serviceSelect.value, 10);
-        updatePackageOptions(selectedId);
-      });
-
-      // Stepper Interactive Focus Tracking
-      function setStepperStep(step) {
-        const step1 = document.getElementById('step-nav-1');
-        const step2 = document.getElementById('step-nav-2');
-        const step3 = document.getElementById('step-nav-3');
-        if (!step1 || !step2 || !step3) return;
-
-        [step1, step2, step3].forEach(s => s.classList.remove('active', 'completed'));
-        if (step === 1) {
-          step1.classList.add('active');
-        } else if (step === 2) {
-          step1.classList.add('completed');
-          step2.classList.add('active');
-        } else if (step === 3) {
-          step1.classList.add('completed');
-          step2.classList.add('completed');
-          step3.classList.add('active');
-        }
-      }
-
-      ['customer_name', 'email', 'mobile'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('focus', () => setStepperStep(1));
-      });
-      ['service_id', 'package_id', 'event_type'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('focus', () => setStepperStep(2));
-      });
-      ['event_date', 'event_time', 'event_location', 'complete_address', 'additional_requirements'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('focus', () => setStepperStep(3));
-      });
-
-      // 4. Form Submission
-      const form = document.getElementById('drone-booking-form');
-      const submitBtn = document.getElementById('btn-submit-booking');
-
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const payload = {
-          customer_name: document.getElementById('customer_name').value.trim(),
-          email: document.getElementById('email').value.trim(),
-          mobile: document.getElementById('mobile').value.trim(),
-          event_type: document.getElementById('event_type').value.trim(),
-          service_id: parseInt(document.getElementById('service_id').value, 10),
-          package_id: document.getElementById('package_id').value ? parseInt(document.getElementById('package_id').value, 10) : null,
-          event_date: document.getElementById('event_date').value,
-          event_time: document.getElementById('event_time').value,
-          event_location: document.getElementById('event_location').value.trim(),
-          complete_address: document.getElementById('complete_address').value.trim(),
-          additional_requirements: document.getElementById('additional_requirements').value.trim(),
-        };
-
-        // If not logged in, save form data and redirect to login
-        const currentUser = Auth.getUser();
-        if (!currentUser) {
-          sessionStorage.setItem('pending_booking', JSON.stringify(payload));
-          showToast('Please sign in to confirm your flight booking.', 'info');
-          setTimeout(() => {
-            window.location.href = 'login.html?unauthorized=true&redirect=' + encodeURIComponent('booking.html');
-          }, 900);
-          return;
-        }
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Submitting Booking...';
-
-        try {
-          const res = await API.post('/api/bookings', payload);
-          if (res.success) {
-            sessionStorage.removeItem('pending_booking');
-            showToast('Booking submitted successfully!', 'success');
-            document.getElementById('booking-form-view').style.display = 'none';
-            document.getElementById('booking-confirmation-view').style.display = 'block';
-            document.getElementById('confirmed-reference-code').textContent = res.booking.booking_reference;
-          }
-        } catch (err) {
-          showToast(err.message || 'Failed to submit booking.', 'error');
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Submit Flight Booking Request →';
-        }
-      });
-    });
-
-    async function loadServicesDropdown() {
-      const serviceSelect = document.getElementById('service_id');
-      try {
-        const res = await API.get('/api/services');
-        if (res.success && res.data) {
-          servicesData = res.data;
-          servicesData.forEach(svc => {
-            const opt = document.createElement('option');
-            opt.value = svc.id;
-            opt.textContent = svc.name;
-            serviceSelect.appendChild(opt);
-          });
-
-          // Check query parameters to pre-select
-          const urlParams = new URLSearchParams(window.location.search);
-          const svcParam = urlParams.get('service');
-          const pkgParam = urlParams.get('package');
-
-          if (svcParam) {
-            const matched = servicesData.find(s => s.id == svcParam || s.slug == svcParam);
-            if (matched) {
-              serviceSelect.value = matched.id;
-              updatePackageOptions(matched.id, pkgParam);
-            }
-          }
-        }
-      } catch (e) {
-        console.error('Error loading services for booking form:', e);
-      }
-    }
-
-    function updatePackageOptions(serviceId, preselectedPkgId = null) {
-      const packageSelect = document.getElementById('package_id');
-      packageSelect.innerHTML = '<option value="">Select Package Tier (Optional)...</option>';
-
-      const service = servicesData.find(s => s.id === serviceId);
-      if (service && service.packages && service.packages.length > 0) {
-        service.packages.forEach(pkg => {
-          const opt = document.createElement('option');
-          opt.value = pkg.id;
-          const price = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(pkg.price);
-          opt.textContent = `${pkg.name} (${pkg.duration_hours}h) - ${price}`;
-          packageSelect.appendChild(opt);
-        });
-
-        if (preselectedPkgId) {
-          packageSelect.value = preselectedPkgId;
-        }
-      }
-    }
-  </script>
 </body>
 </html>
