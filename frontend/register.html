@@ -104,6 +104,48 @@
       padding-left: 2.65rem;
     }
 
+    .reg-form-control.has-toggle {
+      padding-right: 4.5rem;
+    }
+
+    /* Modern Text Toggle Button (SHOW / HIDE) */
+    .pwd-text-toggle-btn {
+      position: absolute;
+      right: 12px;
+      background: rgba(2, 132, 199, 0.08);
+      border: 1px solid rgba(2, 132, 199, 0.22);
+      color: #0284c7;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      padding: 0.32rem 0.65rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-family: var(--font-sans);
+      line-height: 1;
+      user-select: none;
+      z-index: 2;
+    }
+
+    .pwd-text-toggle-btn:hover {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #0284c7;
+    }
+
+    .pwd-text-toggle-btn.is-active {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #475569;
+    }
+
+    .pwd-text-toggle-btn.is-active:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
     .input-icon-wrap:focus-within .input-svg-icon {
       color: #0284c7;
     }
@@ -611,7 +653,8 @@
             <span class="input-svg-icon">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             </span>
-            <input type="password" id="password" class="reg-form-control has-icon" placeholder="Create password" required autocomplete="new-password">
+            <input type="password" id="password" class="reg-form-control has-icon has-toggle" placeholder="Create password" required autocomplete="new-password">
+            <button type="button" class="pwd-text-toggle-btn" data-target="password" aria-label="Toggle password visibility">SHOW</button>
           </div>
         </div>
 
@@ -622,7 +665,8 @@
             <span class="input-svg-icon">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             </span>
-            <input type="password" id="confirm_password" class="reg-form-control has-icon" placeholder="Re-enter password" required autocomplete="new-password">
+            <input type="password" id="confirm_password" class="reg-form-control has-icon has-toggle" placeholder="Re-enter password" required autocomplete="new-password">
+            <button type="button" class="pwd-text-toggle-btn" data-target="confirm_password" aria-label="Toggle confirm password visibility">SHOW</button>
           </div>
           <div class="field-hint" id="confirm-password-hint"></div>
         </div>
@@ -770,6 +814,24 @@
       if (destEl) {
         destEl.textContent = emailInput.value.trim() || 'Enter your email above';
       }
+    });
+
+    // Text-based Password Visibility Toggle (SHOW / HIDE)
+    document.querySelectorAll('.pwd-text-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        const input = document.getElementById(targetId);
+        if (!input) return;
+        if (input.type === 'password') {
+          input.type = 'text';
+          btn.textContent = 'HIDE';
+          btn.classList.add('is-active');
+        } else {
+          input.type = 'password';
+          btn.textContent = 'SHOW';
+          btn.classList.remove('is-active');
+        }
+      });
     });
 
     // 1. Username Availability Check (Debounced)
