@@ -59,8 +59,17 @@ const Lightbox = {
     });
   },
 
-  open(mediaUrl, mediaType, itemTitle, itemDescription) {
+  open(mediaUrl, mediaType, itemTitle, itemDescription, isLogo = false) {
     if (!this.modal || !this.container) return;
+
+    const modalBox = this.modal.querySelector('.modal-box');
+    if (modalBox) {
+      if (isLogo) {
+        modalBox.classList.add('logo-preview-mode');
+      } else {
+        modalBox.classList.remove('logo-preview-mode');
+      }
+    }
 
     this.container.innerHTML = '';
     if (mediaType === 'video') {
@@ -75,8 +84,12 @@ const Lightbox = {
       const img = document.createElement('img');
       img.src = mediaUrl;
       img.alt = itemTitle || 'Drone Capture';
-      img.style.maxWidth = '100%';
-      img.style.maxHeight = '65vh';
+      if (isLogo) {
+        img.className = 'lightbox-logo-img';
+      } else {
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '65vh';
+      }
       this.container.appendChild(img);
     }
 
@@ -90,6 +103,8 @@ const Lightbox = {
   close() {
     if (!this.modal) return;
     this.modal.classList.remove('active');
+    const modalBox = this.modal.querySelector('.modal-box');
+    if (modalBox) modalBox.classList.remove('logo-preview-mode');
     if (this.container) this.container.innerHTML = '';
     document.body.style.overflow = 'auto';
   }
@@ -99,6 +114,42 @@ window.Lightbox = Lightbox;
 // DOM Initialization
 document.addEventListener('DOMContentLoaded', () => {
   Lightbox.init();
+
+  // Interactive Brand Logo Preview (touch/click to preview official Logo)
+  const brandLogo = document.querySelector('.brand-logo');
+  const brandLogoImg = document.querySelector('.brand-logo-img');
+  
+  function triggerLogoModal(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (window.Lightbox) {
+      window.Lightbox.open(
+        'images/logo.png',
+        'image',
+        'ELITE DRONE',
+        'Official Brand Emblem • Aerial Photography & Videography',
+        true
+      );
+    }
+  }
+  window.triggerLogoModal = triggerLogoModal;
+
+  if (brandLogoImg) {
+    brandLogoImg.style.cursor = 'pointer';
+    brandLogoImg.setAttribute('title', 'Touch to view Elite Drone Logo');
+    brandLogoImg.addEventListener('click', triggerLogoModal);
+  }
+
+  // On index.html, clicking the brand logo also opens the preview
+  const isIndexPage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '';
+  if (isIndexPage && brandLogo) {
+    brandLogo.setAttribute('title', 'Touch to view Elite Drone Logo');
+    brandLogo.addEventListener('click', (e) => {
+      triggerLogoModal(e);
+    });
+  }
 
   // 1. Header scroll effect
   const header = document.querySelector('.site-header');
