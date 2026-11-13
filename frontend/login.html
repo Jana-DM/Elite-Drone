@@ -138,6 +138,13 @@
       font-weight: 600;
     }
 
+    .auth-alert-warning {
+      background: #fffbeb;
+      border: 1.5px solid #fcd34d;
+      color: #92400e;
+      font-weight: 600;
+    }
+
     .reg-form-group {
       margin-bottom: 1.25rem;
     }
@@ -591,6 +598,13 @@
       if (urlParams.get('unauthorized') === 'true') {
         alertBox.className = 'auth-alert auth-alert-error';
         alertBox.textContent = 'Please sign in to your account to book a drone shoot.';
+        alertBox.style.display = 'block';
+      }
+
+      // Show alert if registration/login is required for dashboard
+      if (urlParams.get('msg') === 'register_required') {
+        alertBox.className = 'auth-alert auth-alert-warning';
+        alertBox.innerHTML = '🔒 <strong>Sign In Required:</strong> Please sign in to access your Client Dashboard, or <a href="register.html?redirect=dashboard.html" style="color: #0284c7; text-decoration: underline; font-weight: 700;">register an account here</a>.';
         alertBox.style.display = 'block';
       }
 

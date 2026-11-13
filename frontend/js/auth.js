@@ -49,7 +49,8 @@ const Auth = {
             <span class="nav-user-avatar">${initial}</span>
             <span>${user.full_name || user.username}${roleBadge}</span>
           </a>
-          <a href="${dashboardLink}" class="btn btn-secondary btn-sm">
+          <a href="booking.html" class="btn btn-nav-book"><span>BOOK SHOOT</span> <span>✦</span></a>
+          <a href="${dashboardLink}" class="btn btn-nav-dashboard">
             Dashboard
           </a>
           <button onclick="Auth.logout()" class="btn btn-secondary btn-sm" style="border-color: rgba(239,68,68,0.4); color: #f87171;">
@@ -62,10 +63,24 @@ const Auth = {
         <a href="login.html" class="btn btn-nav-login">Login</a>
         <a href="register.html" class="btn btn-nav-register">Register</a>
         <a href="booking.html" class="btn btn-nav-book"><span>BOOK SHOOT</span> <span>✦</span></a>
+        <a href="dashboard.html" class="btn btn-nav-dashboard" onclick="return handleDashboardNavClick(event)">Dashboard</a>
       `;
     }
   }
 };
+
+function handleDashboardNavClick(event) {
+  const user = (window.Auth && Auth.getUser()) || JSON.parse(localStorage.getItem('elite_drone_user') || 'null');
+  if (!user) {
+    if (event) event.preventDefault();
+    window.location.href = 'register.html?redirect=dashboard.html&msg=register_required';
+    return false;
+  }
+  const dashboardLink = user.role === 'admin' || user.role === 'superadmin' ? 'admin.html' : 'dashboard.html';
+  window.location.href = dashboardLink;
+  return true;
+}
+window.handleDashboardNavClick = handleDashboardNavClick;
 
 window.Auth = Auth;
 document.addEventListener('DOMContentLoaded', () => {

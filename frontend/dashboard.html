@@ -376,7 +376,7 @@
     document.addEventListener('DOMContentLoaded', async () => {
       const user = Auth.getUser();
       if (!user) {
-        window.location.href = 'login.html?unauthorized=true';
+        window.location.href = 'register.html?redirect=dashboard.html&msg=register_required';
         return;
       }
 

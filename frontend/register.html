@@ -158,6 +158,30 @@
       display: none !important;
     }
 
+    /* Alerts */
+    .auth-alert {
+      padding: 0.85rem 1.15rem;
+      border-radius: 10px;
+      font-size: 0.86rem;
+      margin-bottom: 1.35rem;
+      display: none;
+      line-height: 1.45;
+    }
+
+    .auth-alert-warning {
+      background: #fffbeb;
+      border: 1.5px solid #fcd34d;
+      color: #92400e;
+      font-weight: 600;
+    }
+
+    .auth-alert-success {
+      background: #f0fdf4;
+      border: 1.5px solid #86efac;
+      color: #15803d;
+      font-weight: 600;
+    }
+
     /* Modern OTP Notice Box */
     .reg-otp-email-notice {
       display: flex;
@@ -579,6 +603,9 @@
       <!-- Create Account Title -->
       <h1 class="auth-create-title">CREATE ACCOUNT</h1>
 
+      <!-- Notice Alert -->
+      <div id="register-alert-box" class="auth-alert"></div>
+
       <form id="registration-form" novalidate>
         <!-- 1. Full Name -->
         <div class="reg-form-group">
@@ -786,6 +813,14 @@
     const verifiedBadge = document.getElementById('otp-verified-badge');
     const verifiedLabel = document.getElementById('verified-destination-label');
     const genderHidden = document.getElementById('gender');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const regAlert = document.getElementById('register-alert-box');
+    if (urlParams.get('msg') === 'register_required') {
+      regAlert.className = 'auth-alert auth-alert-warning';
+      regAlert.innerHTML = '🔒 <strong>Registration Required:</strong> Please create an account first to access your Client Dashboard. (Already have an account? <a href="login.html?redirect=dashboard.html" style="color: #0284c7; text-decoration: underline; font-weight: 700;">Sign in here</a>)';
+      regAlert.style.display = 'block';
+    }
 
     // Sync gender radio with hidden input
     document.querySelectorAll('input[name="gender"]').forEach(radio => {
@@ -1105,8 +1140,9 @@
         const res = await API.post('/api/auth/register', payload);
         if (res.success) {
           showToast('Registration successful! Redirecting to login...', 'success');
+          const redirectParam = urlParams.get('redirect') || 'dashboard.html';
           setTimeout(() => {
-            window.location.href = 'login.html?registered=true';
+            window.location.href = `login.html?registered=true&redirect=${encodeURIComponent(redirectParam)}`;
           }, 1500);
         }
       } catch (err) {
