@@ -107,7 +107,7 @@ async function runTests() {
 
     // Since bcrypt is one-way, in test let's create a known test code and verify it
     const bcrypt = require('bcrypt');
-    const testOtpCode = '882244';
+    const testOtpCode = '8224';
     const knownHash = await bcrypt.hash(testOtpCode, 10);
     await pool.query('UPDATE otp_verifications SET otp_hash = $1 WHERE id = $2', [knownHash, otpId]);
 
@@ -118,7 +118,7 @@ async function runTests() {
       body: JSON.stringify({
         destinationType: 'email',
         destination: testEmail,
-        otpCode: '000000',
+        otpCode: '0000',
         purpose: 'registration'
       })
     });

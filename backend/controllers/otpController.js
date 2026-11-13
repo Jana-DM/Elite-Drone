@@ -73,8 +73,8 @@ exports.sendOtp = async (req, res) => {
       });
     }
 
-    // 3. Generate 6-digit numeric OTP
-    const rawOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    // 3. Generate 4-digit numeric OTP
+    const rawOtp = Math.floor(1000 + Math.random() * 9000).toString();
     const otpHash = await bcrypt.hash(rawOtp, 10);
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
@@ -131,15 +131,15 @@ exports.verifyOtp = async (req, res) => {
     if (!destinationType || !destination || !otpCode) {
       return res.status(400).json({
         success: false,
-        message: 'Destination type, destination, and 6-digit OTP code are required.',
+        message: 'Destination type, destination, and 4-digit OTP code are required.',
       });
     }
 
     const dest = destination.trim().toLowerCase();
     const cleanOtp = otpCode.trim();
 
-    if (!/^\d{6}$/.test(cleanOtp)) {
-      return res.status(400).json({ success: false, message: 'OTP must be exactly 6 digits.' });
+    if (!/^\d{4}$/.test(cleanOtp)) {
+      return res.status(400).json({ success: false, message: 'OTP must be exactly 4 digits.' });
     }
 
     // Find latest active OTP record

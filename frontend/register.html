@@ -699,7 +699,7 @@
             SEND OTP
           </button>
 
-          <input type="text" id="otp_code" class="reg-otp-input" placeholder="• • • • • •" maxlength="6">
+          <input type="text" id="otp_code" class="reg-otp-input" placeholder="• • • •" maxlength="4">
 
           <button type="button" id="btn-verify-otp" class="btn-otp-action" disabled>
             VERIFY OTP
@@ -1014,8 +1014,8 @@
       const targetDestination = emailInput.value.trim();
       const code = otpCodeInput.value.trim();
 
-      if (!/^\d{6}$/.test(code)) {
-        showToast('Please enter a valid 6-digit numeric OTP.', 'error');
+      if (!/^\d{4}$/.test(code)) {
+        showToast('Please enter a valid 4-digit numeric OTP.', 'error');
         otpCodeInput.focus();
         return;
       }
