@@ -555,84 +555,69 @@
             </div>
 
             <!-- =================================================
-                 OTP
+                 OTP VERIFICATION (MATCHING REGISTER PAGE)
             ================================================== -->
 
-            <section class="otp-card">
+            <div class="reg-otp-box">
 
-                <div class="otp-heading">
+                <div class="reg-otp-title">OTP VERIFICATION</div>
 
-                    <h3>
-                        OTP Verification
-                    </h3>
-
-                    <p>
-                        Verify your email address
-                    </p>
-
+                <div class="reg-otp-email-notice">
+                    <span class="otp-notice-icon">📧</span>
+                    <div class="otp-notice-text">
+                        <span>Security verification code will be sent to:</span>
+                        <strong id="otp-dest-display">Enter your email above</strong>
+                    </div>
                 </div>
 
+                <button
+                    type="button"
+                    id="sendOtpBtn"
+                    class="btn-otp-action"
+                >
+                    SEND OTP
+                </button>
 
-                <div class="otp-row">
+                <input
+                    type="text"
+                    id="otp"
+                    class="reg-otp-input"
+                    maxlength="4"
+                    inputmode="numeric"
+                    placeholder="• • • •"
+                    autocomplete="one-time-code"
+                >
 
-                    <input
-                        type="text"
-                        id="otp"
-                        maxlength="4"
-                        inputmode="numeric"
-                        placeholder="4 digit OTP"
-                        autocomplete="one-time-code"
-                    >
+                <button
+                    type="button"
+                    id="verifyOtpBtn"
+                    class="btn-otp-action"
+                    disabled
+                >
+                    VERIFY OTP
+                </button>
 
-                    <button
-                        type="button"
-                        id="sendOtpBtn"
-                        class="secondary-btn"
-                    >
-                        Send OTP
-                    </button>
-
-                </div>
-
-                <div class="otp-action-row">
-
-                    <div
-                        id="otpTimer"
-                        class="otp-timer"
-                        aria-live="polite"
-                    ></div>
-
-                    <button
-                        type="button"
-                        id="verifyOtpBtn"
-                        class="verify-btn"
-                    >
-                        Verify OTP
-                    </button>
-
-                </div>
+                <!-- Status / Countdown Message -->
+                <div
+                    id="otpTimer"
+                    class="otp-status-message"
+                    aria-live="polite"
+                ></div>
 
                 <div
                     id="otpError"
                     class="field-error"
                 ></div>
 
+                <!-- Verified Badge -->
                 <div
                     id="otpSuccess"
-                    class="otp-success"
+                    class="otp-verified-badge"
                 >
-
-                    <span class="success-tick">
-                        ✓
-                    </span>
-
-                    <span>
-                        Your OTP is correct
-                    </span>
-
+                    ✓ Security Verification Completed for <span id="verified-destination-label"></span>
                 </div>
 
-            </section>
+            </div>
 
             <!-- =================================================
                  AMOUNT

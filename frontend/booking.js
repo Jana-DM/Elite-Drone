@@ -31,6 +31,8 @@ const addressInput = document.getElementById("address");
 const countryCode = null; // removed - using email OTP instead
 const emailInput = document.getElementById("email");
 const mobileInput = emailInput; // alias for backward compatibility
+const otpDestDisplay = document.getElementById("otp-dest-display");
+const verifiedLabel = document.getElementById("verified-destination-label");
 const otpInput = document.getElementById("otp");
 const sendOtpBtn = document.getElementById("sendOtpBtn");
 const verifyOtpBtn = document.getElementById("verifyOtpBtn");
@@ -394,7 +396,7 @@ function calculateAmount(days = null) {
 }
 
 /* ============================================================
-   EMAIL VALIDATION
+   EMAIL VALIDATION & OTP NOTICE SYNC
 ============================================================ */
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -403,12 +405,19 @@ if (mobileInput) {
     mobileInput.addEventListener("input", function () {
         const emailVal = mobileInput.value.trim();
 
+        if (otpDestDisplay) {
+            otpDestDisplay.textContent = emailVal || "Enter your email above";
+        }
+
         otpVerified = false;
-        if (otpSuccess) otpSuccess.classList.remove("show");
+        if (otpSuccess) {
+            otpSuccess.classList.remove("show");
+            otpSuccess.style.display = "none";
+        }
 
         if (verifyOtpBtn) {
-            verifyOtpBtn.disabled = false;
-            verifyOtpBtn.textContent = "Verify OTP";
+            verifyOtpBtn.disabled = true;
+            verifyOtpBtn.textContent = "VERIFY OTP";
         }
 
         if (EMAIL_REGEX.test(emailVal)) {
@@ -424,7 +433,7 @@ if (mobileInput) {
 }
 
 /* ============================================================
-   OTP SEND
+   OTP SEND (MATCHING REGISTER PAGE)
 ============================================================ */
 
 if (sendOtpBtn) {
@@ -442,12 +451,17 @@ if (sendOtpBtn) {
         clearError(errors.otp);
 
         otpVerified = false;
-        if (otpSuccess) otpSuccess.classList.remove("show");
-
-        startOtpTimer();
+        if (otpSuccess) {
+            otpSuccess.classList.remove("show");
+            otpSuccess.style.display = "none";
+        }
 
         sendOtpBtn.disabled = true;
-        sendOtpBtn.textContent = "Sending...";
+        sendOtpBtn.textContent = "PLEASE WAIT...";
+        if (otpTimer) {
+            otpTimer.textContent = "Contacting security dispatch server...";
+            otpTimer.style.color = "#0284c7";
+        }
 
         try {
             const response = await fetch("/send-otp", {
@@ -472,8 +486,10 @@ if (sendOtpBtn) {
 
             if (verifyOtpBtn) {
                 verifyOtpBtn.disabled = false;
-                verifyOtpBtn.textContent = "Verify OTP";
+                verifyOtpBtn.textContent = "VERIFY OTP";
             }
+
+            startOtpCountdown(90);
 
             // In local development, show the code helper
             if (result.otp) {
@@ -490,48 +506,44 @@ if (sendOtpBtn) {
             clearInterval(otpTimerInterval);
             if (otpTimer) otpTimer.textContent = "";
 
-            sendOtpBtn.classList.remove("hidden");
             sendOtpBtn.disabled = false;
-            sendOtpBtn.textContent = "Send OTP";
+            sendOtpBtn.textContent = "SEND OTP";
         }
     });
 }
 
 /* ============================================================
-   OTP TIMER
+   OTP COUNTDOWN TIMER
 ============================================================ */
 
-function startOtpTimer() {
+function startOtpCountdown(seconds) {
     clearInterval(otpTimerInterval);
-    otpRemaining = OTP_DURATION;
+    otpRemaining = seconds;
+    sendOtpBtn.disabled = true;
 
-    if (sendOtpBtn) sendOtpBtn.classList.add("hidden");
-
-    function updateOtpTimer() {
-        const minutes = String(Math.floor(otpRemaining / 60)).padStart(2, "0");
-        const seconds = String(otpRemaining % 60).padStart(2, "0");
-        if (otpTimer) otpTimer.textContent = `OTP expires in ${minutes}:${seconds}`;
+    function updateCountdown() {
+        if (otpRemaining > 0) {
+            sendOtpBtn.textContent = `Resend in ${otpRemaining}s`;
+            if (otpTimer) {
+                otpTimer.textContent = `OTP dispatched. You may request a new code in ${otpRemaining}s.`;
+                otpTimer.style.color = "#0284c7";
+            }
+        } else {
+            clearInterval(otpTimerInterval);
+            sendOtpBtn.disabled = false;
+            sendOtpBtn.textContent = "SEND OTP";
+            if (otpTimer) {
+                otpTimer.textContent = "Did not receive code? Click Send OTP.";
+                otpTimer.style.color = "#d97706";
+            }
+        }
     }
 
-    updateOtpTimer();
+    updateCountdown();
 
     otpTimerInterval = setInterval(function () {
         otpRemaining--;
-
-        if (otpRemaining <= 0) {
-            otpRemaining = 0;
-            updateOtpTimer();
-            clearInterval(otpTimerInterval);
-
-            if (sendOtpBtn) {
-                sendOtpBtn.classList.remove("hidden");
-                sendOtpBtn.disabled = false;
-                sendOtpBtn.textContent = "Resend OTP";
-            }
-            return;
-        }
-
-        updateOtpTimer();
+        updateCountdown();
     }, 1000);
 }
 
@@ -545,15 +557,19 @@ if (otpInput) {
 
         if (otpInput.value.length === 4) {
             clearError(errors.otp);
+            if (verifyOtpBtn) verifyOtpBtn.disabled = false;
         } else {
             otpVerified = false;
-            if (otpSuccess) otpSuccess.classList.remove("show");
+            if (otpSuccess) {
+                otpSuccess.classList.remove("show");
+                otpSuccess.style.display = "none";
+            }
         }
     });
 }
 
 /* ============================================================
-   OTP VERIFY
+   OTP VERIFY (MATCHING REGISTER PAGE)
 ============================================================ */
 
 if (verifyOtpBtn) {
@@ -567,13 +583,13 @@ if (verifyOtpBtn) {
         }
 
         if (otp.length !== 4) {
-            showError(errors.otp, "Please enter your 4 digit OTP");
+            showError(errors.otp, "Please enter your 4-digit numeric OTP");
             if (otpInput) otpInput.focus();
             return;
         }
 
         verifyOtpBtn.disabled = true;
-        verifyOtpBtn.textContent = "Verifying...";
+        verifyOtpBtn.textContent = "VERIFYING...";
 
         try {
             const response = await fetch("/verify-otp", {
@@ -594,11 +610,20 @@ if (verifyOtpBtn) {
 
             otpVerified = true;
             clearError(errors.otp);
-            if (errors.otp) errors.otp.style.color = "var(--error)";
 
-            if (otpSuccess) otpSuccess.classList.add("show");
-            verifyOtpBtn.textContent = "Verified";
+            if (otpSuccess) {
+                otpSuccess.style.display = "flex";
+                otpSuccess.classList.add("show");
+            }
+            if (verifiedLabel) {
+                verifiedLabel.textContent = `${email} (EMAIL)`;
+            }
+
+            verifyOtpBtn.textContent = "VERIFIED ✓";
             verifyOtpBtn.disabled = true;
+            sendOtpBtn.disabled = true;
+            clearInterval(otpTimerInterval);
+            if (otpTimer) otpTimer.textContent = "";
 
         } catch (error) {
             console.error("VERIFY OTP ERROR:", error);
@@ -607,7 +632,7 @@ if (verifyOtpBtn) {
             if (errors.otp) errors.otp.style.color = "var(--error)";
 
             verifyOtpBtn.disabled = false;
-            verifyOtpBtn.textContent = "Verify OTP";
+            verifyOtpBtn.textContent = "VERIFY OTP";
         }
     });
 }
@@ -1089,7 +1114,10 @@ function loadBookingData() {
         }
         if (endDateInput && data.endDate) endDateInput.value = data.endDate;
         if (addressInput && data.address) addressInput.value = data.address;
-        if (mobileInput && (data.email || data.mobile)) mobileInput.value = data.email || data.mobile;
+        if (mobileInput && (data.email || data.mobile)) {
+            mobileInput.value = data.email || data.mobile;
+            if (otpDestDisplay) otpDestDisplay.textContent = mobileInput.value;
+        }
 
         if (data.paymentMethod) {
             const radio = document.querySelector(`input[name="paymentMethod"][value="${data.paymentMethod}"]`);
@@ -1130,6 +1158,7 @@ function loadWelcomeUser() {
     }
     if (mobileInput && !mobileInput.value && (user.email || user.mobile)) {
         mobileInput.value = user.email || user.mobile || "";
+        if (otpDestDisplay && user.email) otpDestDisplay.textContent = user.email;
     }
 }
 
