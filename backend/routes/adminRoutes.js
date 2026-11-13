@@ -21,5 +21,10 @@ router.get('/customers', adminController.getCustomers);
 router.post('/gallery', adminController.addGalleryItem);
 router.delete('/gallery/:id', adminController.deleteGalleryItem);
 
+// Audit Logs & Settings
+router.get('/logs', adminController.getAuditLogs);
+router.get('/settings', adminController.getSettings);
+router.put('/settings', adminController.updateSettings);
+
 module.exports = router;
 

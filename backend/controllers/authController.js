@@ -315,3 +315,94 @@ exports.logout = (req, res) => {
   res.clearCookie('token');
   return res.json({ success: true, message: 'Logged out successfully.' });
 };
+
+// 6. Update Profile
+exports.updateProfile = async (req, res) => {
+  try {
+    const { full_name, gender, mobile, username } = req.body;
+    const userId = req.user.id;
+    const role = req.user.role;
+
+    if (role === 'admin' || role === 'superadmin') {
+      const updateRes = await db.query(
+        `UPDATE admin_users 
+         SET full_name = COALESCE($1, full_name),
+             username = COALESCE($2, username),
+             updated_at = NOW()
+         WHERE id = $3
+         RETURNING id, username, email, full_name, role`,
+        [full_name, username ? username.trim().toLowerCase() : null, userId]
+      );
+      return res.json({
+        success: true,
+        message: 'Admin profile updated successfully!',
+        user: updateRes.rows[0],
+      });
+    }
+
+    // Customer profile update
+    const updateRes = await db.query(
+      `UPDATE users 
+       SET full_name = COALESCE($1, full_name),
+           gender = COALESCE($2, gender),
+           mobile = COALESCE($3, mobile),
+           username = COALESCE($4, username),
+           updated_at = NOW()
+       WHERE id = $5
+       RETURNING id, full_name, gender, email, country_code, mobile, username`,
+      [full_name, gender, mobile, username ? username.trim().toLowerCase() : null, userId]
+    );
+
+    return res.json({
+      success: true,
+      message: 'Profile updated successfully!',
+      user: {
+        ...updateRes.rows[0],
+        role: 'customer',
+      },
+    });
+  } catch (err) {
+    console.error('Error updating profile:', err);
+    return res.status(500).json({ success: false, message: 'Failed to update profile.' });
+  }
+};
+
+// 7. Change Password
+exports.changePassword = async (req, res) => {
+  try {
+    const { current_password, new_password } = req.body;
+    const userId = req.user.id;
+    const role = req.user.role;
+
+    if (!current_password || !new_password) {
+      return res.status(400).json({ success: false, message: 'Current password and new password are required.' });
+    }
+
+    if (new_password.length < 8) {
+      return res.status(400).json({ success: false, message: 'New password must be at least 8 characters long.' });
+    }
+
+    const table = (role === 'admin' || role === 'superadmin') ? 'admin_users' : 'users';
+    const userRes = await db.query(`SELECT password_hash FROM ${table} WHERE id = $1`, [userId]);
+
+    if (userRes.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'User account not found.' });
+    }
+
+    const match = await bcrypt.compare(current_password, userRes.rows[0].password_hash);
+    if (!match) {
+      return res.status(400).json({ success: false, message: 'Current password does not match.' });
+    }
+
+    const newHash = await bcrypt.hash(new_password, 10);
+    await db.query(`UPDATE ${table} SET password_hash = $1, updated_at = NOW() WHERE id = $2`, [newHash, userId]);
+
+    return res.json({
+      success: true,
+      message: 'Password changed successfully! Please keep it secure.',
+    });
+  } catch (err) {
+    console.error('Error changing password:', err);
+    return res.status(500).json({ success: false, message: 'Failed to change password.' });
+  }
+};

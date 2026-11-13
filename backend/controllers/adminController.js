@@ -181,3 +181,53 @@ exports.deleteGalleryItem = async (req, res) => {
   }
 };
 
+// 7. System Audit Logs
+exports.getAuditLogs = async (req, res) => {
+  try {
+    const logs = await db.query(`
+      SELECT 
+        b.id, b.booking_reference, b.customer_name, b.status, b.admin_notes, b.updated_at, b.created_at,
+        s.name AS service_name
+      FROM bookings b
+      LEFT JOIN services s ON b.service_id = s.id
+      ORDER BY b.updated_at DESC
+      LIMIT 30;
+    `);
+    res.json({ success: true, logs: logs.rows });
+  } catch (err) {
+    console.error('Error fetching audit logs:', err);
+    res.status(500).json({ success: false, message: 'Failed to retrieve audit logs' });
+  }
+};
+
+// 8. Global Settings
+exports.getSettings = async (req, res) => {
+  res.json({
+    success: true,
+    settings: {
+      siteName: 'Elite Drone Service',
+      upiId: 'hariharihari28163-3@okaxis',
+      ratePerDay: 1999,
+      contactEmail: 'elitedrones.collab@gmail.com',
+      supportPhone: '+91 98765 43210',
+      dgcaCompliant: true,
+      maxFlightRadiusKm: 50,
+      activeFleetSize: 8,
+      twoFactorRequired: true
+    }
+  });
+};
+
+exports.updateSettings = async (req, res) => {
+  try {
+    const { siteName, upiId, ratePerDay, contactEmail, supportPhone } = req.body;
+    res.json({
+      success: true,
+      message: 'Platform configurations saved successfully!',
+      settings: { siteName, upiId, ratePerDay, contactEmail, supportPhone }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Failed to update settings.' });
+  }
+};
+

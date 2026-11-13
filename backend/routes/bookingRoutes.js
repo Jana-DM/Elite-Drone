@@ -9,5 +9,6 @@ router.use(protect);
 router.post('/', bookingController.createBooking);
 router.get('/my-bookings', bookingController.getMyBookings);
 router.put('/:id/cancel', bookingController.cancelBooking);
+router.put('/:id/reschedule', bookingController.rescheduleBooking);
 
 module.exports = router;

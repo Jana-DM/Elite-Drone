@@ -17,6 +17,8 @@ router.get('/check-username', authController.checkUsername);
 router.post('/register', authController.register);
 router.post('/login', loginLimiter, authController.login);
 router.get('/me', protect, authController.getMe);
+router.put('/profile', protect, authController.updateProfile);
+router.post('/change-password', protect, authController.changePassword);
 router.post('/logout', authController.logout);
 
 module.exports = router;

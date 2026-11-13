@@ -205,3 +205,49 @@ exports.cancelBooking = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error while cancelling booking.' });
   }
 };
+
+// 4. Customer Reschedule Booking
+exports.rescheduleBooking = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+    const { event_date, event_time, reschedule_reason } = req.body;
+
+    if (!event_date) {
+      return res.status(400).json({ success: false, message: 'Please provide a valid new event date.' });
+    }
+
+    const bookingRes = await db.query(
+      'SELECT * FROM bookings WHERE id = $1 AND user_id = $2',
+      [id, userId]
+    );
+
+    if (bookingRes.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Booking not found.' });
+    }
+
+    const booking = bookingRes.rows[0];
+    if (booking.status === 'Completed' || booking.status === 'Cancelled') {
+      return res.status(400).json({ success: false, message: `Cannot reschedule a ${booking.status.toLowerCase()} booking.` });
+    }
+
+    await db.query(
+      `UPDATE bookings 
+       SET event_date = $1, 
+           event_time = COALESCE($2, event_time),
+           status = 'Pending',
+           admin_notes = COALESCE(admin_notes, '') || ' [Client Rescheduled to ' || $1 || ']',
+           updated_at = NOW() 
+       WHERE id = $3`,
+      [event_date, event_time || null, id]
+    );
+
+    return res.json({
+      success: true,
+      message: `Flight booking ${booking.booking_reference} has been rescheduled to ${event_date}. Status set to Pending review.`,
+    });
+  } catch (err) {
+    console.error('Error rescheduling booking:', err);
+    return res.status(500).json({ success: false, message: 'Server error while rescheduling booking.' });
+  }
+};

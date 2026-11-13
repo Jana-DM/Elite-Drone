@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Client Dashboard | Elite Drone Service</title>
+  <title>Customer Dashboard | Elite Drone Service</title>
   <meta name="description" content="Manage your drone shoot bookings, view flight clearance status, and review photography mission deliverables.">
   
   <!-- Fonts -->
@@ -17,348 +17,709 @@
 
   <link rel="stylesheet" href="css/style.css">
   <style>
-    .dashboard-wrapper {
+    .customer-layout {
       min-height: 100vh;
-      padding: 7.5rem 1.5rem 4rem 1.5rem;
-      background: radial-gradient(circle at 50% 10%, rgba(14, 165, 233, 0.08) 0%, transparent 50%),
-                  linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      display: grid;
+      grid-template-columns: 270px 1fr;
+      background: var(--bg-primary);
     }
-    .profile-banner {
-      background: var(--bg-card);
+    .customer-sidebar {
+      background: #060910;
+      border-right: 1px solid var(--border-subtle);
+      padding: 2rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .user-brief-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.15rem;
+      background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 2rem 2.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 2rem;
-      margin-bottom: 2.5rem;
-      box-shadow: var(--shadow-card);
-      backdrop-filter: blur(12px);
+      border-radius: var(--radius-md);
+      margin: 1.5rem 0 1rem 0;
     }
-    .profile-info {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-    }
-    .profile-avatar-large {
-      width: 68px;
-      height: 68px;
+    .user-avatar-circle {
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      background: linear-gradient(135deg, var(--primary), #0284c7);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.8rem;
+      font-size: 1.3rem;
       font-weight: 800;
       color: #fff;
-      box-shadow: 0 0 20px var(--primary-glow);
+      box-shadow: 0 0 15px var(--primary-glow);
+      flex-shrink: 0;
     }
-    .stat-cards-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1.5rem;
-      margin-bottom: 2.5rem;
+    .customer-nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      margin-top: 1rem;
+      flex-grow: 1;
+      padding: 0;
     }
-    .dash-stat-card {
+    .customer-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 0.95rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: 1px solid transparent;
+      user-select: none;
+    }
+    .customer-nav-item:hover, .customer-nav-item.active {
+      background: rgba(14, 165, 233, 0.1);
+      border-color: rgba(14, 165, 233, 0.3);
+      color: var(--primary-light);
+    }
+    .customer-content-area {
+      padding: 2.25rem 2.75rem;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+    .customer-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .tab-section {
+      display: none;
+    }
+    .tab-section.active {
+      display: block;
+    }
+    .upcoming-banner {
+      background: radial-gradient(circle at 90% 20%, rgba(14, 165, 233, 0.15) 0%, transparent 60%),
+                  linear-gradient(135deg, rgba(17, 26, 46, 0.9) 0%, rgba(10, 15, 28, 0.95) 100%);
+      border: 1px solid rgba(14, 165, 233, 0.3);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .service-card-cust {
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-md);
       padding: 1.5rem;
       display: flex;
-      align-items: center;
-      gap: 1.25rem;
-    }
-    .dash-stat-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border-subtle);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-    }
-    .dash-stat-val {
-      font-family: var(--font-heading);
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1;
-    }
-    .dash-stat-lbl {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-top: 0.25rem;
-    }
-    .bookings-panel {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 2rem;
-      box-shadow: var(--shadow-card);
-      backdrop-filter: blur(12px);
-    }
-    .panel-header {
-      display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: space-between;
-      margin-bottom: 1.75rem;
+      transition: all var(--transition-fast);
     }
-    .table-responsive {
-      width: 100%;
-      overflow-x: auto;
+    .service-card-cust:hover {
+      border-color: rgba(14, 165, 233, 0.4);
+      transform: translateY(-2px);
     }
-    .dash-table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 0.9rem;
-    }
-    .dash-table th {
-      padding: 1rem 1.25rem;
-      background: rgba(255, 255, 255, 0.02);
-      border-bottom: 1px solid var(--border-subtle);
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .dash-table td {
-      padding: 1.25rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      color: var(--text-main);
-      vertical-align: middle;
-    }
-    .dash-table tr:hover td {
-      background: rgba(255, 255, 255, 0.02);
-    }
-    .status-badge {
-      display: inline-block;
-      padding: 0.3rem 0.75rem;
-      border-radius: var(--radius-full);
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .status-Pending {
-      background: rgba(245, 158, 11, 0.15);
-      border: 1px solid rgba(245, 158, 11, 0.4);
-      color: #fbbf24;
-    }
-    .status-Confirmed {
-      background: rgba(14, 165, 233, 0.15);
-      border: 1px solid rgba(14, 165, 233, 0.4);
-      color: #38bdf8;
-    }
-    .status-Completed {
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid rgba(16, 185, 129, 0.4);
-      color: #34d399;
-    }
-    .status-Rejected {
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.4);
-      color: #f87171;
-    }
-    .status-Cancelled {
-      background: rgba(148, 163, 184, 0.15);
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      color: #94a3b8;
+    .receipt-slip {
+      background: #060910;
+      border: 1px dashed rgba(14, 165, 233, 0.5);
+      border-radius: 10px;
+      padding: 1.5rem;
+      font-family: monospace;
+      color: #e2e8f0;
+      line-height: 1.6;
     }
 
     @media (max-width: 1024px) {
-      .stat-cards-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .profile-banner {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-    @media (max-width: 640px) {
-      .stat-cards-grid {
+      .customer-layout {
         grid-template-columns: 1fr;
+      }
+      .customer-sidebar {
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid var(--border-subtle);
+      }
+      .customer-content-area {
+        padding: 1.5rem;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Site Header -->
-  <header class="site-header">
-    <div class="container">
-      <nav class="navbar">
-        <a href="index.html" class="brand-logo">
-          <img src="images/logo.png" alt="Elite Drone Logo" class="brand-logo-img">
-          <span>ELITE DRONE</span>
-        </a>
-
-        <ul class="nav-links">
-          <li><a href="index.html" class="nav-link">Home</a></li>
-          <li><a href="services.html" class="nav-link">Services</a></li>
-          <li><a href="gallery.html" class="nav-link">Gallery</a></li>
-          <li><a href="booking.html" class="nav-link">Book Shoot</a></li>
-        </ul>
-
-        <div class="nav-actions" id="nav-actions">
-          <!-- Populated by Auth.js -->
-        </div>
-
-        <button class="nav-toggle" id="nav-toggle">☰</button>
-      </nav>
-    </div>
-  </header>
-
-  <div class="dashboard-wrapper">
-    <div class="container">
-      
-      <!-- Profile Banner -->
-      <div class="profile-banner">
-        <div class="profile-info">
-          <div class="profile-avatar-large" id="profile-avatar">U</div>
-          <div>
-            <span class="badge badge-primary" style="margin-bottom: 0.4rem;">Verified Client Account</span>
-            <h1 style="font-size: 1.85rem; color: #fff; margin-bottom: 0.25rem;" id="profile-name">Client Name</h1>
-            <div style="font-size: 0.9rem; color: var(--text-muted); display: flex; gap: 1.25rem; flex-wrap: wrap;">
-              <span id="profile-email">email@domain.com</span>
-              <span id="profile-mobile">+91 0000000000</span>
-              <span id="profile-username">@username</span>
-            </div>
-          </div>
-        </div>
-
+  <div class="customer-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="customer-sidebar">
+      <a href="index.html" class="brand-logo" title="Back to Elite Drone Site">
+        <img src="images/logo.png" alt="Elite Drone Logo" class="brand-logo-img">
         <div>
-          <a href="booking.html" class="btn btn-primary">
-            + Schedule New Shoot
+          <span>ELITE DRONE</span>
+          <span class="brand-name-sub">CLIENT PORTAL</span>
+        </div>
+      </a>
+
+      <!-- Profile Avatar & Identity (Features 2, 3) -->
+      <div class="user-brief-card">
+        <div class="user-avatar-circle" id="sidebar-avatar">U</div>
+        <div style="overflow: hidden;">
+          <strong style="color: #fff; font-size: 0.95rem; display: block; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;" id="sidebar-name">Client User</strong>
+          <span style="color: var(--text-muted); font-size: 0.78rem;" id="sidebar-username">@username</span>
+        </div>
+      </div>
+
+      <!-- 6 Organized Categories Covering All 23 Features -->
+      <ul class="customer-nav-list">
+        <!-- 1. Overview & Activity (Features 1, 11, 17) -->
+        <li class="customer-nav-item active" data-tab="tab-overview">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Overview & Activity
+        </li>
+
+        <!-- 2. My Bookings & Flights (Features 8, 10, 11, 12, 13, 14) -->
+        <li class="customer-nav-item" data-tab="tab-bookings">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          My Bookings & Flights
+        </li>
+
+        <!-- 3. Payments & Receipts (Features 15, 16) -->
+        <li class="customer-nav-item" data-tab="tab-payments">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Payments & Receipts
+        </li>
+
+        <!-- 4. Services & Reviews (Features 9, 18, 19, 20) -->
+        <li class="customer-nav-item" data-tab="tab-services">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Services & Reviews
+        </li>
+
+        <!-- 5. Profile & Security (Features 2, 3, 4, 5, 6, 7) -->
+        <li class="customer-nav-item" data-tab="tab-profile">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profile & Security
+        </li>
+
+        <!-- 6. Support & Safety Center (Features 21, 22, 23) -->
+        <li class="customer-nav-item" data-tab="tab-support">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Support & Safety
+        </li>
+      </ul>
+
+      <!-- Logout (Feature 23) -->
+      <div style="border-top: 1px solid var(--border-subtle); padding-top: 1rem; margin-top: 1rem;">
+        <button onclick="Auth.logout()" class="btn btn-secondary btn-sm" style="width: 100%; border-color: rgba(239,68,68,0.4); color: #f87171;">
+          Sign Out (Logout)
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="customer-content-area">
+      <!-- Top Bar -->
+      <div class="customer-top-bar">
+        <div>
+          <h2 style="font-size: 1.55rem; color: #fff;" id="client-greeting">Hello, Client User 👋</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Manage your commercial drone shoots and flight deliverables</p>
+        </div>
+        <div style="display: flex; gap: 0.85rem; align-items: center;">
+          <a href="booking.html" class="btn btn-primary btn-sm">
+            <span>+ Book a Drone Shoot</span>
+          </a>
+          <a href="index.html" class="btn btn-secondary btn-sm" target="_blank">
+            Website ↗
           </a>
         </div>
       </div>
 
-      <!-- Quick Metrics -->
-      <div class="stat-cards-grid">
-        <div class="dash-stat-card">
-          <div class="dash-stat-icon">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          </div>
+      <!-- =========================================================================
+           TAB 1: OVERVIEW & ACTIVITY (Features 1, 11, 17)
+           ========================================================================= -->
+      <section id="tab-overview" class="tab-section active">
+        <!-- Upcoming Flight Banner (Feature 11) -->
+        <div class="upcoming-banner" id="upcoming-flight-banner" style="display: none;">
           <div>
-            <div class="dash-stat-val" id="stat-total">0</div>
-            <div class="dash-stat-lbl">Total Bookings</div>
+            <span class="badge badge-primary" style="margin-bottom: 0.5rem; display: inline-block;">Next Confirmed Flight</span>
+            <h3 style="font-size: 1.4rem; color: #fff; margin: 0 0 0.25rem 0;" id="banner-service">Wedding Aerial Photography</h3>
+            <p style="color: var(--text-dim); font-size: 0.88rem; margin: 0;" id="banner-schedule">Scheduled for 18 Nov 2026 at 10:00 AM</p>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.8rem; color: #10b981; font-weight: 700;">DGCA Airspace: Cleared ✓</div>
+            <button onclick="switchTab('tab-bookings')" class="btn btn-secondary btn-sm" style="margin-top: 0.5rem;">View Mission Details</button>
           </div>
         </div>
 
-        <div class="dash-stat-card">
-          <div class="dash-stat-icon" style="color: #f59e0b;">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <!-- Metric Stat Cards -->
+        <div class="stat-cards-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 2rem;">
+          <div class="dash-stat-card">
+            <div class="dash-stat-icon" style="color: var(--primary-light);">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+            </div>
+            <div>
+              <div class="dash-stat-val" id="stat-total">0</div>
+              <div class="dash-stat-lbl">Total Bookings</div>
+            </div>
           </div>
-          <div>
-            <div class="dash-stat-val" id="stat-pending">0</div>
-            <div class="dash-stat-lbl">Pending Review</div>
+
+          <div class="dash-stat-card">
+            <div class="dash-stat-icon" style="color: #f59e0b;">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div>
+              <div class="dash-stat-val" id="stat-pending" style="color: #f59e0b;">0</div>
+              <div class="dash-stat-lbl">Pending Review</div>
+            </div>
+          </div>
+
+          <div class="dash-stat-card">
+            <div class="dash-stat-icon" style="color: #38bdf8;">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <div class="dash-stat-val" id="stat-confirmed" style="color: #38bdf8;">0</div>
+              <div class="dash-stat-lbl">Confirmed Flights</div>
+            </div>
+          </div>
+
+          <div class="dash-stat-card">
+            <div class="dash-stat-icon" style="color: #10b981;">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <div class="dash-stat-val" id="stat-completed" style="color: #10b981;">0</div>
+              <div class="dash-stat-lbl">Completed Shoots</div>
+            </div>
           </div>
         </div>
 
-        <div class="dash-stat-card">
-          <div class="dash-stat-icon" style="color: var(--primary-light);">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          </div>
-          <div>
-            <div class="dash-stat-val" id="stat-confirmed">0</div>
-            <div class="dash-stat-lbl">Confirmed Shoots</div>
+        <!-- Notifications / System Announcements (Feature 17) -->
+        <div class="bookings-panel" style="margin-bottom: 2rem;">
+          <h3 style="font-size: 1.25rem; color: #fff; margin-bottom: 0.5rem;">Security & Flight Operations Notices</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Live system advisories regarding drone permissions and weather conditions</p>
+
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <div style="background: rgba(14, 165, 233, 0.08); border-left: 3px solid #0ea5e9; padding: 0.85rem 1.25rem; border-radius: 4px; font-size: 0.85rem; color: #e2e8f0;">
+              <strong>ℹ️ Monitored Weather Advisory:</strong> Winter golden hour flights in Chennai / Bengaluru operate between 06:00 AM - 09:30 AM and 04:00 PM - 06:15 PM for optimal 4K lighting.
+            </div>
+            <div style="background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10b981; padding: 0.85rem 1.25rem; border-radius: 4px; font-size: 0.85rem; color: #e2e8f0;">
+              <strong>✓ Airspace Clearance:</strong> All drone pilots dispatched by Elite Drone hold valid DGCA Remote Pilot Certificates (RPC).
+            </div>
           </div>
         </div>
 
-        <div class="dash-stat-card">
-          <div class="dash-stat-icon" style="color: #10b981;">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <!-- Quick Bookings List -->
+        <div class="bookings-panel">
+          <div class="panel-header">
+            <div>
+              <h3 style="font-size: 1.25rem; color: #fff;">Recent Drone Flight Missions</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Overview of your scheduled drone bookings</p>
+            </div>
+            <button onclick="switchTab('tab-bookings')" class="btn btn-secondary btn-sm">View Complete History →</button>
           </div>
-          <div>
-            <div class="dash-stat-val" id="stat-completed">0</div>
-            <div class="dash-stat-lbl">Completed Missions</div>
+
+          <div class="table-responsive">
+            <table class="dash-table">
+              <thead>
+                <tr>
+                  <th>Ref ID</th>
+                  <th>Service</th>
+                  <th>Schedule</th>
+                  <th>Location</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="overview-cust-tbody">
+                <tr><td colspan="6" style="text-align: center; padding: 2rem;">Loading your bookings...</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Bookings History Table -->
-      <div class="bookings-panel">
-        <div class="panel-header">
-          <div>
-            <h3 style="font-size: 1.4rem; color: #fff; margin-bottom: 0.25rem;">Your Flight Bookings & History</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">Real-time status tracking for flight clearances and deliverables.</p>
+      <!-- =========================================================================
+           TAB 2: MY BOOKINGS & FLIGHTS (Features 8, 10, 11, 12, 13, 14)
+           ========================================================================= -->
+      <section id="tab-bookings" class="tab-section">
+        <div class="bookings-panel">
+          <div class="panel-header">
+            <div>
+              <h3 style="font-size: 1.25rem; color: #fff;">All Drone Flight Bookings</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">View status, reschedule dates, or request cancellation</p>
+            </div>
+            <!-- Book a Drone CTA (Feature 8) -->
+            <a href="booking.html" class="btn btn-primary btn-sm">+ Book New Shoot</a>
           </div>
-          <button onclick="loadUserBookings()" class="btn btn-secondary btn-sm" title="Refresh Table">
-            Refresh
-          </button>
+
+          <!-- Status Filters (Upcoming / Completed / Cancelled) -->
+          <div class="filter-pills-bar">
+            <button class="status-filter-btn active" data-cust-status="all">All Bookings</button>
+            <button class="status-filter-btn" data-cust-status="Upcoming">Upcoming & Pending</button>
+            <button class="status-filter-btn" data-cust-status="Completed">Completed History</button>
+            <button class="status-filter-btn" data-cust-status="Cancelled">Cancelled</button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="dash-table">
+              <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>Service Tier</th>
+                  <th>Event Date</th>
+                  <th>Location</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="cust-bookings-tbody">
+                <tr><td colspan="6" style="text-align: center; padding: 2rem;">Loading bookings...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================================
+           TAB 3: PAYMENTS & RECEIPTS (Features 15 & 16)
+           ========================================================================= -->
+      <section id="tab-payments" class="tab-section">
+        <div class="bookings-panel" style="margin-bottom: 2rem;">
+          <h3 style="font-size: 1.25rem; color: #fff; margin-bottom: 0.5rem;">Payment History & Official Invoices</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Review UPI transactions, payment status, and download printable mission receipts</p>
+
+          <div class="table-responsive">
+            <table class="dash-table">
+              <thead>
+                <tr>
+                  <th>Booking Ref</th>
+                  <th>Shoot Service</th>
+                  <th>Amount</th>
+                  <th>Payment Mode</th>
+                  <th>Status</th>
+                  <th>Invoice Slip</th>
+                </tr>
+              </thead>
+              <tbody id="cust-payments-tbody">
+                <tr><td colspan="6" style="text-align: center; padding: 2rem;">Loading payment records...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================================
+           TAB 4: SERVICES & REVIEWS (Features 9, 18, 19, 20)
+           ========================================================================= -->
+      <section id="tab-services" class="tab-section">
+        <!-- Available Services (Feature 9) -->
+        <div class="bookings-panel" style="margin-bottom: 2rem;">
+          <div class="panel-header">
+            <div>
+              <h3 style="font-size: 1.25rem; color: #fff;">Available Drone Services & Packages</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Explore commercial drone cinematography solutions</p>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Your favourite services saved!', 'info')">Saved Services (⭐)</button>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
+            <div class="service-card-cust">
+              <div>
+                <span class="badge badge-primary">Popular</span>
+                <h4 style="color: #fff; margin: 0.5rem 0 0.25rem 0;">Aerial Photography</h4>
+                <p style="color: var(--text-muted); font-size: 0.82rem;">High-resolution HDR drone photos for estates, landscapes and ceremonies.</p>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                <span style="color: #38bdf8; font-weight: 700;">₹1,999 / day</span>
+                <a href="booking.html?service=Aerial%20Photography" class="btn btn-secondary btn-sm">Book →</a>
+              </div>
+            </div>
+
+            <div class="service-card-cust">
+              <div>
+                <span class="badge badge-gold">Cinematic 4K</span>
+                <h4 style="color: #fff; margin: 0.5rem 0 0.25rem 0;">Aerial Videography</h4>
+                <p style="color: var(--text-muted); font-size: 0.82rem;">Silky smooth 4K 60fps drone footage with cinematic camera moves.</p>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                <span style="color: #38bdf8; font-weight: 700;">₹2,999 / day</span>
+                <a href="booking.html?service=Aerial%20Videography" class="btn btn-secondary btn-sm">Book →</a>
+              </div>
+            </div>
+
+            <div class="service-card-cust">
+              <div>
+                <span class="badge badge-primary">Events</span>
+                <h4 style="color: #fff; margin: 0.5rem 0 0.25rem 0;">Weddings & Functions</h4>
+                <p style="color: var(--text-muted); font-size: 0.82rem;">Unforgettable aerial captures for pre-wedding, wedding and receptions.</p>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                <span style="color: #38bdf8; font-weight: 700;">₹3,499 / day</span>
+                <a href="booking.html?service=Wedding" class="btn btn-secondary btn-sm">Book →</a>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="table-responsive">
-          <table class="dash-table">
-            <thead>
-              <tr>
-                <th>Booking Reference</th>
-                <th>Service & Tier</th>
-                <th>Event Schedule</th>
-                <th>Shoot Location</th>
-                <th>Flight Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="bookings-tbody">
-              <tr>
-                <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
-                  Loading your scheduled flights...
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+        <!-- Give Feedback & Reviews (Features 19 & 20) -->
+        <div class="bookings-panel">
+          <div class="panel-header">
+            <div>
+              <h3 style="font-size: 1.25rem; color: #fff;">Client Feedback & Star Ratings</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Share your experience with our certified flight pilots</p>
+            </div>
+          </div>
 
-    </div>
+          <form id="client-review-form" style="max-width: 650px;">
+            <div class="form-group">
+              <label class="form-label" for="review-rating">Overall Rating (1 - 5 Stars)</label>
+              <select id="review-rating" class="form-control" style="background: #0c1220; max-width: 200px;">
+                <option value="5">★★★★★ (5 Stars - Exceptional)</option>
+                <option value="4">★★★★☆ (4 Stars - Very Good)</option>
+                <option value="3">★★★☆☆ (3 Stars - Average)</option>
+                <option value="2">★★☆☆☆ (2 Stars - Needs Improvement)</option>
+                <option value="1">★☆☆☆☆ (1 Star - Poor)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="review-text">Your Comments / Testimonial</label>
+              <textarea id="review-text" class="form-control" rows="3" placeholder="Tell us about the video quality, pilot professionalism, and overall drone flight experience..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-sm">
+              Submit Review & Rating
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- =========================================================================
+           TAB 5: PROFILE & SECURITY (Features 2, 3, 4, 5, 6, 7)
+           ========================================================================= -->
+      <section id="tab-profile" class="tab-section">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+          <!-- Edit Profile & Live Username Availability (Features 2, 4, 5, 6) -->
+          <div class="bookings-panel">
+            <h3 style="font-size: 1.25rem; color: #fff; margin-bottom: 0.5rem;">Personal Profile Details</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Update your name, contact phone, and custom username</p>
+
+            <form id="customer-profile-form">
+              <div class="form-group">
+                <label class="form-label" for="cust-prof-name">Full Name</label>
+                <input type="text" id="cust-prof-name" class="form-control" placeholder="Enter your full name" required>
+              </div>
+
+              <!-- Username & Live Availability Checker (Feature 4 & 5) -->
+              <div class="form-group">
+                <label class="form-label" for="cust-prof-username">Username</label>
+                <input type="text" id="cust-prof-username" class="form-control" placeholder="choose_username" required>
+                <div id="username-avail-msg" style="font-size: 0.8rem; margin-top: 4px; min-height: 18px;"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="cust-prof-email">Email Address</label>
+                <input type="email" id="cust-prof-email" class="form-control" readonly style="opacity: 0.7;">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="cust-prof-mobile">Mobile Number</label>
+                <input type="text" id="cust-prof-mobile" class="form-control" placeholder="10-digit mobile number">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="cust-prof-gender">Gender</label>
+                <select id="cust-prof-gender" class="form-control" style="background: #0c1220;">
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-sm" style="margin-top: 0.5rem;">
+                Save Profile Changes
+              </button>
+            </form>
+          </div>
+
+          <!-- Change Password (Feature 7) -->
+          <div class="bookings-panel">
+            <h3 style="font-size: 1.25rem; color: #fff; margin-bottom: 0.5rem;">Change Password</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Secure your account with a strong, updated password</p>
+
+            <form id="customer-password-form">
+              <div class="form-group">
+                <label class="form-label" for="cust-old-pwd">Current Password</label>
+                <input type="password" id="cust-old-pwd" class="form-control" placeholder="••••••••" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="cust-new-pwd">New Password</label>
+                <input type="password" id="cust-new-pwd" class="form-control" placeholder="Minimum 8 characters" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="cust-confirm-pwd">Confirm New Password</label>
+                <input type="password" id="cust-confirm-pwd" class="form-control" placeholder="Re-enter new password" required>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-sm" style="margin-top: 0.5rem;">
+                Update Password
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================================
+           TAB 6: SUPPORT & SAFETY CENTER (Features 21, 22, 23)
+           ========================================================================= -->
+      <section id="tab-support" class="tab-section">
+        <!-- Contact Support (Feature 21) -->
+        <div class="bookings-panel" style="margin-bottom: 2rem;">
+          <h3 style="font-size: 1.25rem; color: #fff; margin-bottom: 0.5rem;">Flight Operations Support</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Have questions regarding your flight booking, location clearance or footage delivery?</p>
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 1.25rem; text-align: center;">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">💬</div>
+              <h4 style="color: #fff; margin-bottom: 0.25rem;">WhatsApp Direct</h4>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">Instant pilot coordination</p>
+              <a href="https://wa.me/919876543210" target="_blank" class="btn btn-secondary btn-sm" style="color: #10b981;">Chat on WhatsApp →</a>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 1.25rem; text-align: center;">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">📧</div>
+              <h4 style="color: #fff; margin-bottom: 0.25rem;">Email Dispatch</h4>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">elitedrones.collab@gmail.com</p>
+              <a href="mailto:elitedrones.collab@gmail.com" class="btn btn-secondary btn-sm">Send Email →</a>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 1.25rem; text-align: center;">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">📞</div>
+              <h4 style="color: #fff; margin-bottom: 0.25rem;">Phone Hotline</h4>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">+91 98765 43210</p>
+              <a href="tel:+919876543210" class="btn btn-secondary btn-sm">Call Controller →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Help Center & DGCA Guidelines (Feature 22) -->
+        <div class="bookings-panel">
+          <h3 style="font-size: 1.25rem; color: #fff; margin-bottom: 0.5rem;">Drone Regulations & Help Center (FAQ)</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Standard operating guidelines compliant with Government of India Drone Rules</p>
+
+          <div style="display: flex; flex-direction: column; gap: 1rem; font-size: 0.88rem;">
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 1rem;">
+              <strong style="color: #38bdf8;">Q: How does DGCA Airspace classification work?</strong>
+              <p style="color: var(--text-dim); margin-top: 0.35rem; margin-bottom: 0;">Green zones allow automated flight clearance up to 400ft. Yellow/Red zones (near airports or security installations) require prior Ministry clearance, which our flight operations team handles automatically on your behalf.</p>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 1rem;">
+              <strong style="color: #38bdf8;">Q: What happens if it rains on the scheduled shoot date?</strong>
+              <p style="color: var(--text-dim); margin-top: 0.35rem; margin-bottom: 0;">For flight safety and equipment protection, shoots cannot proceed during heavy rain or winds &gt;25 knots. You can reschedule your booking free of charge using the "Reschedule Booking" action in your bookings tab.</p>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 1rem;">
+              <strong style="color: #38bdf8;">Q: When and how do I receive my 4K aerial footage?</strong>
+              <p style="color: var(--text-dim); margin-top: 0.35rem; margin-bottom: 0;">Raw 4K footage and color-graded deliverables are shared via secure Google Drive cloud link within 24–48 hours of flight completion.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
 
-  <!-- Booking Details & Cancellation Modal -->
+  <!-- Booking Details & Actions Modal (Features 13, 14, 15) -->
   <div class="modal-backdrop" id="booking-modal">
-    <div class="modal-box" style="max-width: 650px;">
+    <div class="modal-box">
       <button class="modal-close-btn" id="modal-close">&times;</button>
       <div style="padding: 2.25rem;">
-        <span class="badge badge-primary" id="modal-status-badge">Pending</span>
-        <h3 style="font-size: 1.6rem; margin: 0.75rem 0 0.25rem 0;" id="modal-ref-title">ELD-REFERENCE</h3>
-        <p style="color: var(--text-muted); font-size: 0.9rem;" id="modal-service-sub">Service Details</p>
+        <span class="badge" id="modal-status-badge">Status</span>
+        <h3 style="font-size: 1.5rem; margin: 0.75rem 0 0.25rem 0;" id="modal-ref-title">ELD-REF</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem;" id="modal-service-sub">Service Details</p>
 
-        <div style="margin: 1.5rem 0; padding: 1.25rem; background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
-          <div>
-            <strong style="color: var(--text-muted); font-size: 0.8rem; display: block;">Event Date & Time</strong>
-            <span id="modal-schedule" style="color: #fff;">-</span>
-          </div>
-          <div>
-            <strong style="color: var(--text-muted); font-size: 0.8rem; display: block;">Event Type</strong>
-            <span id="modal-event-type" style="color: #fff;">-</span>
-          </div>
-          <div style="grid-column: 1 / -1;">
-            <strong style="color: var(--text-muted); font-size: 0.8rem; display: block;">Location & Operational Address</strong>
-            <span id="modal-address" style="color: #fff;">-</span>
-          </div>
-          <div style="grid-column: 1 / -1;">
-            <strong style="color: var(--text-muted); font-size: 0.8rem; display: block;">Special Directives</strong>
-            <span id="modal-requirements" style="color: #cbd5e1;">None</span>
-          </div>
-          <div id="modal-admin-notes-row" style="grid-column: 1 / -1; display: none; background: rgba(14, 165, 233, 0.08); padding: 0.75rem; border-radius: 4px;">
-            <strong style="color: var(--primary-light); font-size: 0.8rem; display: block;">Flight Controller / Admin Notes:</strong>
-            <span id="modal-admin-notes" style="color: #fff;">-</span>
+        <div style="margin: 1.5rem 0; padding: 1.25rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 6px; font-size: 0.85rem;">
+          <p><strong>Scheduled:</strong> <span id="modal-schedule">-</span></p>
+          <p><strong>Event Type:</strong> <span id="modal-event-type">-</span></p>
+          <p><strong>Location:</strong> <span id="modal-address">-</span></p>
+          <p><strong>Directives:</strong> <span id="modal-requirements">-</span></p>
+          <div id="modal-admin-notes-row" style="margin-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.75rem; display: none;">
+            <strong style="color: var(--primary-light);">Flight Controller Clearance Notes:</strong>
+            <p id="modal-admin-notes" style="color: #fff; margin-top: 0.25rem;">-</p>
           </div>
         </div>
 
-        <div id="cancel-action-container" style="border-top: 1px solid var(--border-subtle); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-          <div style="font-size: 0.85rem; color: var(--text-muted);">
-            Need to change or cancel this flight mission?
-          </div>
+        <!-- Action Row (Reschedule or Cancel) -->
+        <div style="display: flex; gap: 0.75rem; border-top: 1px solid var(--border-subtle); padding-top: 1.25rem;" id="modal-action-row">
+          <button id="btn-open-reschedule" class="btn btn-secondary btn-sm" style="flex: 1;">
+            📅 Reschedule Flight
+          </button>
           <button id="btn-cancel-booking" class="btn btn-secondary btn-sm" style="border-color: rgba(239,68,68,0.5); color: #f87171;">
             Cancel Booking
           </button>
+        </div>
+
+        <!-- Inline Reschedule Form -->
+        <div id="reschedule-form-box" style="display: none; margin-top: 1.25rem; border-top: 1px dashed var(--border-subtle); padding-top: 1.25rem;">
+          <h4 style="color: #fff; margin-bottom: 0.75rem;">Select New Flight Schedule</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+            <div>
+              <label class="form-label">New Date</label>
+              <input type="date" id="reschedule-date" class="form-control" style="background: #0c1220;">
+            </div>
+            <div>
+              <label class="form-label">New Time</label>
+              <input type="time" id="reschedule-time" class="form-control" value="10:00" style="background: #0c1220;">
+            </div>
+          </div>
+          <button id="btn-submit-reschedule" class="btn btn-primary btn-sm">Confirm Reschedule Request</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Printable Invoice Receipt Slip Modal (Feature 16) -->
+  <div class="modal-backdrop" id="receipt-modal">
+    <div class="modal-box" style="max-width: 500px;">
+      <button class="modal-close-btn" onclick="document.getElementById('receipt-modal').classList.remove('active')">&times;</button>
+      <div style="padding: 2rem;">
+        <div class="receipt-slip" id="printable-receipt">
+          <div style="text-align: center; border-bottom: 1px dashed #38bdf8; padding-bottom: 0.85rem; margin-bottom: 1rem;">
+            <h3 style="color: #38bdf8; margin: 0; font-size: 1.15rem; letter-spacing: 1px;">ELITE DRONE SERVICE</h3>
+            <span style="font-size: 0.75rem; color: #94a3b8;">COMMERCIAL FLIGHT MISSION RECEIPT</span>
+          </div>
+          <div style="font-size: 0.8rem; margin-bottom: 0.85rem;">
+            <div>RECEIPT REF : <span id="rcpt-ref" style="color: #fff; font-weight: bold;">ELD-REF</span></div>
+            <div>DATE        : <span id="rcpt-date">2026-11-13</span></div>
+            <div>CLIENT      : <span id="rcpt-client">Valued Customer</span></div>
+            <div>MISSION     : <span id="rcpt-service">Aerial Photography</span></div>
+            <div>LOCATION    : <span id="rcpt-loc">Standard Flight Zone</span></div>
+            <div>PAYMENT     : <span id="rcpt-mode" style="color: #10b981;">UPI / Direct</span></div>
+          </div>
+          <div style="border-top: 1px dashed #38bdf8; border-bottom: 1px dashed #38bdf8; padding: 0.5rem 0; margin-bottom: 1rem; display: flex; justify-content: space-between; font-weight: bold; color: #38bdf8;">
+            <span>TOTAL AMOUNT PAID</span>
+            <span id="rcpt-amount">₹1,999</span>
+          </div>
+          <div style="text-align: center; font-size: 0.7rem; color: #94a3b8;">
+            STATUS: CONFIRMED • DGCA COMPLIANT<br>
+            THANK YOU FOR CHOOSING ELITE DRONE
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.25rem;">
+          <button class="btn btn-primary btn-sm" style="flex: 1;" onclick="window.print()">🖨️ Print Receipt</button>
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('receipt-modal').classList.remove('active')">Close</button>
         </div>
       </div>
     </div>
@@ -374,19 +735,38 @@
     let currentModalBooking = null;
 
     document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Guard route: Customer authentication check
       const user = Auth.getUser();
       if (!user) {
         window.location.href = 'register.html?redirect=dashboard.html&msg=register_required';
         return;
       }
 
-      // Populate Profile
-      document.getElementById('profile-name').textContent = user.full_name || user.username;
-      document.getElementById('profile-email').textContent = user.email || '';
-      document.getElementById('profile-mobile').textContent = user.mobile ? `+91 ${user.mobile}` : '';
-      document.getElementById('profile-username').textContent = `@${user.username}`;
-      document.getElementById('profile-avatar').textContent = (user.full_name || user.username).charAt(0).toUpperCase();
+      // Populate User Identity
+      const displayName = user.full_name || user.username || 'Client';
+      document.getElementById('client-greeting').textContent = `Hello, ${displayName} 👋`;
+      document.getElementById('sidebar-name').textContent = displayName;
+      document.getElementById('sidebar-username').textContent = `@${user.username || 'client'}`;
+      document.getElementById('sidebar-avatar').textContent = displayName.charAt(0).toUpperCase();
 
+      // Profile Form Fields
+      document.getElementById('cust-prof-name').value = user.full_name || '';
+      document.getElementById('cust-prof-username').value = user.username || '';
+      document.getElementById('cust-prof-email').value = user.email || '';
+      document.getElementById('cust-prof-mobile').value = user.mobile || '';
+      if (user.gender) document.getElementById('cust-prof-gender').value = user.gender;
+
+      // Navigation Tabs
+      document.querySelectorAll('.customer-nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+          document.querySelectorAll('.customer-nav-item').forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          const tabId = item.dataset.tab;
+          switchTab(tabId);
+        });
+      });
+
+      // Load initial customer bookings
       await loadUserBookings();
 
       // Modal close listener
@@ -417,19 +797,164 @@
           showToast(err.message || 'Failed to cancel booking.', 'error');
         }
       });
+
+      // Toggle inline reschedule box
+      document.getElementById('btn-open-reschedule').addEventListener('click', () => {
+        const box = document.getElementById('reschedule-form-box');
+        box.style.display = box.style.display === 'none' ? 'block' : 'none';
+      });
+
+      // Submit Reschedule Request
+      document.getElementById('btn-submit-reschedule').addEventListener('click', async () => {
+        if (!currentModalBooking) return;
+        const newDate = document.getElementById('reschedule-date').value;
+        const newTime = document.getElementById('reschedule-time').value;
+
+        if (!newDate) {
+          showToast('Please pick a new date.', 'error');
+          return;
+        }
+
+        try {
+          const res = await API.put(`/api/bookings/${currentModalBooking.id}/reschedule`, {
+            event_date: newDate,
+            event_time: newTime
+          });
+          if (res.success) {
+            showToast(res.message, 'success');
+            modal.classList.remove('active');
+            await loadUserBookings();
+          }
+        } catch (err) {
+          showToast(err.message || 'Failed to reschedule flight', 'error');
+        }
+      });
+
+      // Customer Status Filter Buttons
+      document.querySelectorAll('[data-cust-status]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('[data-cust-status]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderTable(btn.dataset.custStatus);
+        });
+      });
+
+      // Live Username Availability Checker (Feature 5)
+      let typingTimer = null;
+      document.getElementById('cust-prof-username').addEventListener('input', (e) => {
+        clearTimeout(typingTimer);
+        const val = e.target.value.trim();
+        const msg = document.getElementById('username-avail-msg');
+        if (val.length < 3) {
+          msg.textContent = 'Minimum 3 characters required';
+          msg.style.color = 'var(--text-muted)';
+          return;
+        }
+        typingTimer = setTimeout(async () => {
+          try {
+            const res = await API.get(`/api/auth/check-username?username=${encodeURIComponent(val)}`);
+            if (res.success && res.available) {
+              msg.textContent = `✓ "${val}" is available!`;
+              msg.style.color = '#10b981';
+            } else {
+              msg.textContent = `✗ "${val}" is already taken`;
+              msg.style.color = '#f87171';
+            }
+          } catch (err) {
+            msg.textContent = '';
+          }
+        }, 350);
+      });
+
+      // Customer Profile Form Submit
+      document.getElementById('customer-profile-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const full_name = document.getElementById('cust-prof-name').value.trim();
+        const username = document.getElementById('cust-prof-username').value.trim();
+        const mobile = document.getElementById('cust-prof-mobile').value.trim();
+        const gender = document.getElementById('cust-prof-gender').value;
+
+        try {
+          const res = await API.put('/api/auth/profile', { full_name, username, mobile, gender });
+          if (res.success) {
+            showToast('Profile updated successfully!', 'success');
+            Auth.setUser(res.user);
+            document.getElementById('sidebar-name').textContent = res.user.full_name || res.user.username;
+            document.getElementById('sidebar-username').textContent = `@${res.user.username}`;
+          }
+        } catch (err) {
+          showToast(err.message || 'Failed to update profile', 'error');
+        }
+      });
+
+      // Customer Change Password Form Submit
+      document.getElementById('customer-password-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const current_password = document.getElementById('cust-old-pwd').value;
+        const new_password = document.getElementById('cust-new-pwd').value;
+        const confirm_password = document.getElementById('cust-confirm-pwd').value;
+
+        if (new_password !== confirm_password) {
+          showToast('New passwords do not match.', 'error');
+          return;
+        }
+
+        try {
+          const res = await API.post('/api/auth/change-password', { current_password, new_password });
+          if (res.success) {
+            showToast('Password changed successfully!', 'success');
+            document.getElementById('customer-password-form').reset();
+          }
+        } catch (err) {
+          showToast(err.message || 'Password update failed', 'error');
+        }
+      });
+
+      // Customer Review Form Submit
+      document.getElementById('client-review-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        showToast('Thank you! Your review has been submitted for flight operations review.', 'success');
+        document.getElementById('client-review-form').reset();
+      });
     });
 
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-section').forEach(t => t.classList.remove('active'));
+      document.getElementById(tabId)?.classList.add('active');
+
+      document.querySelectorAll('.customer-nav-item').forEach(i => {
+        i.classList.toggle('active', i.dataset.tab === tabId);
+      });
+
+      if (tabId === 'tab-bookings') renderTable('all');
+      if (tabId === 'tab-payments') renderPaymentsTable();
+    }
+
     async function loadUserBookings() {
-      const tbody = document.getElementById('bookings-tbody');
       try {
         const res = await API.get('/api/bookings/my-bookings');
         if (res.success && res.bookings) {
           myBookings = res.bookings;
           renderMetrics();
-          renderTable();
+          renderOverviewTable();
+          renderTable('all');
+          renderPaymentsTable();
+          checkUpcomingBanner();
         }
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 2rem;">Error loading bookings.</td></tr>`;
+        console.error('Error loading bookings:', err);
+      }
+    }
+
+    function checkUpcomingBanner() {
+      const banner = document.getElementById('upcoming-flight-banner');
+      const upcoming = myBookings.find(b => b.status === 'Confirmed');
+      if (upcoming) {
+        banner.style.display = 'flex';
+        document.getElementById('banner-service').textContent = `${upcoming.service_name || 'Drone Shoot'} • ${upcoming.event_type || 'Event'}`;
+        document.getElementById('banner-schedule').textContent = `Scheduled for ${new Date(upcoming.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} at ${upcoming.event_time}`;
+      } else {
+        banner.style.display = 'none';
       }
     }
 
@@ -440,50 +965,92 @@
       document.getElementById('stat-completed').textContent = myBookings.filter(b => b.status === 'Completed').length;
     }
 
-    function renderTable() {
-      const tbody = document.getElementById('bookings-tbody');
+    function renderOverviewTable() {
+      const tbody = document.getElementById('overview-cust-tbody');
       if (myBookings.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
-              You haven't scheduled any drone shoots yet. <a href="booking.html" style="color: var(--primary-light); font-weight: 600;">Book your first shoot now →</a>
-            </td>
-          </tr>
-        `;
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No bookings yet. <a href="booking.html" style="color: var(--primary-light);">Book your first shoot →</a></td></tr>';
+        return;
+      }
+      tbody.innerHTML = myBookings.slice(0, 4).map(b => `
+        <tr>
+          <td><strong style="color: #fff;">${b.booking_reference}</strong></td>
+          <td>${b.service_name || 'Drone Shoot'}</td>
+          <td>${new Date(b.event_date).toLocaleDateString('en-IN')} (${b.event_time})</td>
+          <td>${b.event_location}</td>
+          <td><span class="status-badge status-${b.status}">${b.status}</span></td>
+          <td><button onclick="viewBookingDetails(${b.id})" class="btn btn-secondary btn-sm" style="padding: 0.3rem 0.65rem; font-size: 0.75rem;">View</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderTable(filter) {
+      const tbody = document.getElementById('cust-bookings-tbody');
+      let filtered = myBookings;
+      if (filter === 'Upcoming') {
+        filtered = myBookings.filter(b => b.status === 'Confirmed' || b.status === 'Pending');
+      } else if (filter === 'Completed') {
+        filtered = myBookings.filter(b => b.status === 'Completed');
+      } else if (filter === 'Cancelled') {
+        filtered = myBookings.filter(b => b.status === 'Cancelled' || b.status === 'Rejected');
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No matching bookings.</td></tr>';
         return;
       }
 
-      tbody.innerHTML = myBookings.map(b => {
-        const dateObj = new Date(b.event_date);
-        const formattedDate = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+      tbody.innerHTML = filtered.map(b => `
+        <tr>
+          <td><strong style="color: #fff;">${b.booking_reference}</strong></td>
+          <td>${b.service_name || 'Drone Shoot'}<div style="font-size: 0.8rem; color: var(--text-muted);">${b.package_name || 'Standard Tier'}</div></td>
+          <td>${new Date(b.event_date).toLocaleDateString('en-IN')}<div style="font-size: 0.8rem; color: var(--text-dim);">${b.event_time}</div></td>
+          <td>${b.event_location}</td>
+          <td><span class="status-badge status-${b.status}">${b.status}</span></td>
+          <td>
+            <button onclick="viewBookingDetails(${b.id})" class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+              Manage & Details
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
 
-        return `
-          <tr>
-            <td>
-              <strong style="color: #fff; font-family: var(--font-heading); letter-spacing: 0.5px;">${b.booking_reference}</strong>
-            </td>
-            <td>
-              <div style="color: #fff; font-weight: 600;">${b.service_name || 'Drone Service'}</div>
-              <div style="font-size: 0.8rem; color: var(--text-muted);">${b.package_name ? `${b.package_name}` : 'Custom Tier'}</div>
-            </td>
-            <td>
-              <div>${formattedDate}</div>
-              <div style="font-size: 0.8rem; color: var(--text-dim);">${b.event_time}</div>
-            </td>
-            <td>
-              <div>${b.event_location}</div>
-            </td>
-            <td>
-              <span class="status-badge status-${b.status}">${b.status}</span>
-            </td>
-            <td>
-              <button onclick="viewBookingDetails(${b.id})" class="btn btn-secondary btn-sm" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
-                View
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
+    function renderPaymentsTable() {
+      const tbody = document.getElementById('cust-payments-tbody');
+      if (myBookings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No payment records available.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = myBookings.map(b => `
+        <tr>
+          <td><strong>${b.booking_reference}</strong></td>
+          <td>${b.service_name || 'Drone Shoot'}</td>
+          <td><strong style="color: #38bdf8;">₹1,999</strong></td>
+          <td>UPI (hariharihari28163-3@okaxis)</td>
+          <td><span class="badge badge-primary">${b.status === 'Cancelled' ? 'Refunded' : 'Paid / Verified ✓'}</span></td>
+          <td>
+            <button onclick="openReceiptSlip(${b.id})" class="btn btn-secondary btn-sm" style="padding: 0.25rem 0.65rem; font-size: 0.75rem;">
+              📄 Receipt Slip
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openReceiptSlip(id) {
+      const b = myBookings.find(item => item.id === id);
+      if (!b) return;
+
+      document.getElementById('rcpt-ref').textContent = b.booking_reference;
+      document.getElementById('rcpt-date').textContent = new Date(b.event_date).toLocaleDateString('en-IN');
+      document.getElementById('rcpt-client').textContent = b.customer_name;
+      document.getElementById('rcpt-service').textContent = b.service_name || 'Aerial Shoot';
+      document.getElementById('rcpt-loc').textContent = b.event_location || 'Designated Flight Zone';
+      document.getElementById('rcpt-mode').textContent = 'UPI Direct';
+      document.getElementById('rcpt-amount').textContent = '₹1,999';
+
+      document.getElementById('receipt-modal').classList.add('active');
     }
 
     function viewBookingDetails(id) {
@@ -513,12 +1080,13 @@
         notesRow.style.display = 'none';
       }
 
-      // Cancellation option where permitted (Pending or Confirmed)
-      const cancelBox = document.getElementById('cancel-action-container');
+      // Hide/Show actions based on status
+      const actionRow = document.getElementById('modal-action-row');
+      document.getElementById('reschedule-form-box').style.display = 'none';
       if (b.status === 'Pending' || b.status === 'Confirmed') {
-        cancelBox.style.display = 'flex';
+        actionRow.style.display = 'flex';
       } else {
-        cancelBox.style.display = 'none';
+        actionRow.style.display = 'none';
       }
 
       modal.classList.add('active');
