@@ -348,6 +348,11 @@ button, input, select, textarea {
   border-bottom: 1px solid transparent;
 }
 
+.site-header .container {
+  max-width: 1540px;
+  width: 96%;
+}
+
 .site-header.scrolled {
   background: rgba(7, 10, 18, 0.94);
   backdrop-filter: blur(18px);
@@ -373,6 +378,7 @@ button, input, select, textarea {
   letter-spacing: 1.5px;
   color: #fff;
   text-decoration: none;
+  flex-shrink: 0;
 }
 
 .brand-logo-img {
@@ -421,8 +427,9 @@ button, input, select, textarea {
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 2.2rem;
+  gap: clamp(1rem, 1.8vw, 2.2rem);
   list-style: none;
+  white-space: nowrap;
 }
 
 .nav-link {
@@ -431,6 +438,7 @@ button, input, select, textarea {
   color: var(--text-dim);
   position: relative;
   padding: 0.5rem 0;
+  white-space: nowrap;
 }
 
 .nav-link:hover, .nav-link.active {
@@ -456,7 +464,9 @@ button, input, select, textarea {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.55rem;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* Option 3: Cinema Gold Luxury Action Buttons */
@@ -475,6 +485,8 @@ button, input, select, textarea {
   transition: all var(--transition-fast);
   cursor: pointer;
   line-height: 1.2;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .btn-nav-login:hover {
@@ -500,6 +512,8 @@ button, input, select, textarea {
   transition: all var(--transition-fast);
   cursor: pointer;
   line-height: 1.2;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .btn-nav-register:hover {
@@ -529,6 +543,8 @@ button, input, select, textarea {
   transition: all var(--transition-fast);
   cursor: pointer;
   line-height: 1.2;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .btn-nav-book:hover {
@@ -555,9 +571,18 @@ button, input, select, textarea {
   transition: all var(--transition-fast);
   cursor: pointer;
   line-height: 1.2;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: 0.85rem;
 }
 
 .btn-nav-dashboard:hover {
+  background: rgba(14, 165, 233, 0.28);
+  border-color: #38bdf8;
+  color: #ffffff;
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 18px rgba(14, 165, 233, 0.35);
+}
   background: rgba(14, 165, 233, 0.28);
   border-color: #38bdf8;
   color: #ffffff;
@@ -2268,6 +2293,24 @@ button, input, select, textarea {
 /* ==========================================================================
    RESPONSIVE MEDIA QUERIES
    ========================================================================== */
+@media (max-width: 1280px) {
+  .nav-links {
+    gap: 1.25rem;
+  }
+
+  .nav-link {
+    font-size: 0.9rem;
+  }
+
+  .nav-actions {
+    gap: 0.45rem;
+  }
+
+  .btn-nav-dashboard {
+    margin-left: 0.45rem;
+  }
+}
+
 @media (max-width: 1024px) {
   .hero-title {
     font-size: 2.85rem;
