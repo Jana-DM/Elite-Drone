@@ -4,7 +4,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcrypt');
-const { sendSmsOtp } = require('./config/mailer');
+const { sendSmsOtp, sendEmailOtp } = require('./config/mailer');
 require('dotenv').config();
 
 const db = require('./config/db');
@@ -106,20 +106,24 @@ app.get('/api/stats', async (req, res) => {
 // BOOKING PAGE DEDICATED ENDPOINTS (/send-otp, /verify-otp, /api/booking/notify)
 // ============================================================
 
-// 1. Send Booking Mobile OTP
+// 1. Send Booking Email/Mobile OTP
 app.post('/send-otp', async (req, res) => {
   try {
-    const { contact } = req.body;
+    const { contact, method } = req.body;
     if (!contact) {
-      return res.status(400).json({ success: false, message: 'Mobile contact is required' });
+      return res.status(400).json({ success: false, message: 'Contact is required' });
     }
 
     const cleanContact = String(contact).trim();
+    const isEmail = cleanContact.includes('@') || method === 'email';
+    const destType = isEmail ? 'email' : 'mobile';
+
     // 4-digit OTP for booking form
     const rawOtp = Math.floor(1000 + Math.random() * 9000).toString();
     const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
 
     // Store in-memory
+    bookingOtps.set(cleanContact.toLowerCase(), { otp: rawOtp, expiresAt });
     bookingOtps.set(cleanContact, { otp: rawOtp, expiresAt });
 
     // Store in PostgreSQL otp_verifications if available
@@ -127,30 +131,45 @@ app.post('/send-otp', async (req, res) => {
       const otpHash = await bcrypt.hash(rawOtp, 10);
       await db.query(
         `INSERT INTO otp_verifications (destination_type, destination, otp_hash, purpose, expires_at)
-         VALUES ('mobile', $1, $2, 'booking', NOW() + INTERVAL '10 minutes')`,
-        [cleanContact, otpHash]
+         VALUES ($1, $2, $3, 'booking', NOW() + INTERVAL '10 minutes')`,
+        [destType, cleanContact.toLowerCase(), otpHash]
       );
     } catch (dbErr) {
       // Ignored for non-blocking dev mode
     }
 
-    // Dispatch SMS / Dev Console
-    await sendSmsOtp({
-      mobile: cleanContact,
-      otpCode: rawOtp,
-      purpose: 'Elite Drone Booking Mobile Verification'
-    });
+    // Dispatch Email / SMS
+    if (isEmail) {
+      await sendEmailOtp({
+        to: cleanContact,
+        otpCode: rawOtp,
+        purpose: 'Elite Drone Booking Email Verification'
+      });
 
-    console.log(`====================================================`);
-    console.log(`📱 [ELITE DRONE BOOKING OTP DISPATCH]`);
-    console.log(`🎯 Recipient: ${cleanContact}`);
-    console.log(`🔑 OTP Code:  >>> ${rawOtp} <<<`);
-    console.log(`⏱️ Duration:  90s active countdown (10 min expiry)`);
-    console.log(`====================================================`);
+      console.log(`====================================================`);
+      console.log(`📧 [ELITE DRONE BOOKING OTP DISPATCH]`);
+      console.log(`🎯 Recipient Email: ${cleanContact}`);
+      console.log(`🔑 OTP Code:        >>> ${rawOtp} <<<`);
+      console.log(`⏱️ Duration:        90s active countdown (10 min expiry)`);
+      console.log(`====================================================`);
+    } else {
+      await sendSmsOtp({
+        mobile: cleanContact,
+        otpCode: rawOtp,
+        purpose: 'Elite Drone Booking Mobile Verification'
+      });
+
+      console.log(`====================================================`);
+      console.log(`📱 [ELITE DRONE BOOKING OTP DISPATCH]`);
+      console.log(`🎯 Recipient Mobile: ${cleanContact}`);
+      console.log(`🔑 OTP Code:         >>> ${rawOtp} <<<`);
+      console.log(`⏱️ Duration:         90s active countdown (10 min expiry)`);
+      console.log(`====================================================`);
+    }
 
     return res.json({
       success: true,
-      message: 'OTP sent successfully to your mobile number.',
+      message: isEmail ? 'OTP sent successfully to your email address.' : 'OTP sent successfully to your mobile number.',
       otp: rawOtp // Exposed for seamless testing
     });
   } catch (err) {
@@ -159,23 +178,24 @@ app.post('/send-otp', async (req, res) => {
   }
 });
 
-// 2. Verify Booking Mobile OTP
+// 2. Verify Booking Email/Mobile OTP
 app.post('/verify-otp', async (req, res) => {
   try {
     const { contact, otp } = req.body;
     if (!contact || !otp) {
-      return res.status(400).json({ success: false, message: 'Mobile contact and OTP are required' });
+      return res.status(400).json({ success: false, message: 'Contact and OTP are required' });
     }
 
     const cleanContact = String(contact).trim();
     const cleanOtp = String(otp).trim();
 
-    // Check memory store
-    const memRecord = bookingOtps.get(cleanContact);
+    // Check memory store (case-insensitive)
+    const memRecord = bookingOtps.get(cleanContact.toLowerCase()) || bookingOtps.get(cleanContact);
     let isVerified = false;
 
     if (memRecord && memRecord.otp === cleanOtp && Date.now() < memRecord.expiresAt) {
       isVerified = true;
+      bookingOtps.delete(cleanContact.toLowerCase());
       bookingOtps.delete(cleanContact);
     }
 
@@ -184,7 +204,7 @@ app.post('/verify-otp', async (req, res) => {
       try {
         const dbRes = await db.query(
           `SELECT id, otp_hash FROM otp_verifications 
-           WHERE destination = $1 AND is_verified = FALSE AND expires_at > NOW() 
+           WHERE LOWER(destination) = LOWER($1) AND is_verified = FALSE AND expires_at > NOW() 
            ORDER BY id DESC LIMIT 1`,
           [cleanContact]
         );

@@ -28,8 +28,9 @@ const startDateInput = document.getElementById("startDate");
 const endDateInput = document.getElementById("endDate");
 const daysInput = document.getElementById("numberOfDays");
 const addressInput = document.getElementById("address");
-const countryCode = document.getElementById("countryCode");
-const mobileInput = document.getElementById("mobile");
+const countryCode = null; // removed - using email OTP instead
+const emailInput = document.getElementById("email");
+const mobileInput = emailInput; // alias for backward compatibility
 const otpInput = document.getElementById("otp");
 const sendOtpBtn = document.getElementById("sendOtpBtn");
 const verifyOtpBtn = document.getElementById("verifyOtpBtn");
@@ -393,12 +394,14 @@ function calculateAmount(days = null) {
 }
 
 /* ============================================================
-   MOBILE VALIDATION
+   EMAIL VALIDATION
 ============================================================ */
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 if (mobileInput) {
     mobileInput.addEventListener("input", function () {
-        mobileInput.value = mobileInput.value.replace(/\D/g, "").slice(0, 10);
+        const emailVal = mobileInput.value.trim();
 
         otpVerified = false;
         if (otpSuccess) otpSuccess.classList.remove("show");
@@ -408,29 +411,14 @@ if (mobileInput) {
             verifyOtpBtn.textContent = "Verify OTP";
         }
 
-        if (mobileInput.value.length === 10) {
+        if (EMAIL_REGEX.test(emailVal)) {
             clearError(errors.mobile);
+        } else if (emailVal.length > 0) {
+            showError(errors.mobile, "Please enter a valid email address");
         } else {
-            showError(errors.mobile, "Please enter your 10-digit mobile number");
+            clearError(errors.mobile);
         }
 
-        saveBookingData();
-    });
-}
-
-/* ============================================================
-   COUNTRY CODE CHANGE
-============================================================ */
-
-if (countryCode) {
-    countryCode.addEventListener("change", function () {
-        otpVerified = false;
-        if (otpSuccess) otpSuccess.classList.remove("show");
-        if (verifyOtpBtn) {
-            verifyOtpBtn.disabled = false;
-            verifyOtpBtn.textContent = "Verify OTP";
-        }
-        clearError(errors.otp);
         saveBookingData();
     });
 }
@@ -443,9 +431,9 @@ if (sendOtpBtn) {
     sendOtpBtn.addEventListener("click", async function (event) {
         event.preventDefault();
 
-        const mobile = mobileInput ? mobileInput.value.trim() : "";
-        if (mobile.length !== 10) {
-            showError(errors.mobile, "Please enter your 10 digit mobile number");
+        const email = mobileInput ? mobileInput.value.trim() : "";
+        if (!EMAIL_REGEX.test(email)) {
+            showError(errors.mobile, "Please enter a valid email address");
             if (mobileInput) mobileInput.focus();
             return;
         }
@@ -466,8 +454,8 @@ if (sendOtpBtn) {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    method: "mobile",
-                    contact: (countryCode ? countryCode.value : "+91") + mobile
+                    method: "email",
+                    contact: email
                 })
             });
 
@@ -571,10 +559,10 @@ if (otpInput) {
 if (verifyOtpBtn) {
     verifyOtpBtn.addEventListener("click", async function () {
         const otp = otpInput ? otpInput.value.trim() : "";
-        const mobile = mobileInput ? mobileInput.value.trim() : "";
+        const email = mobileInput ? mobileInput.value.trim() : "";
 
-        if (mobile.length !== 10) {
-            showError(errors.mobile, "Please enter your 10 digit number");
+        if (!EMAIL_REGEX.test(email)) {
+            showError(errors.mobile, "Please enter your valid email address");
             return;
         }
 
@@ -592,8 +580,8 @@ if (verifyOtpBtn) {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    method: "mobile",
-                    contact: (countryCode ? countryCode.value : "+91") + mobile,
+                    method: "email",
+                    contact: email,
                     otp: otp
                 })
             });
@@ -831,9 +819,10 @@ function validateBookingForm() {
         valid = false;
     }
 
-    /* MOBILE */
-    if (!mobileInput || mobileInput.value.length !== 10) {
-        showError(errors.mobile, "Please enter your 10 digit number");
+    /* EMAIL */
+    const emailVal = mobileInput ? mobileInput.value.trim() : "";
+    if (!EMAIL_REGEX.test(emailVal)) {
+        showError(errors.mobile, "Please enter your valid email address");
         valid = false;
     } else {
         clearError(errors.mobile);
@@ -841,7 +830,7 @@ function validateBookingForm() {
 
     /* OTP */
     if (!otpVerified) {
-        showError(errors.otp, "Please verify your mobile OTP before booking.");
+        showError(errors.otp, "Please verify your email OTP before booking.");
         if (errors.otp) errors.otp.style.color = "var(--error)";
         valid = false;
     }
@@ -915,8 +904,8 @@ function completeBooking(paymentStatus) {
         userId: user.id || user.userId || `EDU-${Date.now().toString(36)}`,
         customerName: nameInput ? nameInput.value.trim() : (user.full_name || user.username || "Client"),
         username: user.username || "",
-        email: (user.email || "client@elitedrone.com").toLowerCase(),
-        mobile: (countryCode ? countryCode.value : "+91") + (mobileInput ? mobileInput.value.trim() : ""),
+        email: ((mobileInput && mobileInput.value.trim()) || user.email || "client@elitedrone.com").toLowerCase(),
+        mobile: user.mobile || "",
         service: selectedEvent,
         event: selectedEvent,
         numberOfDays: days,
@@ -1066,8 +1055,7 @@ function saveBookingData() {
         endDate: endDateInput ? endDateInput.value : "",
         numberOfDays: daysInput ? daysInput.value : "",
         address: addressInput ? addressInput.value : "",
-        countryCode: countryCode ? countryCode.value : "+91",
-        mobile: mobileInput ? mobileInput.value : "",
+        email: mobileInput ? mobileInput.value : "",
         paymentMethod: selectedPayment ? selectedPayment.value : ""
     };
 
@@ -1101,8 +1089,7 @@ function loadBookingData() {
         }
         if (endDateInput && data.endDate) endDateInput.value = data.endDate;
         if (addressInput && data.address) addressInput.value = data.address;
-        if (countryCode && data.countryCode) countryCode.value = data.countryCode;
-        if (mobileInput && data.mobile) mobileInput.value = data.mobile;
+        if (mobileInput && (data.email || data.mobile)) mobileInput.value = data.email || data.mobile;
 
         if (data.paymentMethod) {
             const radio = document.querySelector(`input[name="paymentMethod"][value="${data.paymentMethod}"]`);
@@ -1141,9 +1128,8 @@ function loadWelcomeUser() {
     if (nameInput && !nameInput.value && displayName) {
         nameInput.value = displayName;
     }
-    if (mobileInput && !mobileInput.value && user.mobile) {
-        const cleanMob = String(user.mobile).replace(/\D/g, "").slice(-10);
-        mobileInput.value = cleanMob;
+    if (mobileInput && !mobileInput.value && (user.email || user.mobile)) {
+        mobileInput.value = user.email || user.mobile || "";
     }
 }
 
