@@ -363,147 +363,99 @@
       font-weight: 600;
     }
 
-    /* OTP Box - Exact Match to Reference */
+    /* OTP Box - Exact Match to User Screenshot */
     .reg-otp-box {
-      background: #f4f9fd;
-      border: 1.5px solid #d0e7f9;
+      background: #fbfdff;
+      border: 1.5px solid #dbeafe;
       border-radius: 16px;
-      padding: 1.35rem 1.5rem;
+      padding: 1.5rem;
       margin: 1.5rem 0 1.25rem;
     }
 
-    .otp-card-header {
-      margin-bottom: 1.15rem;
-    }
-
     .reg-otp-title {
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       font-weight: 800;
-      color: #0369a1;
-      margin: 0 0 0.25rem 0;
-      letter-spacing: -0.2px;
+      color: #002b5c;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
       font-family: var(--font-sans);
     }
 
-    .reg-otp-sub {
-      color: #64748b;
-      font-size: 0.88rem;
-      margin: 0;
-      font-weight: 500;
-    }
-
-    .otp-card-grid {
-      display: grid;
-      grid-template-columns: 1fr 140px;
-      gap: 1rem;
-      align-items: start;
-    }
-
-    .otp-input-col {
+    .btn-otp-action {
+      background: #f0f7ff;
+      border: 1.5px solid #bae6fd;
+      color: #0284c7;
+      font-weight: 800;
+      font-size: 0.95rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 0.85rem;
+      border-radius: 10px;
+      width: 100%;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-family: var(--font-sans);
       display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-otp-action:hover:not(:disabled) {
+      background: #e0f2fe;
+      border-color: #7dd3fc;
+      color: #0369a1;
+    }
+
+    .btn-otp-action:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    /* When OTP is entered, VERIFY OTP becomes bright & clickable */
+    .btn-otp-action.ready-to-verify {
+      background: #0284c7 !important;
+      border-color: #0284c7 !important;
+      color: #ffffff !important;
+      opacity: 1 !important;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+      cursor: pointer !important;
+    }
+
+    .btn-otp-action.is-verified {
+      background: #059669 !important;
+      border-color: #059669 !important;
+      color: #ffffff !important;
+      opacity: 1 !important;
+      cursor: default !important;
     }
 
     .reg-otp-input {
       width: 100%;
-      height: 48px;
       background: #ffffff;
-      border: 1.5px solid #cbd5e1;
+      border: 1.5px solid #e2e8f0;
       border-radius: 10px;
-      padding: 0 1rem;
+      padding: 0.85rem;
       text-align: center;
-      letter-spacing: 3px;
-      font-weight: 700;
-      font-size: 1.1rem;
+      letter-spacing: 10px;
+      font-weight: 800;
+      font-size: 1.3rem;
       color: #0f172a;
       box-sizing: border-box;
-      margin: 0;
+      margin: 0.85rem 0;
       transition: all var(--transition-fast);
     }
 
     .reg-otp-input::placeholder {
       color: #94a3b8;
-      font-weight: 600;
-      letter-spacing: 1px;
+      letter-spacing: 10px;
+      font-weight: 800;
     }
 
     .reg-otp-input:focus {
       border-color: #0284c7;
       box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
       outline: none;
-    }
-
-    .otp-buttons-col {
-      display: flex;
-      flex-direction: column;
-      gap: 0.65rem;
-    }
-
-    .btn-otp-primary {
-      background: #0284c7;
-      border: none;
-      color: #ffffff;
-      font-weight: 700;
-      font-size: 0.95rem;
-      height: 48px;
-      border-radius: 10px;
-      width: 100%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all var(--transition-fast);
-      box-shadow: 0 2px 4px rgba(2, 132, 199, 0.2);
-    }
-
-    .btn-otp-primary:hover:not(:disabled) {
-      background: #0369a1;
-      transform: translateY(-1px);
-    }
-
-    .btn-otp-primary:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
-    }
-
-    .btn-otp-verify {
-      background: #006097;
-      border: none;
-      color: #ffffff;
-      font-weight: 700;
-      font-size: 0.95rem;
-      height: 48px;
-      border-radius: 10px;
-      width: 100%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all var(--transition-fast);
-      box-shadow: 0 2px 4px rgba(0, 96, 151, 0.2);
-    }
-
-    .btn-otp-verify:hover {
-      background: #004b77;
-      transform: translateY(-1px);
-    }
-
-    .btn-otp-verify:disabled {
-      background: #006097;
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .btn-otp-verify.ready-to-verify {
-      background: #0284c7 !important;
-      opacity: 1 !important;
-      box-shadow: 0 0 12px rgba(2, 132, 199, 0.5);
-      cursor: pointer !important;
-    }
-
-    @media (max-width: 480px) {
-      .otp-card-grid {
-        grid-template-columns: 1fr;
-      }
     }
 
     .reg-otp-input:focus {
@@ -761,31 +713,31 @@
           <div class="rule-item" id="rule-spec" style="grid-column: 1 / -1;">○ Special character (!@#$%^&*...)</div>
         </div>
 
-        <!-- 7. OTP Verification Box (Exact Match to Reference) -->
+        <!-- 7. OTP Verification Box (Exact Match to User Uploaded Screenshot) -->
         <div class="reg-otp-box">
-          <div class="otp-card-header">
-            <h3 class="reg-otp-title">OTP Verification</h3>
-            <p class="reg-otp-sub">Verify your email address</p>
+          <div class="reg-otp-title">OTP VERIFICATION</div>
+          
+          <div class="reg-otp-email-notice">
+            <span class="otp-notice-icon">📧</span>
+            <div class="otp-notice-text">
+              <span>Security verification code will be sent to:</span>
+              <strong id="otp-dest-display">Enter your email above</strong>
+            </div>
           </div>
           <input type="hidden" name="otp_method" value="email">
 
-          <div class="otp-card-grid">
-            <div class="otp-input-col">
-              <input type="text" id="otp_code" class="reg-otp-input" placeholder="4 digit OTP" maxlength="4" autocomplete="one-time-code" inputmode="numeric">
-            </div>
+          <button type="button" id="btn-send-otp" class="btn-otp-action">
+            SEND OTP
+          </button>
 
-            <div class="otp-buttons-col">
-              <button type="button" id="btn-send-otp" class="btn-otp-primary">
-                Send OTP
-              </button>
-              <button type="button" id="btn-verify-otp" class="btn-otp-verify">
-                Verify OTP
-              </button>
-            </div>
-          </div>
+          <input type="text" id="otp_code" class="reg-otp-input" placeholder="• • • •" maxlength="4" autocomplete="one-time-code" inputmode="numeric">
+
+          <button type="button" id="btn-verify-otp" class="btn-otp-action">
+            VERIFY OTP
+          </button>
 
           <!-- Status Message -->
-          <div id="otp-status-message" style="margin-top: 0.75rem; font-size: 0.85rem; font-weight: 600;"></div>
+          <div id="otp-status-message" style="margin-top: 0.75rem; font-size: 0.85rem; font-weight: 600; text-align: center;"></div>
 
           <!-- Verified Badge -->
           <div class="otp-verified-badge" id="otp-verified-badge">
