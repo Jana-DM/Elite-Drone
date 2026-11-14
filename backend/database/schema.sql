@@ -133,6 +133,9 @@ CREATE TABLE IF NOT EXISTS bookings (
     event_location VARCHAR(150) NOT NULL,
     complete_address TEXT NOT NULL,
     additional_requirements TEXT,
+    total_amount NUMERIC(10,2) NOT NULL DEFAULT 1999.00,
+    payment_mode VARCHAR(50) NOT NULL DEFAULT 'UPI',
+    payment_status VARCHAR(50) NOT NULL DEFAULT 'Paid',
     status VARCHAR(20) NOT NULL DEFAULT 'Pending' CHECK (status IN ('Pending', 'Confirmed', 'Rejected', 'Completed', 'Cancelled')),
     admin_notes TEXT,
     cancellation_reason TEXT,
@@ -176,3 +179,35 @@ CREATE TRIGGER trigger_gallery_updated_at
     BEFORE UPDATE ON gallery_items
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+-- 9. SETTINGS TABLE
+CREATE TABLE IF NOT EXISTS settings (
+    key VARCHAR(100) PRIMARY KEY,
+    value TEXT NOT NULL,
+    description VARCHAR(255),
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 10. REVIEWS TABLE
+CREATE TABLE IF NOT EXISTS reviews (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    customer_name VARCHAR(100) NOT NULL,
+    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT NOT NULL,
+    service_name VARCHAR(100) DEFAULT 'Commercial Aerial Shoot',
+    status VARCHAR(20) DEFAULT 'Approved' CHECK (status IN ('Pending', 'Approved', 'Rejected')),
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 11. AUDIT LOGS TABLE
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    admin_id INTEGER REFERENCES admin_users(id) ON DELETE SET NULL,
+    action VARCHAR(100) NOT NULL,
+    details TEXT,
+    ip_address VARCHAR(50),
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+

@@ -468,20 +468,7 @@
             </div>
           </div>
           <div id="reviews-moderation-list" style="display: flex; flex-direction: column; gap: 1rem;">
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-                  <strong style="color: #fff;">Arun Kumar</strong>
-                  <span style="color: #f59e0b;">★★★★★</span>
-                  <span class="badge badge-primary">Wedding Aerial Cinematography</span>
-                </div>
-                <p style="color: var(--text-dim); font-size: 0.85rem; margin: 0;">"The 4K drone shots for our destination wedding were phenomenal. DGCA compliant and highly professional pilots!"</p>
-              </div>
-              <div style="display: flex; gap: 0.5rem;">
-                <button class="btn btn-secondary btn-sm" style="color: #10b981; border-color: rgba(16,185,129,0.4);" onclick="showToast('Review approved for homepage display!', 'success')">Approve ✓</button>
-                <button class="btn btn-secondary btn-sm" style="color: #f87171; border-color: rgba(239,68,68,0.4);" onclick="showToast('Review dismissed.', 'info')">Remove</button>
-              </div>
-            </div>
+            <p style="color: var(--text-muted); padding: 1.5rem; text-align: center;">Loading customer reviews from database...</p>
           </div>
         </div>
       </section>
@@ -497,7 +484,7 @@
               <h3 style="font-size: 1.25rem; color: #fff;">Service Catalog & Daily Rates</h3>
               <p style="font-size: 0.85rem; color: var(--text-muted);">Configure active commercial services and daily pricing</p>
             </div>
-            <button class="btn btn-primary btn-sm" onclick="showToast('Pricing configurations saved globally!', 'success')">Save Pricing</button>
+            <button class="btn btn-primary btn-sm" onclick="saveAdminPricing()">Save Pricing</button>
           </div>
 
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
@@ -515,7 +502,7 @@
               <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.85rem;">60fps ProRes + RAW Log Grading</p>
               <div style="display: flex; align-items: center; gap: 0.5rem;">
                 <span style="font-size: 1.1rem; color: #38bdf8; font-weight: 700;">₹</span>
-                <input type="number" class="form-control" value="999" style="font-weight: 700; font-size: 1.1rem; background: #0c1220;">
+                <input type="number" id="setting-cinematic-surcharge" class="form-control" value="999" style="font-weight: 700; font-size: 1.1rem; background: #0c1220;">
               </div>
             </div>
 
@@ -524,7 +511,7 @@
               <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.85rem;">Expedited Digital Sky Clearance (&lt;24hrs)</p>
               <div style="display: flex; align-items: center; gap: 0.5rem;">
                 <span style="font-size: 1.1rem; color: #38bdf8; font-weight: 700;">₹</span>
-                <input type="number" class="form-control" value="1499" style="font-weight: 700; font-size: 1.1rem; background: #0c1220;">
+                <input type="number" id="setting-rush-permit" class="form-control" value="1499" style="font-weight: 700; font-size: 1.1rem; background: #0c1220;">
               </div>
             </div>
           </div>
@@ -849,6 +836,7 @@
       // Load initial data
       await loadMetrics();
       await loadAdminBookings();
+      await loadAdminSettings();
       renderCalendar();
 
       // Setup Modal Close
@@ -998,8 +986,14 @@
         loadAdminBookings();
         renderCalendar();
       }
-      if (tabId === 'tab-customers') loadAdminCustomers();
-      if (tabId === 'tab-services') loadAdminGallery();
+      if (tabId === 'tab-customers') {
+        loadAdminCustomers();
+        loadAdminReviews();
+      }
+      if (tabId === 'tab-services') {
+        loadAdminGallery();
+        loadAdminSettings();
+      }
       if (tabId === 'tab-comms') loadAuditLogs();
     }
 
@@ -1014,10 +1008,9 @@
           document.getElementById('metric-confirmed').textContent = m.confirmedBookings;
           document.getElementById('metric-completed').textContent = m.completedBookings;
 
-          // Calculate estimated revenue
-          const totalBookings = m.totalBookings || 0;
-          const gross = totalBookings * 1999;
-          document.getElementById('rev-gross').textContent = `₹${gross.toLocaleString('en-IN')}`;
+          // Revenue from database
+          const gross = m.totalRevenue || ((m.totalBookings || 0) * 1999);
+          document.getElementById('rev-gross').textContent = `₹${Number(gross).toLocaleString('en-IN')}`;
 
           // Render Recent
           const tbody = document.getElementById('overview-recent-tbody');
@@ -1210,6 +1203,107 @@
       }
     }
 
+    // Load Customer Reviews Moderation
+    async function loadAdminReviews() {
+      const container = document.getElementById('reviews-moderation-list');
+      try {
+        const res = await API.get('/api/admin/reviews');
+        if (res.success && res.reviews) {
+          if (res.reviews.length === 0) {
+            container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem; padding: 1rem; text-align: center;">No reviews submitted yet.</p>';
+            return;
+          }
+          container.innerHTML = res.reviews.map(r => `
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                  <strong style="color: #fff;">${r.customer_name}</strong>
+                  <span style="color: #f59e0b;">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+                  <span class="badge ${r.status === 'Approved' ? 'badge-primary' : 'badge-gold'}">${r.status}</span>
+                  <span style="color: var(--text-muted); font-size: 0.78rem;">${r.service_name || 'Commercial Shoot'}</span>
+                </div>
+                <p style="color: var(--text-dim); font-size: 0.85rem; margin: 0;">"${r.comment}"</p>
+                <span style="color: var(--text-muted); font-size: 0.75rem;">${new Date(r.created_at).toLocaleString('en-IN')}</span>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                ${r.status !== 'Approved' ? `
+                  <button class="btn btn-secondary btn-sm" style="color: #10b981; border-color: rgba(16,185,129,0.4);" onclick="updateAdminReviewStatus(${r.id}, 'Approved')">Approve ✓</button>
+                ` : `
+                  <button class="btn btn-secondary btn-sm" style="color: #f59e0b; border-color: rgba(245,158,11,0.4);" onclick="updateAdminReviewStatus(${r.id}, 'Pending')">Unpublish</button>
+                `}
+                <button class="btn btn-secondary btn-sm" style="color: #f87171; border-color: rgba(239,68,68,0.4);" onclick="deleteAdminReview(${r.id})">Remove</button>
+              </div>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        container.innerHTML = '<p style="color: #ef4444; font-size: 0.85rem; padding: 1rem; text-align: center;">Failed to load reviews from database.</p>';
+      }
+    }
+
+    async function updateAdminReviewStatus(id, status) {
+      try {
+        const res = await API.put(`/api/admin/reviews/${id}/status`, { status });
+        if (res.success) {
+          showToast(`Review marked as ${status}!`, 'success');
+          await loadAdminReviews();
+        }
+      } catch (err) {
+        showToast(err.message || 'Failed to update review status', 'error');
+      }
+    }
+
+    async function deleteAdminReview(id) {
+      if (!confirm('Are you sure you want to delete this review?')) return;
+      try {
+        const res = await API.delete(`/api/admin/reviews/${id}`);
+        if (res.success) {
+          showToast('Review removed from database.', 'success');
+          await loadAdminReviews();
+        }
+      } catch (err) {
+        showToast(err.message || 'Failed to delete review', 'error');
+      }
+    }
+
+    // Save Pricing Settings
+    async function saveAdminPricing() {
+      const baseRate = document.getElementById('setting-base-rate').value;
+      const surcharge = document.getElementById('setting-cinematic-surcharge').value;
+      const rush = document.getElementById('setting-rush-permit').value;
+
+      try {
+        const res = await API.put('/api/admin/settings', {
+          base_rate: baseRate,
+          cinematic_surcharge: surcharge,
+          rush_permit_fee: rush
+        });
+        if (res.success) {
+          showToast('Pricing configurations saved to database globally!', 'success');
+        }
+      } catch (err) {
+        showToast(err.message || 'Failed to save pricing', 'error');
+      }
+    }
+
+    // Load Admin Settings
+    async function loadAdminSettings() {
+      try {
+        const res = await API.get('/api/admin/settings');
+        if (res.success && res.settings) {
+          const s = res.settings;
+          if (document.getElementById('setting-hotline')) document.getElementById('setting-hotline').value = s.supportPhone || '';
+          if (document.getElementById('setting-email')) document.getElementById('setting-email').value = s.contactEmail || '';
+          if (document.getElementById('setting-upi')) document.getElementById('setting-upi').value = s.upiId || '';
+          if (document.getElementById('setting-base-rate')) document.getElementById('setting-base-rate').value = s.baseRate || 1999;
+          if (document.getElementById('setting-cinematic-surcharge')) document.getElementById('setting-cinematic-surcharge').value = s.cinematicSurcharge || 999;
+          if (document.getElementById('setting-rush-permit')) document.getElementById('setting-rush-permit').value = s.rushPermitFee || 1499;
+        }
+      } catch (err) {
+        console.warn('Failed to load settings:', err);
+      }
+    }
+
     // Load Audit Logs
     async function loadAuditLogs() {
       const tbody = document.getElementById('admin-audit-logs-tbody');
@@ -1218,11 +1312,11 @@
         if (res.success && res.logs) {
           tbody.innerHTML = res.logs.map(log => `
             <tr>
-              <td style="font-size: 0.8rem; color: var(--text-dim);">${new Date(log.updated_at || log.created_at).toLocaleString('en-IN')}</td>
-              <td><strong>Flight Review: ${log.status}</strong></td>
-              <td><code>${log.booking_reference}</code></td>
-              <td style="font-size: 0.82rem; color: var(--text-muted);">${log.admin_notes || 'Standard clearance approved'}</td>
-              <td><span class="badge badge-gold">Superadmin</span></td>
+              <td style="font-size: 0.8rem; color: var(--text-dim);">${new Date(log.created_at || log.updated_at).toLocaleString('en-IN')}</td>
+              <td><strong>${log.action || ('Flight Review: ' + (log.status || 'Updated'))}</strong></td>
+              <td><code>${log.admin_username ? '@' + log.admin_username : (log.customer_username ? '@' + log.customer_username : (log.booking_reference || 'System'))}</code></td>
+              <td style="font-size: 0.82rem; color: var(--text-muted);">${log.details || log.admin_notes || 'Standard operation executed'}</td>
+              <td><span class="badge ${log.admin_username ? 'badge-gold' : 'badge-primary'}">${log.ip_address || 'Internal'}</span></td>
             </tr>
           `).join('');
         }

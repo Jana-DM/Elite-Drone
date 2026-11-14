@@ -1195,9 +1195,24 @@ window.addEventListener("online", function () {
 
 async function sendOwnerNotification(bookingData) {
     try {
+        const token = localStorage.getItem('token');
+        let user = null;
+        try {
+            user = JSON.parse(localStorage.getItem('user') || 'null');
+        } catch (e) {}
+
+        if (user && user.id && !bookingData.userId) {
+            bookingData.userId = user.id;
+        }
+
+        const headers = { "Content-Type": "application/json" };
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+
         const response = await fetch("/api/booking/notify", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: headers,
             body: JSON.stringify(bookingData)
         });
 

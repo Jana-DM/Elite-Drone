@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-// 1. Dashboard Metrics
+// 1. Dashboard Metrics & Revenue Analytics
 exports.getMetrics = async (req, res) => {
   try {
     const customersCount = await db.query('SELECT count(*) FROM users');
@@ -11,15 +11,23 @@ exports.getMetrics = async (req, res) => {
     const rejectedCount = await db.query("SELECT count(*) FROM bookings WHERE status = 'Rejected'");
     const cancelledCount = await db.query("SELECT count(*) FROM bookings WHERE status = 'Cancelled'");
 
-    // Recent 5 activities
+    // Revenue calculation from database
+    const revenueRes = await db.query(`
+      SELECT COALESCE(SUM(total_amount), 0) AS total_revenue
+      FROM bookings
+      WHERE status IN ('Confirmed', 'Completed') OR payment_status = 'Paid';
+    `);
+
+    // Recent activities
     const recentActivity = await db.query(`
       SELECT 
         b.id, b.booking_reference, b.customer_name, b.status, b.created_at, b.event_date,
+        b.total_amount, b.payment_status,
         s.name AS service_name
       FROM bookings b
       LEFT JOIN services s ON b.service_id = s.id
       ORDER BY b.created_at DESC
-      LIMIT 6;
+      LIMIT 8;
     `);
 
     res.json({
@@ -32,6 +40,8 @@ exports.getMetrics = async (req, res) => {
         completedBookings: parseInt(completedCount.rows[0].count, 10),
         rejectedBookings: parseInt(rejectedCount.rows[0].count, 10),
         cancelledBookings: parseInt(cancelledCount.rows[0].count, 10),
+        totalRevenue: parseFloat(revenueRes.rows[0].total_revenue || 0),
+        activeFleet: 8
       },
       recentActivity: recentActivity.rows,
     });
@@ -77,11 +87,11 @@ exports.getAllBookings = async (req, res) => {
   }
 };
 
-// 3. Update Booking Status (Approve / Reject / Complete / Notes)
+// 3. Update Booking Status & Payment Management
 exports.updateBookingStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, admin_notes } = req.body;
+    const { status, admin_notes, payment_status } = req.body;
 
     const allowed = ['Pending', 'Confirmed', 'Rejected', 'Completed', 'Cancelled'];
     if (status && !allowed.includes(status)) {
@@ -97,11 +107,18 @@ exports.updateBookingStatus = async (req, res) => {
       `UPDATE bookings 
        SET status = COALESCE($1, status),
            admin_notes = COALESCE($2, admin_notes),
+           payment_status = COALESCE($3, payment_status),
            updated_at = NOW()
-       WHERE id = $3
+       WHERE id = $4
        RETURNING *`,
-      [status || null, admin_notes || null, id]
+      [status || null, admin_notes || null, payment_status || null, id]
     );
+
+    // Record audit log
+    await db.query(`
+      INSERT INTO audit_logs (admin_id, action, details)
+      VALUES ($1, 'BOOKING_STATUS_UPDATE', $2)
+    `, [req.user.id, `Booking ${check.rows[0].booking_reference} status changed to ${status || check.rows[0].status}`]);
 
     res.json({
       success: true,
@@ -138,25 +155,30 @@ exports.getCustomers = async (req, res) => {
   }
 };
 
-// 5. Gallery Management: Add Item
+// 5. Gallery Management (Add & Delete)
 exports.addGalleryItem = async (req, res) => {
   try {
-    const { title, category, media_type, media_url, thumbnail_url, description, location, is_featured } = req.body;
-
+    const { title, category, media_type, media_url, thumbnail_url, description, location } = req.body;
     if (!title || !category || !media_type || !media_url) {
-      return res.status(400).json({ success: false, message: 'Title, category, media type, and media URL are required.' });
+      return res.status(400).json({ success: false, message: 'Title, category, type and URL are required.' });
     }
 
     const result = await db.query(
       `INSERT INTO gallery_items (title, category, media_type, media_url, thumbnail_url, description, location, is_featured)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-      [title.trim(), category, media_type, media_url.trim(), thumbnail_url ? thumbnail_url.trim() : null, description ? description.trim() : null, location ? location.trim() : null, is_featured || false]
+       VALUES ($1, $2, $3, $4, $5, $6, $7, true) RETURNING *`,
+      [title, category, media_type, media_url, thumbnail_url || media_url, description || '', location || '']
     );
+
+    // Record audit log
+    await db.query(`
+      INSERT INTO audit_logs (admin_id, action, details)
+      VALUES ($1, 'GALLERY_ITEM_ADDED', $2)
+    `, [req.user.id, `Added gallery item: ${title} (${category})`]);
 
     res.status(201).json({
       success: true,
       message: 'New media item added to portfolio gallery.',
-      item: result.rows[0],
+      item: result.rows[0]
     });
   } catch (err) {
     console.error('Error adding gallery item:', err);
@@ -164,20 +186,99 @@ exports.addGalleryItem = async (req, res) => {
   }
 };
 
-// 6. Gallery Management: Delete Item
 exports.deleteGalleryItem = async (req, res) => {
   try {
     const { id } = req.params;
-    const check = await db.query('SELECT id FROM gallery_items WHERE id = $1', [id]);
+    const check = await db.query('SELECT id, title FROM gallery_items WHERE id = $1', [id]);
     if (check.rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'Gallery item not found.' });
+      return res.status(404).json({ success: false, message: 'Gallery item not found' });
     }
 
     await db.query('DELETE FROM gallery_items WHERE id = $1', [id]);
-    res.json({ success: true, message: 'Gallery item deleted successfully.' });
+
+    // Record audit log
+    await db.query(`
+      INSERT INTO audit_logs (admin_id, action, details)
+      VALUES ($1, 'GALLERY_ITEM_DELETED', $2)
+    `, [req.user.id, `Deleted gallery item ID: ${id} (${check.rows[0].title})`]);
+
+    res.json({ success: true, message: 'Gallery item removed from portfolio.' });
   } catch (err) {
     console.error('Error deleting gallery item:', err);
     res.status(500).json({ success: false, message: 'Failed to delete gallery item' });
+  }
+};
+
+// 6. Customer Reviews Moderation
+exports.getAllReviews = async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT r.*, u.username, u.email
+      FROM reviews r
+      LEFT JOIN users u ON r.user_id = u.id
+      ORDER BY r.created_at DESC;
+    `);
+
+    res.json({
+      success: true,
+      count: result.rows.length,
+      reviews: result.rows
+    });
+  } catch (err) {
+    console.error('Error fetching admin reviews:', err);
+    res.status(500).json({ success: false, message: 'Failed to load reviews' });
+  }
+};
+
+exports.updateReviewStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!['Pending', 'Approved', 'Rejected'].includes(status)) {
+      return res.status(400).json({ success: false, message: 'Invalid review status.' });
+    }
+
+    const updated = await db.query(
+      'UPDATE reviews SET status = $1 WHERE id = $2 RETURNING *',
+      [status, id]
+    );
+
+    if (updated.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Review not found.' });
+    }
+
+    // Record audit log
+    await db.query(`
+      INSERT INTO audit_logs (admin_id, action, details)
+      VALUES ($1, 'REVIEW_STATUS_UPDATE', $2)
+    `, [req.user.id, `Review ID ${id} status set to ${status}`]);
+
+    res.json({
+      success: true,
+      message: `Review marked as ${status}.`,
+      review: updated.rows[0]
+    });
+  } catch (err) {
+    console.error('Error updating review status:', err);
+    res.status(500).json({ success: false, message: 'Failed to update review status' });
+  }
+};
+
+exports.deleteReview = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.query('DELETE FROM reviews WHERE id = $1', [id]);
+
+    await db.query(`
+      INSERT INTO audit_logs (admin_id, action, details)
+      VALUES ($1, 'REVIEW_DELETED', $2)
+    `, [req.user.id, `Deleted review ID ${id}`]);
+
+    res.json({ success: true, message: 'Review removed successfully.' });
+  } catch (err) {
+    console.error('Error deleting review:', err);
+    res.status(500).json({ success: false, message: 'Failed to delete review' });
   }
 };
 
@@ -186,12 +287,14 @@ exports.getAuditLogs = async (req, res) => {
   try {
     const logs = await db.query(`
       SELECT 
-        b.id, b.booking_reference, b.customer_name, b.status, b.admin_notes, b.updated_at, b.created_at,
-        s.name AS service_name
-      FROM bookings b
-      LEFT JOIN services s ON b.service_id = s.id
-      ORDER BY b.updated_at DESC
-      LIMIT 30;
+        l.id, l.action, l.details, l.created_at, l.ip_address,
+        u.username AS customer_username,
+        a.username AS admin_username
+      FROM audit_logs l
+      LEFT JOIN users u ON l.user_id = u.id
+      LEFT JOIN admin_users a ON l.admin_id = a.id
+      ORDER BY l.created_at DESC
+      LIMIT 50;
     `);
     res.json({ success: true, logs: logs.rows });
   } catch (err) {
@@ -200,34 +303,67 @@ exports.getAuditLogs = async (req, res) => {
   }
 };
 
-// 8. Global Settings
+// 8. Global Settings & Pricing (PostgreSQL Backed)
 exports.getSettings = async (req, res) => {
-  res.json({
-    success: true,
-    settings: {
-      siteName: 'Elite Drone Service',
-      upiId: 'hariharihari28163-3@okaxis',
-      ratePerDay: 1999,
-      contactEmail: 'elitedrones.collab@gmail.com',
-      supportPhone: '+91 98765 43210',
-      dgcaCompliant: true,
-      maxFlightRadiusKm: 50,
-      activeFleetSize: 8,
-      twoFactorRequired: true
-    }
-  });
+  try {
+    const result = await db.query('SELECT key, value FROM settings');
+    const settingsMap = {};
+    result.rows.forEach(r => { settingsMap[r.key] = r.value; });
+
+    res.json({
+      success: true,
+      settings: {
+        siteName: settingsMap.business_name || 'Elite Drone Service',
+        upiId: settingsMap.upi_id || 'hariharihari28163-3@okaxis',
+        ratePerDay: Number(settingsMap.base_rate || 1999),
+        baseRate: Number(settingsMap.base_rate || 1999),
+        cinematicSurcharge: Number(settingsMap.cinematic_surcharge || 999),
+        rushPermitFee: Number(settingsMap.rush_permit_fee || 1499),
+        contactEmail: settingsMap.emergency_email || 'support@elitedrone.com',
+        supportPhone: settingsMap.support_hotline || '+91 98765 43210',
+        dgcaCompliant: true,
+        maxFlightRadiusKm: 50,
+        activeFleetSize: 8,
+        twoFactorRequired: true
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching settings:', err);
+    res.status(500).json({ success: false, message: 'Failed to retrieve settings' });
+  }
 };
 
 exports.updateSettings = async (req, res) => {
   try {
-    const { siteName, upiId, ratePerDay, contactEmail, supportPhone } = req.body;
+    const { hotline, email, upi, base_rate, rush_permit_fee, cinematic_surcharge, siteName } = req.body;
+    const updates = [];
+    if (upi) updates.push(['upi_id', upi]);
+    if (hotline) updates.push(['support_hotline', hotline]);
+    if (email) updates.push(['emergency_email', email]);
+    if (base_rate) updates.push(['base_rate', String(base_rate)]);
+    if (rush_permit_fee) updates.push(['rush_permit_fee', String(rush_permit_fee)]);
+    if (cinematic_surcharge) updates.push(['cinematic_surcharge', String(cinematic_surcharge)]);
+    if (siteName) updates.push(['business_name', siteName]);
+
+    for (const [k, v] of updates) {
+      await db.query(`
+        INSERT INTO settings (key, value) VALUES ($1, $2)
+        ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = CURRENT_TIMESTAMP
+      `, [k, v]);
+    }
+
+    // Record audit log
+    await db.query(`
+      INSERT INTO audit_logs (admin_id, action, details)
+      VALUES ($1, 'SETTINGS_UPDATE', $2)
+    `, [req.user ? req.user.id : 1, `Settings updated: ${updates.map(u => u[0]).join(', ')}`]);
+
     res.json({
       success: true,
-      message: 'Platform configurations saved successfully!',
-      settings: { siteName, upiId, ratePerDay, contactEmail, supportPhone }
+      message: 'Platform configurations saved to database successfully!'
     });
   } catch (err) {
+    console.error('Error updating settings:', err);
     res.status(500).json({ success: false, message: 'Failed to update settings.' });
   }
 };
-

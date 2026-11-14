@@ -73,6 +73,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/otp', require('./routes/otpRoutes'));
 app.use('/api/bookings', require('./routes/bookingRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/reviews', require('./routes/reviewRoutes'));
 
 // Public Live Stats Endpoint for "Our Journey" section
 app.get('/api/stats', async (req, res) => {
@@ -243,42 +244,74 @@ app.post('/api/booking/notify', async (req, res) => {
     const booking = req.body || {};
     const bookingRef = booking.bookingId || ('ED-' + Date.now().toString().slice(-8));
     const customerName = booking.customerName || booking.name || 'Valued Customer';
-    const email = booking.email || 'client@elitedrone.com';
-    const mobile = booking.mobile || '0000000000';
+    const email = (booking.email || 'client@elitedrone.com').trim().toLowerCase();
+    const mobile = (booking.mobile || '0000000000').trim();
     const serviceName = booking.service || booking.event || 'Aerial Photography';
     const eventDate = booking.startDate || booking.date || new Date().toISOString().slice(0, 10);
     const address = booking.location || booking.address || 'Address provided on file';
-    const amount = booking.totalAmount || booking.amount || 1999;
-    const paymentStatus = booking.paymentStatus || 'Offline Payment';
+    const amount = Number(booking.totalAmount || booking.amount || 1999);
+    const paymentStatus = booking.paymentStatus || 'Paid';
+    const paymentMode = booking.paymentMode || 'UPI';
+
+    // 1. Identify User ID from JWT Token, booking payload, or Database lookup
+    let userId = booking.userId || null;
+    if (!userId && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      try {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'elite_drone_jwt_secret_key_2026');
+        userId = decoded.id;
+      } catch (tokenErr) {
+        // Continue fallback lookup
+      }
+    }
+
+    if (!userId) {
+      const userLookup = await db.query(
+        'SELECT id FROM users WHERE LOWER(email) = $1 OR mobile = $2 LIMIT 1',
+        [email, mobile]
+      );
+      if (userLookup.rows.length > 0) {
+        userId = userLookup.rows[0].id;
+      }
+    }
 
     console.log(`====================================================`);
     console.log(`🚁 [NEW ELITE DRONE BOOKING CONFIRMED]`);
     console.log(`🆔 Reference: ${bookingRef}`);
-    console.log(`👤 Client:    ${customerName}`);
+    console.log(`👤 Client:    ${customerName} (User ID: ${userId || 'Guest/Unlinked'})`);
     console.log(`📱 Contact:   ${mobile}`);
     console.log(`🎯 Event:     ${serviceName}`);
     console.log(`📅 Date:      ${eventDate} (${booking.numberOfDays || '1 Day'})`);
     console.log(`📍 Address:   ${address}`);
-    console.log(`💳 Payment:   ${paymentStatus} (₹${amount})`);
+    console.log(`💳 Payment:   ${paymentStatus} (${paymentMode} ₹${amount})`);
     console.log(`====================================================`);
 
-    // Sync into PostgreSQL bookings table
+    // 2. Sync into PostgreSQL bookings table
     try {
       const svcRes = await db.query('SELECT id FROM services WHERE is_active = TRUE LIMIT 1');
       const serviceId = svcRes.rows.length > 0 ? svcRes.rows[0].id : 1;
 
       await db.query(`
         INSERT INTO bookings (
-          booking_reference, customer_name, email, mobile, event_type,
+          booking_reference, user_id, customer_name, email, mobile, event_type,
           service_id, event_date, event_time, event_location, complete_address,
+          total_amount, payment_mode, payment_status,
           status, admin_notes
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, '10:00:00', $8, $9, 'Confirmed', $10
+          $1, $2, $3, $4, $5, $6,
+          $7, $8, '10:00:00', $9, $10,
+          $11, $12, $13,
+          'Confirmed', $14
         ) ON CONFLICT (booking_reference) DO UPDATE SET
+          user_id = COALESCE(EXCLUDED.user_id, bookings.user_id),
+          total_amount = EXCLUDED.total_amount,
+          payment_mode = EXCLUDED.payment_mode,
+          payment_status = EXCLUDED.payment_status,
           status = 'Confirmed',
           admin_notes = EXCLUDED.admin_notes
       `, [
         bookingRef,
+        userId,
         customerName,
         email,
         mobile,
@@ -287,15 +320,26 @@ app.post('/api/booking/notify', async (req, res) => {
         eventDate,
         address.slice(0, 140),
         address,
-        `Payment: ${paymentStatus}. Amount: ₹${amount}. Days: ${booking.numberOfDays || '1'}. Gender: ${booking.gender || 'N/A'}, Age: ${booking.age || 'N/A'}`
+        amount,
+        paymentMode,
+        paymentStatus,
+        `Payment: ${paymentStatus} via ${paymentMode}. Amount: ₹${amount}. Days: ${booking.numberOfDays || '1'}. Gender: ${booking.gender || 'N/A'}, Age: ${booking.age || 'N/A'}`
       ]);
+
+      // Record audit log
+      await db.query(`
+        INSERT INTO audit_logs (user_id, action, details)
+        VALUES ($1, 'BOOKING_CREATED', $2)
+      `, [userId, `Booking ${bookingRef} created for ${serviceName} on ${eventDate}`]);
+
     } catch (dbErr) {
       console.warn('Booking PostgreSQL sync note:', dbErr.message);
     }
 
     return res.json({
       success: true,
-      message: 'Booking notification dispatched and synced successfully'
+      message: 'Booking notification dispatched and synced successfully',
+      bookingReference: bookingRef
     });
   } catch (err) {
     console.error('Error in /api/booking/notify:', err);

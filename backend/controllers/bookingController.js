@@ -77,6 +77,10 @@ exports.createBooking = async (req, res) => {
       refCheck = await db.query('SELECT id FROM bookings WHERE booking_reference = $1', [reference]);
     }
 
+    const amount = Number(req.body.total_amount || 1999.00);
+    const paymentMode = req.body.payment_mode || 'UPI';
+    const paymentStatus = req.body.payment_status || 'Paid';
+
     const insertQuery = `
       INSERT INTO bookings (
         booking_reference,
@@ -92,8 +96,11 @@ exports.createBooking = async (req, res) => {
         event_location,
         complete_address,
         additional_requirements,
+        total_amount,
+        payment_mode,
+        payment_status,
         status
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'Pending')
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, 'Pending')
       RETURNING *;
     `;
 
@@ -111,10 +118,19 @@ exports.createBooking = async (req, res) => {
       event_location.trim(),
       complete_address.trim(),
       additional_requirements ? additional_requirements.trim() : null,
+      amount,
+      paymentMode,
+      paymentStatus
     ];
 
     const result = await db.query(insertQuery, values);
     const booking = result.rows[0];
+
+    // Audit log
+    await db.query(`
+      INSERT INTO audit_logs (user_id, action, details)
+      VALUES ($1, 'BOOKING_CREATED', $2)
+    `, [userId, `Direct booking ${reference} created for ${serviceCheck.rows[0].name}`]);
 
     return res.status(201).json({
       success: true,
@@ -196,6 +212,12 @@ exports.cancelBooking = async (req, res) => {
       [cancellation_reason || 'Cancelled by customer', id]
     );
 
+    // Record audit log
+    await db.query(
+      'INSERT INTO audit_logs (user_id, action, details) VALUES ($1, $2, $3)',
+      [userId, 'BOOKING_CANCELLED', `Booking ${booking.booking_reference} cancelled. Reason: ${cancellation_reason || 'Customer request'}`]
+    );
+
     return res.json({
       success: true,
       message: `Booking ${booking.booking_reference} has been cancelled successfully.`,
@@ -240,6 +262,12 @@ exports.rescheduleBooking = async (req, res) => {
            updated_at = NOW() 
        WHERE id = $3`,
       [event_date, event_time || null, id]
+    );
+
+    // Record audit log
+    await db.query(
+      'INSERT INTO audit_logs (user_id, action, details) VALUES ($1, $2, $3)',
+      [userId, 'BOOKING_RESCHEDULED', `Booking ${booking.booking_reference} rescheduled to ${event_date} ${event_time || ''}`]
     );
 
     return res.json({

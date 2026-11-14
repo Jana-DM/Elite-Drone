@@ -501,6 +501,14 @@
               Submit Review & Rating
             </button>
           </form>
+
+          <!-- Live Client Reviews & Community Testimonials (Feature 19) -->
+          <div style="margin-top: 2rem; border-top: 1px solid var(--border-subtle); padding-top: 1.5rem;">
+            <h4 style="font-size: 1.1rem; color: #fff; margin-bottom: 0.75rem;">Recent Community Reviews</h4>
+            <div id="cust-reviews-display" style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <p style="color: var(--text-muted); font-size: 0.85rem;">Loading reviews from database...</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -911,11 +919,29 @@
       });
 
       // Customer Review Form Submit
-      document.getElementById('client-review-form').addEventListener('submit', (e) => {
+      document.getElementById('client-review-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        showToast('Thank you! Your review has been submitted for flight operations review.', 'success');
-        document.getElementById('client-review-form').reset();
+        const rating = document.getElementById('review-rating').value;
+        const comment = document.getElementById('review-text').value.trim();
+
+        try {
+          const res = await API.post('/api/reviews', {
+            rating,
+            comment,
+            service_name: 'Commercial Drone Shoot'
+          });
+          if (res.success) {
+            showToast('Thank you! Your review has been saved in the platform database.', 'success');
+            document.getElementById('client-review-form').reset();
+            await loadCustomerReviews();
+          }
+        } catch (err) {
+          showToast(err.message || 'Failed to submit review.', 'error');
+        }
       });
+
+      // Initial review load
+      loadCustomerReviews();
     });
 
     function switchTab(tabId) {
@@ -928,6 +954,33 @@
 
       if (tabId === 'tab-bookings') renderTable('all');
       if (tabId === 'tab-payments') renderPaymentsTable();
+      if (tabId === 'tab-services') loadCustomerReviews();
+    }
+
+    async function loadCustomerReviews() {
+      const container = document.getElementById('cust-reviews-display');
+      if (!container) return;
+      try {
+        const res = await API.get('/api/reviews');
+        if (res.success && res.reviews) {
+          if (res.reviews.length === 0) {
+            container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">No reviews yet. Be the first to share your experience!</p>';
+            return;
+          }
+          container.innerHTML = res.reviews.map(r => `
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                <strong style="color: #fff; font-size: 0.9rem;">${r.customer_name}</strong>
+                <span style="color: #f59e0b; font-size: 0.85rem;">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+              </div>
+              <p style="color: var(--text-dim); font-size: 0.82rem; margin: 0;">"${r.comment}"</p>
+              <span style="color: var(--text-muted); font-size: 0.72rem; display: block; margin-top: 0.35rem;">${new Date(r.created_at).toLocaleDateString('en-IN')} • ${r.service_name || 'Commercial Shoot'}</span>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">Customer reviews temporarily unavailable.</p>';
+      }
     }
 
     async function loadUserBookings() {
@@ -1026,9 +1079,9 @@
         <tr>
           <td><strong>${b.booking_reference}</strong></td>
           <td>${b.service_name || 'Drone Shoot'}</td>
-          <td><strong style="color: #38bdf8;">₹1,999</strong></td>
-          <td>UPI (hariharihari28163-3@okaxis)</td>
-          <td><span class="badge badge-primary">${b.status === 'Cancelled' ? 'Refunded' : 'Paid / Verified ✓'}</span></td>
+          <td><strong style="color: #38bdf8;">₹${Number(b.total_amount || 1999).toLocaleString('en-IN')}</strong></td>
+          <td>${b.payment_mode || 'UPI'} (${b.payment_mode === 'UPI' ? 'hariharihari28163-3@okaxis' : 'Direct'})</td>
+          <td><span class="badge ${b.status === 'Cancelled' ? 'badge-danger' : 'badge-primary'}">${b.payment_status || (b.status === 'Cancelled' ? 'Refunded' : 'Paid / Verified ✓')}</span></td>
           <td>
             <button onclick="openReceiptSlip(${b.id})" class="btn btn-secondary btn-sm" style="padding: 0.25rem 0.65rem; font-size: 0.75rem;">
               📄 Receipt Slip
@@ -1047,8 +1100,8 @@
       document.getElementById('rcpt-client').textContent = b.customer_name;
       document.getElementById('rcpt-service').textContent = b.service_name || 'Aerial Shoot';
       document.getElementById('rcpt-loc').textContent = b.event_location || 'Designated Flight Zone';
-      document.getElementById('rcpt-mode').textContent = 'UPI Direct';
-      document.getElementById('rcpt-amount').textContent = '₹1,999';
+      document.getElementById('rcpt-mode').textContent = b.payment_mode || 'UPI Direct';
+      document.getElementById('rcpt-amount').textContent = '₹' + Number(b.total_amount || 1999).toLocaleString('en-IN');
 
       document.getElementById('receipt-modal').classList.add('active');
     }

@@ -21,6 +21,11 @@ router.get('/customers', adminController.getCustomers);
 router.post('/gallery', adminController.addGalleryItem);
 router.delete('/gallery/:id', adminController.deleteGalleryItem);
 
+// Reviews Moderation
+router.get('/reviews', adminController.getAllReviews);
+router.put('/reviews/:id/status', adminController.updateReviewStatus);
+router.delete('/reviews/:id', adminController.deleteReview);
+
 // Audit Logs & Settings
 router.get('/logs', adminController.getAuditLogs);
 router.get('/settings', adminController.getSettings);
