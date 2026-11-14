@@ -800,10 +800,25 @@
     // State
     let isUsernameAvailable = false;
     let isOtpVerified = false;
-    let isOtpSent = false;        // Track whether OTP was actually sent
+    let isOtpSent = false;
     let verifiedDestination = '';
     let otpCountdownTimer = null;
     let countdownRemaining = 0;
+
+    // Fallback showToast in case scripts load out of order
+    if (typeof window.showToast !== 'function') {
+      window.showToast = function(msg, type = 'info') {
+        console.log(`[Toast ${type}]:`, msg);
+        const container = document.querySelector('.toast-container');
+        if (container) {
+          const t = document.createElement('div');
+          t.className = `toast toast-${type}`;
+          t.textContent = msg;
+          container.appendChild(t);
+          setTimeout(() => t.remove(), 4000);
+        }
+      };
+    }
 
     const emailInput = document.getElementById('email');
     const confirmEmailInput = document.getElementById('confirm_email');
@@ -1003,7 +1018,7 @@
         return;
       }
 
-      const originalBtnText = sendOtpBtn.textContent;
+      const originalBtnText = sendOtpBtn.textContent || 'SEND OTP';
       sendOtpBtn.disabled = true;
       sendOtpBtn.textContent = 'PLEASE WAIT...';
       statusMsg.textContent = 'Contacting security dispatch server...';
@@ -1016,19 +1031,25 @@
           purpose: 'registration'
         });
 
-        if (res.success) {
-          showToast(res.message, 'success');
-          isOtpSent = true;           // Mark OTP as sent
-          verifyOtpBtn.disabled = false;
-          verifyOtpBtn.classList.add('ready-to-verify');
-          otpCodeInput.focus();
+        if (res && res.success) {
+          isOtpSent = true;
+          showToast(res.message || 'OTP sent successfully to your email.', 'success');
           startOtpCountdown(res.countdownSeconds || 90);
+          otpCodeInput.focus();
+
+          const currentCode = otpCodeInput.value.trim();
+          if (currentCode.length === 4) {
+            verifyOtpBtn.disabled = false;
+            verifyOtpBtn.classList.add('ready-to-verify');
+          }
+        } else {
+          throw new Error(res?.message || 'Failed to dispatch OTP.');
         }
       } catch (err) {
         showToast(err.message || 'Failed to dispatch OTP.', 'error');
         sendOtpBtn.disabled = false;
         sendOtpBtn.textContent = originalBtnText;
-        statusMsg.textContent = err.message || 'OTP dispatch failed.';
+        statusMsg.textContent = err.message || 'OTP dispatch failed. Please try again.';
         statusMsg.style.color = '#dc2626';
       }
     });
@@ -1037,45 +1058,41 @@
       clearInterval(otpCountdownTimer);
       countdownRemaining = seconds;
       sendOtpBtn.disabled = true;
+      sendOtpBtn.textContent = `Resend in ${countdownRemaining}s`;
+      statusMsg.textContent = `OTP code dispatched. Expires in 10 minutes.`;
+      statusMsg.style.color = '#0284c7';
 
       otpCountdownTimer = setInterval(() => {
         countdownRemaining--;
         if (countdownRemaining > 0) {
           sendOtpBtn.textContent = `Resend in ${countdownRemaining}s`;
-          statusMsg.textContent = `OTP dispatched. You may request a new code in ${countdownRemaining}s.`;
+          statusMsg.textContent = `OTP code dispatched. You may request a new code in ${countdownRemaining}s.`;
           statusMsg.style.color = '#0284c7';
         } else {
           clearInterval(otpCountdownTimer);
           sendOtpBtn.disabled = false;
-          sendOtpBtn.textContent = 'Send OTP';
-          statusMsg.textContent = 'Did not receive code? Click Send OTP.';
+          sendOtpBtn.textContent = 'RESEND OTP';
+          statusMsg.textContent = 'Did not receive code? Click RESEND OTP.';
           statusMsg.style.color = '#d97706';
-          // OTP expired — disable Verify button until new OTP is sent
-          if (!isOtpVerified) {
-            isOtpSent = false;
-            verifyOtpBtn.disabled = true;
-            verifyOtpBtn.classList.remove('ready-to-verify');
-          }
         }
       }, 1000);
     }
 
-    // Live input listener on 4-digit OTP box
+    // Live input listener on 4-digit OTP box: enables Verify button as soon as 4 digits are entered
     otpCodeInput.addEventListener('input', () => {
       otpCodeInput.value = otpCodeInput.value.replace(/\D/g, '').slice(0, 4);
       const code = otpCodeInput.value.trim();
 
-      // Only allow enabling Verify OTP if OTP was actually sent
-      if (!isOtpSent) return;
-
       if (code.length === 4) {
         verifyOtpBtn.disabled = false;
         verifyOtpBtn.classList.add('ready-to-verify');
-        statusMsg.textContent = '✓ 4 digits entered. Click "Verify OTP"';
+        statusMsg.textContent = '✓ 4 digits entered. Click "VERIFY OTP"';
         statusMsg.style.color = '#0284c7';
       } else {
-        verifyOtpBtn.disabled = true;
-        verifyOtpBtn.classList.remove('ready-to-verify');
+        if (!isOtpVerified) {
+          verifyOtpBtn.disabled = true;
+          verifyOtpBtn.classList.remove('ready-to-verify');
+        }
       }
     });
 
@@ -1083,18 +1100,15 @@
     otpCodeInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        verifyOtpBtn.click();
+        if (!verifyOtpBtn.disabled) {
+          verifyOtpBtn.click();
+        }
       }
     });
 
     // 6. Verify OTP Handler
     verifyOtpBtn.addEventListener('click', async () => {
       if (isOtpVerified) return;
-
-      if (!isOtpSent) {
-        showToast('Please click "SEND OTP" first to receive your code.', 'error');
-        return;
-      }
 
       const targetDestination = emailInput.value.trim();
       const code = otpCodeInput.value.trim();
@@ -1118,8 +1132,8 @@
       }
 
       verifyOtpBtn.disabled = true;
-      verifyOtpBtn.textContent = 'Verifying...';
-      statusMsg.textContent = 'Verifying security code...';
+      verifyOtpBtn.textContent = 'VERIFYING...';
+      statusMsg.textContent = 'Verifying security code with database...';
       statusMsg.style.color = '#0284c7';
 
       try {
@@ -1130,7 +1144,7 @@
           purpose: 'registration'
         });
 
-        if (res.success) {
+        if (res && res.success) {
           isOtpVerified = true;
           verifiedDestination = targetDestination;
           showToast('OTP verified successfully!', 'success');
@@ -1139,20 +1153,25 @@
           verifiedLabel.textContent = `${targetDestination}`;
           verifyOtpBtn.textContent = 'VERIFIED ✓';
           verifyOtpBtn.disabled = true;
+          verifyOtpBtn.classList.remove('ready-to-verify');
           verifyOtpBtn.style.background = '#059669';
+          verifyOtpBtn.style.borderColor = '#059669';
+          verifyOtpBtn.style.color = '#ffffff';
           sendOtpBtn.disabled = true;
           clearInterval(otpCountdownTimer);
           statusMsg.textContent = '✓ Security verification completed!';
           statusMsg.style.color = '#059669';
 
           validateForm();
+        } else {
+          throw new Error(res?.message || 'Verification failed.');
         }
       } catch (err) {
         showToast(err.message || 'Invalid or expired OTP.', 'error');
         verifyOtpBtn.disabled = false;
-        verifyOtpBtn.textContent = 'Verify OTP';
+        verifyOtpBtn.textContent = 'VERIFY OTP';
         verifyOtpBtn.classList.add('ready-to-verify');
-        statusMsg.textContent = err.message || 'Verification failed. Please check code or click Send OTP.';
+        statusMsg.textContent = err.message || 'Verification failed. Please check code or click RESEND OTP.';
         statusMsg.style.color = '#dc2626';
       }
     });

@@ -57,5 +57,39 @@ const API = {
   }
 };
 
-window.API = API;
+// Universal Toast Notification Utility
+function showToast(message, type = 'info') {
+  try {
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.className = 'toast-container';
+      document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    
+    let icon = '<span style="font-weight: bold; color: var(--primary-light, #0284c7);">ℹ</span>';
+    if (type === 'success') icon = '<span style="font-weight: bold; color: #10b981;">✓</span>';
+    if (type === 'error') icon = '<span style="font-weight: bold; color: #ef4444;">✕</span>';
+
+    toast.innerHTML = `<span>${icon}</span> <div>${message}</div>`;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(100%)';
+      toast.style.transition = 'all 0.3s ease-out';
+      setTimeout(() => toast.remove(), 300);
+    }, 4000);
+  } catch (e) {
+    console.log(`[Toast ${type}]:`, message);
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.API = API;
+  window.showToast = showToast;
+}
 
