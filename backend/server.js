@@ -70,10 +70,13 @@ app.get('/api/health', async (req, res) => {
 app.use('/api/services', require('./routes/serviceRoutes'));
 app.use('/api/gallery', require('./routes/galleryRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/users', require('./routes/authRoutes'));
 app.use('/api/otp', require('./routes/otpRoutes'));
 app.use('/api/bookings', require('./routes/bookingRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/reviews', require('./routes/reviewRoutes'));
+app.use('/api/payments', require('./routes/paymentRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
 
 // Public Live Stats Endpoint for "Our Journey" section
 app.get('/api/stats', async (req, res) => {
@@ -331,6 +334,14 @@ app.post('/api/booking/notify', async (req, res) => {
         INSERT INTO audit_logs (user_id, action, details)
         VALUES ($1, 'BOOKING_CREATED', $2)
       `, [userId, `Booking ${bookingRef} created for ${serviceName} on ${eventDate}`]);
+
+      // Record in-app notification if customer is identified
+      if (userId) {
+        await db.query(`
+          INSERT INTO notifications (user_id, title, message, type, action_url)
+          VALUES ($1, 'Booking Confirmed', $2, 'success', '/dashboard.html')
+        `, [userId, `Your flight booking ${bookingRef} for ${serviceName} on ${eventDate} is confirmed!`]);
+      }
 
     } catch (dbErr) {
       console.warn('Booking PostgreSQL sync note:', dbErr.message);

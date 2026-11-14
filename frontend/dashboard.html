@@ -308,7 +308,7 @@
           <h3 style="font-size: 1.25rem; color: #fff; margin-bottom: 0.5rem;">Security & Flight Operations Notices</h3>
           <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Live system advisories regarding drone permissions and weather conditions</p>
 
-          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div id="customer-notifications-container" style="display: flex; flex-direction: column; gap: 0.75rem;">
             <div style="background: rgba(14, 165, 233, 0.08); border-left: 3px solid #0ea5e9; padding: 0.85rem 1.25rem; border-radius: 4px; font-size: 0.85rem; color: #e2e8f0;">
               <strong>ℹ️ Monitored Weather Advisory:</strong> Winter golden hour flights in Chennai / Bengaluru operate between 06:00 AM - 09:30 AM and 04:00 PM - 06:15 PM for optimal 4K lighting.
             </div>
@@ -942,7 +942,45 @@
 
       // Initial review load
       loadCustomerReviews();
+
+      // Initial notifications load
+      loadCustomerNotifications();
     });
+
+    async function loadCustomerNotifications() {
+      const container = document.getElementById('customer-notifications-container');
+      if (!container) return;
+      try {
+        const res = await API.get('/api/notifications');
+        if (res.success && res.notifications && res.notifications.length > 0) {
+          const userNotifsHtml = res.notifications.slice(0, 5).map(n => {
+            const isSuccess = n.type === 'success';
+            const isWarning = n.type === 'warning';
+            const borderColor = isSuccess ? '#10b981' : (isWarning ? '#f59e0b' : '#0ea5e9');
+            const bg = isSuccess ? 'rgba(16, 185, 129, 0.08)' : (isWarning ? 'rgba(245, 158, 11, 0.08)' : 'rgba(14, 165, 233, 0.08)');
+            const icon = isSuccess ? '✓' : (isWarning ? '⚠' : 'ℹ️');
+            return `
+              <div style="background: ${bg}; border-left: 3px solid ${borderColor}; padding: 0.85rem 1.25rem; border-radius: 4px; font-size: 0.85rem; color: #e2e8f0;">
+                <strong>${icon} ${n.title}:</strong> ${n.message}
+                <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">${new Date(n.created_at).toLocaleString('en-IN')}</span>
+              </div>
+            `;
+          }).join('');
+
+          // Keep standard advisories below personalized notices
+          container.innerHTML = userNotifsHtml + `
+            <div style="background: rgba(14, 165, 233, 0.08); border-left: 3px solid #0ea5e9; padding: 0.85rem 1.25rem; border-radius: 4px; font-size: 0.85rem; color: #e2e8f0;">
+              <strong>ℹ️ Monitored Weather Advisory:</strong> Winter golden hour flights operate between 06:00 AM - 09:30 AM and 04:00 PM - 06:15 PM for optimal 4K lighting.
+            </div>
+            <div style="background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10b981; padding: 0.85rem 1.25rem; border-radius: 4px; font-size: 0.85rem; color: #e2e8f0;">
+              <strong>✓ Airspace Clearance:</strong> All drone pilots dispatched hold valid DGCA Remote Pilot Certificates (RPC).
+            </div>
+          `;
+        }
+      } catch (e) {
+        // Fallback to default
+      }
+    }
 
     function switchTab(tabId) {
       document.querySelectorAll('.tab-section').forEach(t => t.classList.remove('active'));

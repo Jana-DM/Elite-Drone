@@ -45,3 +45,23 @@ exports.adminOnly = (req, res, next) => {
   }
   next();
 };
+
+// Optional authentication: extracts req.user if token is present, but doesn't block if not
+exports.optionalAuth = (req, res, next) => {
+  let token = null;
+  if (req.cookies && req.cookies.token) {
+    token = req.cookies.token;
+  } else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET);
+      req.user = decoded;
+    } catch (e) {
+      // Ignore invalid token in optional auth
+    }
+  }
+  next();
+};

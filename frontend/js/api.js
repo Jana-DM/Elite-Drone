@@ -69,7 +69,7 @@ function showToast(message, type = 'info') {
 
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    
+
     let icon = '<span style="font-weight: bold; color: var(--primary-light, #0284c7);">ℹ</span>';
     if (type === 'success') icon = '<span style="font-weight: bold; color: #10b981;">✓</span>';
     if (type === 'error') icon = '<span style="font-weight: bold; color: #ef4444;">✕</span>';

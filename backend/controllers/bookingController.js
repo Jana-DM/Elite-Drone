@@ -1,4 +1,6 @@
 const db = require('../config/db');
+const { logAudit } = require('../services/auditService');
+const { createNotification } = require('../services/notificationService');
 
 // Helper to generate unique booking reference: ELD-YYYYMMDD-XXXX
 function generateBookingReference() {
@@ -127,10 +129,21 @@ exports.createBooking = async (req, res) => {
     const booking = result.rows[0];
 
     // Audit log
-    await db.query(`
-      INSERT INTO audit_logs (user_id, action, details)
-      VALUES ($1, 'BOOKING_CREATED', $2)
-    `, [userId, `Direct booking ${reference} created for ${serviceCheck.rows[0].name}`]);
+    await logAudit({
+      userId,
+      action: 'BOOKING_CREATED',
+      details: `Direct booking ${reference} created for ${serviceCheck.rows[0].name}`,
+      ipAddress: req.ip,
+    });
+
+    // In-app customer notification
+    await createNotification({
+      userId,
+      title: 'Booking Request Submitted',
+      message: `Your booking request (${reference}) for ${serviceCheck.rows[0].name} has been received and is pending clearance.`,
+      type: 'info',
+      actionUrl: '/dashboard.html',
+    });
 
     return res.status(201).json({
       success: true,
@@ -213,10 +226,20 @@ exports.cancelBooking = async (req, res) => {
     );
 
     // Record audit log
-    await db.query(
-      'INSERT INTO audit_logs (user_id, action, details) VALUES ($1, $2, $3)',
-      [userId, 'BOOKING_CANCELLED', `Booking ${booking.booking_reference} cancelled. Reason: ${cancellation_reason || 'Customer request'}`]
-    );
+    await logAudit({
+      userId,
+      action: 'BOOKING_CANCELLED',
+      details: `Booking ${booking.booking_reference} cancelled. Reason: ${cancellation_reason || 'Customer request'}`,
+      ipAddress: req.ip,
+    });
+
+    await createNotification({
+      userId,
+      title: 'Booking Cancelled',
+      message: `Your booking (${booking.booking_reference}) was marked as cancelled.`,
+      type: 'warning',
+      actionUrl: '/dashboard.html',
+    });
 
     return res.json({
       success: true,
@@ -265,10 +288,20 @@ exports.rescheduleBooking = async (req, res) => {
     );
 
     // Record audit log
-    await db.query(
-      'INSERT INTO audit_logs (user_id, action, details) VALUES ($1, $2, $3)',
-      [userId, 'BOOKING_RESCHEDULED', `Booking ${booking.booking_reference} rescheduled to ${event_date} ${event_time || ''}`]
-    );
+    await logAudit({
+      userId,
+      action: 'BOOKING_RESCHEDULED',
+      details: `Booking ${booking.booking_reference} rescheduled to ${event_date} ${event_time || ''}`,
+      ipAddress: req.ip,
+    });
+
+    await createNotification({
+      userId,
+      title: 'Flight Rescheduled',
+      message: `Your booking (${booking.booking_reference}) has been rescheduled to ${event_date}. Status set to Pending.`,
+      type: 'info',
+      actionUrl: '/dashboard.html',
+    });
 
     return res.json({
       success: true,

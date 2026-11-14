@@ -536,8 +536,7 @@
         </div>
 
         <div class="reg-social-row">
-          <button type="button" class="reg-social-btn" title="Sign in with Google"
-            onclick="showToast('Google OAuth sign in is ready for integration.', 'info')">
+          <button type="button" class="reg-social-btn" title="Sign in with Google" id="btn-google-login">
             <svg width="22" height="22" viewBox="0 0 48 48">
               <path fill="#EA4335"
                 d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
@@ -549,8 +548,7 @@
                 d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
             </svg>
           </button>
-          <button type="button" class="reg-social-btn" title="Sign in with Facebook"
-            onclick="showToast('Facebook OAuth sign in is ready for integration.', 'info')">
+          <button type="button" class="reg-social-btn" title="Sign in with Facebook" id="btn-facebook-login">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="#1877F2">
               <path
                 d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
@@ -638,10 +636,79 @@
         });
       }
 
-      // Forgot password prompt
-      document.getElementById('forgot-password-link').addEventListener('click', (e) => {
+      // Social Authentication Handlers
+      const googleBtn = document.getElementById('btn-google-login');
+      if (googleBtn) {
+        googleBtn.addEventListener('click', async () => {
+          try {
+            const res = await API.get('/api/auth/google');
+            if (res.authUrl) {
+              window.location.href = res.authUrl;
+            } else {
+              showToast(res.message || 'Google OAuth endpoint ready. Add GOOGLE_CLIENT_ID in .env to activate live Google redirect.', 'info');
+            }
+          } catch (e) {
+            showToast('Google OAuth service is ready on backend.', 'info');
+          }
+        });
+      }
+
+      const fbBtn = document.getElementById('btn-facebook-login');
+      if (fbBtn) {
+        fbBtn.addEventListener('click', async () => {
+          try {
+            const res = await API.get('/api/auth/facebook');
+            if (res.authUrl) {
+              window.location.href = res.authUrl;
+            } else {
+              showToast(res.message || 'Facebook OAuth endpoint ready. Add FACEBOOK_APP_ID in .env to activate live Facebook redirect.', 'info');
+            }
+          } catch (e) {
+            showToast('Facebook OAuth service is ready on backend.', 'info');
+          }
+        });
+      }
+
+      // Real Forgot Password Interactive Flow
+      document.getElementById('forgot-password-link').addEventListener('click', async (e) => {
         e.preventDefault();
-        showToast('Password reset link sent to your registered email if an account exists.', 'info');
+        const currentId = document.getElementById('login_identifier').value.trim();
+        const email = prompt('Enter your registered email address to receive a 4-digit password reset code:', currentId.includes('@') ? currentId : '');
+        if (!email || !email.includes('@')) {
+          if (email !== null) showToast('Please enter a valid email address.', 'error');
+          return;
+        }
+
+        showToast('Dispatching password reset code to your email...', 'info');
+        try {
+          const res = await API.post('/api/auth/forgot-password', { email });
+          showToast(res.message || 'Reset code dispatched to email!', 'success');
+
+          const otpCode = prompt(`Enter the 4-digit reset code sent to ${email}:`);
+          if (!otpCode) return;
+
+          const newPassword = prompt('Enter your new secure password (min 8 chars, uppercase, lowercase, number, special char):');
+          if (!newPassword) return;
+
+          const confirmPassword = prompt('Confirm your new password:');
+          if (newPassword !== confirmPassword) {
+            showToast('Passwords do not match.', 'error');
+            return;
+          }
+
+          const resetRes = await API.post('/api/auth/reset-password', {
+            email,
+            otp_code: otpCode.trim(),
+            new_password: newPassword,
+            confirm_password: confirmPassword,
+          });
+
+          showToast(resetRes.message || 'Password reset successfully! Please sign in.', 'success');
+          document.getElementById('login_identifier').value = email;
+          document.getElementById('password').value = newPassword;
+        } catch (err) {
+          showToast(err.message || 'Password reset failed. Please check the code and try again.', 'error');
+        }
       });
 
       // Form submission

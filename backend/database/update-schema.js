@@ -105,6 +105,99 @@ async function updateSchema() {
     `);
   }
 
+  // 5. Add avatar_url to users table if not exists
+  console.log('  Ensuring avatar_url column exists in users table...');
+  await pool.query(`
+    ALTER TABLE users 
+    ADD COLUMN IF NOT EXISTS avatar_url VARCHAR(500) DEFAULT NULL;
+  `);
+
+  // 6. Create oauth_accounts table for Google & Facebook social logins
+  console.log('  Creating oauth_accounts table...');
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS oauth_accounts (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      provider VARCHAR(50) NOT NULL,
+      provider_user_id VARCHAR(255) NOT NULL,
+      email VARCHAR(255),
+      profile_data JSONB,
+      created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(provider, provider_user_id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_oauth_user_id ON oauth_accounts(user_id);
+    CREATE INDEX IF NOT EXISTS idx_oauth_provider_uid ON oauth_accounts(provider, provider_user_id);
+  `);
+
+  // 7. Create password_reset_tokens table for Forgot Password workflow
+  console.log('  Creating password_reset_tokens table...');
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS password_reset_tokens (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      email VARCHAR(255) NOT NULL,
+      token_hash VARCHAR(255) NOT NULL,
+      otp_code VARCHAR(10),
+      expires_at TIMESTAMPTZ NOT NULL,
+      is_used BOOLEAN DEFAULT FALSE,
+      created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE INDEX IF NOT EXISTS idx_pwd_reset_user ON password_reset_tokens(user_id);
+    CREATE INDEX IF NOT EXISTS idx_pwd_reset_email ON password_reset_tokens(email);
+  `);
+
+  // 8. Create payments table for payment orders, transactions, and audit
+  console.log('  Creating payments table...');
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS payments (
+      id SERIAL PRIMARY KEY,
+      booking_id INTEGER REFERENCES bookings(id) ON DELETE SET NULL,
+      user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      order_id VARCHAR(100) UNIQUE NOT NULL,
+      transaction_id VARCHAR(100),
+      payment_mode VARCHAR(50) DEFAULT 'UPI',
+      amount NUMERIC(10,2) NOT NULL,
+      currency VARCHAR(10) DEFAULT 'INR',
+      status VARCHAR(50) DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'SUCCESS', 'FAILED', 'REFUNDED')),
+      metadata JSONB,
+      created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE INDEX IF NOT EXISTS idx_payments_booking ON payments(booking_id);
+    CREATE INDEX IF NOT EXISTS idx_payments_user ON payments(user_id);
+  `);
+
+  // 9. Create notifications table for in-app customer & admin alerts
+  console.log('  Creating notifications table...');
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS notifications (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      title VARCHAR(255) NOT NULL,
+      message TEXT NOT NULL,
+      type VARCHAR(50) DEFAULT 'info',
+      is_read BOOLEAN DEFAULT FALSE,
+      action_url VARCHAR(255),
+      created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, is_read);
+  `);
+
+  // Seed initial notification for demo/customer if empty
+  const notifCount = await pool.query('SELECT COUNT(*) FROM notifications');
+  if (parseInt(notifCount.rows[0].count) === 0) {
+    const firstUser = await pool.query('SELECT id FROM users ORDER BY id ASC LIMIT 1');
+    if (firstUser.rows.length > 0) {
+      await pool.query(`
+        INSERT INTO notifications (user_id, title, message, type, action_url)
+        VALUES 
+        ($1, 'Welcome to Elite Drone Service', 'Your account is active. Explore our DGCA certified aerial cinematography packages.', 'info', '/dashboard.html'),
+        ($1, 'Flight Clearance Guaranteed', 'All drone missions are backed by certified pilot dispatch and full insurance.', 'success', '/dashboard.html');
+      `, [firstUser.rows[0].id]);
+    }
+  }
+
   console.log('✅ Schema synchronization completed successfully!');
   process.exit(0);
 }

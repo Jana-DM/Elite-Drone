@@ -1,4 +1,6 @@
 const db = require('../config/db');
+const { logAudit } = require('../services/auditService');
+const { createNotification } = require('../services/notificationService');
 
 // 1. Dashboard Metrics & Revenue Analytics
 exports.getMetrics = async (req, res) => {
@@ -115,10 +117,25 @@ exports.updateBookingStatus = async (req, res) => {
     );
 
     // Record audit log
-    await db.query(`
-      INSERT INTO audit_logs (admin_id, action, details)
-      VALUES ($1, 'BOOKING_STATUS_UPDATE', $2)
-    `, [req.user.id, `Booking ${check.rows[0].booking_reference} status changed to ${status || check.rows[0].status}`]);
+    await logAudit({
+      adminId: req.user.id,
+      action: 'BOOKING_STATUS_UPDATE',
+      details: `Booking ${check.rows[0].booking_reference} status changed to ${status || check.rows[0].status}`,
+      ipAddress: req.ip,
+    });
+
+    // Notify customer in-app
+    const targetUserId = check.rows[0].user_id;
+    if (targetUserId && status) {
+      const notifType = status === 'Confirmed' ? 'success' : (status === 'Cancelled' || status === 'Rejected' ? 'warning' : 'info');
+      await createNotification({
+        userId: targetUserId,
+        title: `Flight Mission ${status}`,
+        message: `Your booking ${check.rows[0].booking_reference} has been marked as ${status}.${admin_notes ? ` Note: ${admin_notes}` : ''}`,
+        type: notifType,
+        actionUrl: '/dashboard.html',
+      });
+    }
 
     res.json({
       success: true,
