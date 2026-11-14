@@ -3,14 +3,18 @@ require('dotenv').config();
 
 let transporter = null;
 
-if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+const emailUser = process.env.SMTP_USER || process.env.EMAIL_USER;
+const emailPass = process.env.SMTP_PASS || process.env.EMAIL_PASS;
+
+if (emailUser && emailPass) {
   transporter = nodemailer.createTransport({
+    service: 'gmail',
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.SMTP_PORT || '587', 10),
     secure: process.env.SMTP_SECURE === 'true',
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user: emailUser,
+      pass: emailPass,
     },
   });
 
@@ -27,7 +31,7 @@ if (process.env.SMTP_USER && process.env.SMTP_PASS) {
 
 async function sendEmailOtp({ to, otpCode, purpose = 'Verification' }) {
   const mailOptions = {
-    from: `"${process.env.FROM_NAME || 'Elite Drone Service'}" <${process.env.FROM_EMAIL || 'no-reply@elitedroneservice.com'}>`,
+    from: `"${process.env.FROM_NAME || 'Elite Drone Service'}" <${process.env.FROM_EMAIL || emailUser || 'elitedrones.collab@gmail.com'}>`,
     to,
     subject: `Your ${purpose} Code: ${otpCode} - Elite Drone Service`,
     html: `

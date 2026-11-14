@@ -113,3 +113,4 @@ updateSchema().catch(err => {
   console.error('❌ Schema update error:', err);
   process.exit(1);
 });
+
