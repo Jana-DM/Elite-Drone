@@ -48,3 +48,4 @@ exports.markAllAsRead = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Failed to update notifications.' });
   }
 };
+
