@@ -732,7 +732,7 @@
 
           <input type="text" id="otp_code" class="reg-otp-input" placeholder="• • • •" maxlength="4" autocomplete="one-time-code" inputmode="numeric">
 
-          <button type="button" id="btn-verify-otp" class="btn-otp-action">
+          <button type="button" id="btn-verify-otp" class="btn-otp-action" disabled>
             VERIFY OTP
           </button>
 
@@ -800,6 +800,7 @@
     // State
     let isUsernameAvailable = false;
     let isOtpVerified = false;
+    let isOtpSent = false;        // Track whether OTP was actually sent
     let verifiedDestination = '';
     let otpCountdownTimer = null;
     let countdownRemaining = 0;
@@ -817,6 +818,10 @@
     const verifiedBadge = document.getElementById('otp-verified-badge');
     const verifiedLabel = document.getElementById('verified-destination-label');
     const genderHidden = document.getElementById('gender');
+
+    // Initial state: Verify OTP button must be disabled until OTP is sent
+    verifyOtpBtn.disabled = true;
+    verifyOtpBtn.classList.remove('ready-to-verify');
 
     const urlParams = new URLSearchParams(window.location.search);
     const regAlert = document.getElementById('register-alert-box');
@@ -1013,6 +1018,7 @@
 
         if (res.success) {
           showToast(res.message, 'success');
+          isOtpSent = true;           // Mark OTP as sent
           verifyOtpBtn.disabled = false;
           verifyOtpBtn.classList.add('ready-to-verify');
           otpCodeInput.focus();
@@ -1044,6 +1050,12 @@
           sendOtpBtn.textContent = 'Send OTP';
           statusMsg.textContent = 'Did not receive code? Click Send OTP.';
           statusMsg.style.color = '#d97706';
+          // OTP expired — disable Verify button until new OTP is sent
+          if (!isOtpVerified) {
+            isOtpSent = false;
+            verifyOtpBtn.disabled = true;
+            verifyOtpBtn.classList.remove('ready-to-verify');
+          }
         }
       }, 1000);
     }
@@ -1053,9 +1065,8 @@
       otpCodeInput.value = otpCodeInput.value.replace(/\D/g, '').slice(0, 4);
       const code = otpCodeInput.value.trim();
 
-      if (code.length > 0) {
-        verifyOtpBtn.disabled = false;
-      }
+      // Only allow enabling Verify OTP if OTP was actually sent
+      if (!isOtpSent) return;
 
       if (code.length === 4) {
         verifyOtpBtn.disabled = false;
@@ -1063,6 +1074,7 @@
         statusMsg.textContent = '✓ 4 digits entered. Click "Verify OTP"';
         statusMsg.style.color = '#0284c7';
       } else {
+        verifyOtpBtn.disabled = true;
         verifyOtpBtn.classList.remove('ready-to-verify');
       }
     });
@@ -1078,6 +1090,11 @@
     // 6. Verify OTP Handler
     verifyOtpBtn.addEventListener('click', async () => {
       if (isOtpVerified) return;
+
+      if (!isOtpSent) {
+        showToast('Please click "SEND OTP" first to receive your code.', 'error');
+        return;
+      }
 
       const targetDestination = emailInput.value.trim();
       const code = otpCodeInput.value.trim();
