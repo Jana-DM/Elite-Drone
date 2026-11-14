@@ -1054,19 +1054,25 @@
       }
     });
 
+    function formatTime(totalSeconds) {
+      const mins = Math.floor(totalSeconds / 60);
+      const secs = totalSeconds % 60;
+      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
     function startOtpCountdown(seconds) {
       clearInterval(otpCountdownTimer);
       countdownRemaining = seconds;
       sendOtpBtn.disabled = true;
-      sendOtpBtn.textContent = `Resend in ${countdownRemaining}s`;
-      statusMsg.textContent = `OTP code dispatched. Expires in 10 minutes.`;
+      sendOtpBtn.textContent = `RESEND IN ${formatTime(countdownRemaining)}`;
+      statusMsg.textContent = `OTP code dispatched. You may request a new code in ${formatTime(countdownRemaining)}.`;
       statusMsg.style.color = '#0284c7';
 
       otpCountdownTimer = setInterval(() => {
         countdownRemaining--;
         if (countdownRemaining > 0) {
-          sendOtpBtn.textContent = `Resend in ${countdownRemaining}s`;
-          statusMsg.textContent = `OTP code dispatched. You may request a new code in ${countdownRemaining}s.`;
+          sendOtpBtn.textContent = `RESEND IN ${formatTime(countdownRemaining)}`;
+          statusMsg.textContent = `OTP code dispatched. You may request a new code in ${formatTime(countdownRemaining)}.`;
           statusMsg.style.color = '#0284c7';
         } else {
           clearInterval(otpCountdownTimer);
