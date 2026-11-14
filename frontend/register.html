@@ -363,95 +363,147 @@
       font-weight: 600;
     }
 
-    /* OTP Box */
+    /* OTP Box - Exact Match to Reference */
     .reg-otp-box {
-      background: #f8fafc;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 1.35rem;
+      background: #f4f9fd;
+      border: 1.5px solid #d0e7f9;
+      border-radius: 16px;
+      padding: 1.35rem 1.5rem;
       margin: 1.5rem 0 1.25rem;
     }
 
+    .otp-card-header {
+      margin-bottom: 1.15rem;
+    }
+
     .reg-otp-title {
-      font-family: var(--font-heading);
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #002b5c;
-      margin-bottom: 0.75rem;
-    }
-
-    .reg-otp-methods {
-      display: flex;
-      align-items: center;
-      gap: 1.25rem;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .reg-verify-label {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: #1e293b;
-    }
-
-    .otp-method-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
-      font-size: 0.9rem;
-      color: #1e293b;
-      cursor: pointer;
-    }
-
-    .otp-method-label input[type="radio"] {
-      width: 17px;
-      height: 17px;
-      accent-color: #0284c7;
-      cursor: pointer;
-      margin: 0;
-    }
-
-    .btn-otp-action {
-      background: #f0f7ff;
-      border: 1.5px solid #bae6fd;
-      color: #0284c7;
+      font-size: 1.25rem;
       font-weight: 800;
-      font-size: 0.92rem;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      padding: 0.85rem;
-      border-radius: 10px;
-      width: 100%;
-      cursor: pointer;
-      transition: all var(--transition-fast);
+      color: #0369a1;
+      margin: 0 0 0.25rem 0;
+      letter-spacing: -0.2px;
       font-family: var(--font-sans);
     }
 
-    .btn-otp-action:hover:not(:disabled) {
-      background: #e0f2fe;
-      border-color: #7dd3fc;
-      color: #0369a1;
+    .reg-otp-sub {
+      color: #64748b;
+      font-size: 0.88rem;
+      margin: 0;
+      font-weight: 500;
     }
 
-    .btn-otp-action:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
+    .otp-card-grid {
+      display: grid;
+      grid-template-columns: 1fr 140px;
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .otp-input-col {
+      display: flex;
     }
 
     .reg-otp-input {
       width: 100%;
+      height: 48px;
       background: #ffffff;
-      border: 1.5px solid #e2e8f0;
+      border: 1.5px solid #cbd5e1;
       border-radius: 10px;
-      padding: 0.85rem;
+      padding: 0 1rem;
       text-align: center;
-      letter-spacing: 8px;
-      font-weight: 800;
-      font-size: 1.2rem;
+      letter-spacing: 3px;
+      font-weight: 700;
+      font-size: 1.1rem;
       color: #0f172a;
       box-sizing: border-box;
-      margin: 0.85rem 0;
+      margin: 0;
       transition: all var(--transition-fast);
+    }
+
+    .reg-otp-input::placeholder {
+      color: #94a3b8;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .reg-otp-input:focus {
+      border-color: #0284c7;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+      outline: none;
+    }
+
+    .otp-buttons-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .btn-otp-primary {
+      background: #0284c7;
+      border: none;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      height: 48px;
+      border-radius: 10px;
+      width: 100%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+      box-shadow: 0 2px 4px rgba(2, 132, 199, 0.2);
+    }
+
+    .btn-otp-primary:hover:not(:disabled) {
+      background: #0369a1;
+      transform: translateY(-1px);
+    }
+
+    .btn-otp-primary:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .btn-otp-verify {
+      background: #006097;
+      border: none;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      height: 48px;
+      border-radius: 10px;
+      width: 100%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+      box-shadow: 0 2px 4px rgba(0, 96, 151, 0.2);
+    }
+
+    .btn-otp-verify:hover {
+      background: #004b77;
+      transform: translateY(-1px);
+    }
+
+    .btn-otp-verify:disabled {
+      background: #006097;
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-otp-verify.ready-to-verify {
+      background: #0284c7 !important;
+      opacity: 1 !important;
+      box-shadow: 0 0 12px rgba(2, 132, 199, 0.5);
+      cursor: pointer !important;
+    }
+
+    @media (max-width: 480px) {
+      .otp-card-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .reg-otp-input:focus {
@@ -709,31 +761,31 @@
           <div class="rule-item" id="rule-spec" style="grid-column: 1 / -1;">○ Special character (!@#$%^&*...)</div>
         </div>
 
-        <!-- 7. OTP Verification Box -->
+        <!-- 7. OTP Verification Box (Exact Match to Reference) -->
         <div class="reg-otp-box">
-          <div class="reg-otp-title">OTP VERIFICATION</div>
-          
-          <div class="reg-otp-email-notice">
-            <span class="otp-notice-icon">📧</span>
-            <div class="otp-notice-text">
-              <span>Security verification code will be sent to:</span>
-              <strong id="otp-dest-display">Enter your email above</strong>
-            </div>
+          <div class="otp-card-header">
+            <h3 class="reg-otp-title">OTP Verification</h3>
+            <p class="reg-otp-sub">Verify your email address</p>
           </div>
           <input type="hidden" name="otp_method" value="email">
 
-          <button type="button" id="btn-send-otp" class="btn-otp-action">
-            SEND OTP
-          </button>
+          <div class="otp-card-grid">
+            <div class="otp-input-col">
+              <input type="text" id="otp_code" class="reg-otp-input" placeholder="4 digit OTP" maxlength="4" autocomplete="one-time-code" inputmode="numeric">
+            </div>
 
-          <input type="text" id="otp_code" class="reg-otp-input" placeholder="• • • •" maxlength="4">
-
-          <button type="button" id="btn-verify-otp" class="btn-otp-action" disabled>
-            VERIFY OTP
-          </button>
+            <div class="otp-buttons-col">
+              <button type="button" id="btn-send-otp" class="btn-otp-primary">
+                Send OTP
+              </button>
+              <button type="button" id="btn-verify-otp" class="btn-otp-verify">
+                Verify OTP
+              </button>
+            </div>
+          </div>
 
           <!-- Status Message -->
-          <div id="otp-status-message"></div>
+          <div id="otp-status-message" style="margin-top: 0.75rem; font-size: 0.85rem; font-weight: 600;"></div>
 
           <!-- Verified Badge -->
           <div class="otp-verified-badge" id="otp-verified-badge">
@@ -1010,6 +1062,7 @@
         if (res.success) {
           showToast(res.message, 'success');
           verifyOtpBtn.disabled = false;
+          verifyOtpBtn.classList.add('ready-to-verify');
           otpCodeInput.focus();
           startOtpCountdown(res.countdownSeconds || 90);
         }
@@ -1036,18 +1089,58 @@
         } else {
           clearInterval(otpCountdownTimer);
           sendOtpBtn.disabled = false;
-          sendOtpBtn.textContent = 'SEND OTP';
+          sendOtpBtn.textContent = 'Send OTP';
           statusMsg.textContent = 'Did not receive code? Click Send OTP.';
           statusMsg.style.color = '#d97706';
         }
       }, 1000);
     }
 
+    // Live input listener on 4-digit OTP box
+    otpCodeInput.addEventListener('input', () => {
+      otpCodeInput.value = otpCodeInput.value.replace(/\D/g, '').slice(0, 4);
+      const code = otpCodeInput.value.trim();
+
+      if (code.length > 0) {
+        verifyOtpBtn.disabled = false;
+      }
+
+      if (code.length === 4) {
+        verifyOtpBtn.disabled = false;
+        verifyOtpBtn.classList.add('ready-to-verify');
+        statusMsg.textContent = '✓ 4 digits entered. Click "Verify OTP"';
+        statusMsg.style.color = '#0284c7';
+      } else {
+        verifyOtpBtn.classList.remove('ready-to-verify');
+      }
+    });
+
+    // Enter key submits verification
+    otpCodeInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        verifyOtpBtn.click();
+      }
+    });
+
     // 6. Verify OTP Handler
     verifyOtpBtn.addEventListener('click', async () => {
-      const selectedMethod = document.querySelector('input[name="otp_method"]:checked')?.value || 'email';
+      if (isOtpVerified) return;
+
       const targetDestination = emailInput.value.trim();
       const code = otpCodeInput.value.trim();
+
+      if (!targetDestination) {
+        showToast('Please enter your email address first.', 'error');
+        emailInput.focus();
+        return;
+      }
+
+      if (!code) {
+        showToast('Please enter the 4-digit OTP from your email.', 'error');
+        otpCodeInput.focus();
+        return;
+      }
 
       if (!/^\d{4}$/.test(code)) {
         showToast('Please enter a valid 4-digit numeric OTP.', 'error');
@@ -1057,10 +1150,12 @@
 
       verifyOtpBtn.disabled = true;
       verifyOtpBtn.textContent = 'Verifying...';
+      statusMsg.textContent = 'Verifying security code...';
+      statusMsg.style.color = '#0284c7';
 
       try {
         const res = await API.post('/api/otp/verify', {
-          destinationType: selectedMethod,
+          destinationType: 'email',
           destination: targetDestination,
           otpCode: code,
           purpose: 'registration'
@@ -1072,20 +1167,23 @@
           showToast('OTP verified successfully!', 'success');
           
           verifiedBadge.style.display = 'flex';
-          verifiedLabel.textContent = `${targetDestination} (${selectedMethod.toUpperCase()})`;
+          verifiedLabel.textContent = `${targetDestination}`;
           verifyOtpBtn.textContent = 'VERIFIED ✓';
           verifyOtpBtn.disabled = true;
+          verifyOtpBtn.style.background = '#059669';
           sendOtpBtn.disabled = true;
           clearInterval(otpCountdownTimer);
-          statusMsg.textContent = '';
+          statusMsg.textContent = '✓ Security verification completed!';
+          statusMsg.style.color = '#059669';
 
           validateForm();
         }
       } catch (err) {
         showToast(err.message || 'Invalid or expired OTP.', 'error');
         verifyOtpBtn.disabled = false;
-        verifyOtpBtn.textContent = 'VERIFY OTP';
-        statusMsg.textContent = err.message;
+        verifyOtpBtn.textContent = 'Verify OTP';
+        verifyOtpBtn.classList.add('ready-to-verify');
+        statusMsg.textContent = err.message || 'Verification failed. Please check code or click Send OTP.';
         statusMsg.style.color = '#dc2626';
       }
     });
