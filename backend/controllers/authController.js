@@ -639,18 +639,63 @@ exports.getGoogleAuthUrl = (req, res) => {
 // 12. Google OAuth Callback & Direct ID Token Verification
 exports.googleAuthCallback = async (req, res) => {
   try {
-    const { code, id_token, googleUser } = req.body || {};
+    // If user cancelled or Google returned an error query
+    if (req.query.error) {
+      console.warn('Google OAuth cancelled or returned error:', req.query.error);
+      return res.redirect('/login.html?error=' + encodeURIComponent(req.query.error));
+    }
+
+    const code = req.query.code || req.body?.code;
     let email, name, googleId, picture;
 
-    if (googleUser && googleUser.email) {
-      email = googleUser.email.toLowerCase().trim();
-      name = googleUser.name || 'Google Customer';
-      googleId = googleUser.id || googleUser.sub;
-      picture = googleUser.picture || null;
+    // A. If code is received from Google redirect (GET or POST)
+    if (code) {
+      const redirectUri = process.env.GOOGLE_CALLBACK_URL || `${req.protocol}://${req.get('host')}/api/auth/google/callback`;
+      const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          code,
+          client_id: process.env.GOOGLE_CLIENT_ID,
+          client_secret: process.env.GOOGLE_CLIENT_SECRET,
+          redirect_uri: redirectUri,
+          grant_type: 'authorization_code',
+        }),
+      });
+
+      const tokenData = await tokenResponse.json();
+      if (!tokenData.access_token) {
+        console.error('Google token exchange error:', tokenData);
+        return res.status(400).send(`
+          <!DOCTYPE html><html><body style="font-family:sans-serif;padding:2rem;text-align:center;background:#0b0f19;color:#fff;">
+            <h2 style="color:#ef4444;">Google Sign-In Failed</h2>
+            <p style="color:#94a3b8;">${tokenData.error_description || tokenData.error || 'Unable to exchange authorization code.'}</p>
+            <a href="/login.html" style="color:#38bdf8;">Back to Login</a>
+          </body></html>
+        `);
+      }
+
+      // Fetch user profile from Google
+      const profileResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: { Authorization: `Bearer ${tokenData.access_token}` },
+      });
+      const googleProfile = await profileResponse.json();
+
+      email = googleProfile.email ? googleProfile.email.toLowerCase().trim() : null;
+      name = googleProfile.name || 'Google Customer';
+      googleId = googleProfile.id || googleProfile.sub;
+      picture = googleProfile.picture || null;
+    }
+    // B. Or if direct verified payload is passed (for mobile / test suite)
+    else if (req.body?.googleUser && req.body.googleUser.email) {
+      email = req.body.googleUser.email.toLowerCase().trim();
+      name = req.body.googleUser.name || 'Google Customer';
+      googleId = req.body.googleUser.id || req.body.googleUser.sub;
+      picture = req.body.googleUser.picture || null;
     } else {
       return res.status(400).json({
         success: false,
-        message: 'Google authentication data is required. Provide code or verified Google user payload.',
+        message: 'Google authorization code or user payload is required.',
       });
     }
 
@@ -730,18 +775,82 @@ exports.googleAuthCallback = async (req, res) => {
       ipAddress: req.ip,
     });
 
+    const userPayload = {
+      id: user.id,
+      full_name: user.full_name,
+      email: user.email,
+      username: user.username,
+      avatar_url: picture || user.avatar_url,
+      role: 'customer',
+    };
+
+    // If browser GET request, return auto-redirecting HTML that sets localStorage
+    if (req.method === 'GET') {
+      return res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Authenticating with Elite Drone...</title>
+          <style>
+            body {
+              background: #0b0f19;
+              color: #f8fafc;
+              font-family: 'Segoe UI', system-ui, sans-serif;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              height: 100vh;
+              margin: 0;
+            }
+            .card {
+              background: rgba(17, 26, 46, 0.9);
+              border: 1px solid rgba(14, 165, 233, 0.3);
+              border-radius: 12px;
+              padding: 2.5rem;
+              text-align: center;
+              box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+              max-width: 400px;
+            }
+            .spinner {
+              border: 3px solid rgba(14, 165, 233, 0.2);
+              border-top: 3px solid #38bdf8;
+              border-radius: 50%;
+              width: 36px;
+              height: 36px;
+              animation: spin 0.8s linear infinite;
+              margin: 0 auto 1.5rem;
+            }
+            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            h3 { color: #38bdf8; margin: 0 0 0.5rem; font-size: 1.25rem; }
+            p { color: #94a3b8; font-size: 0.9rem; margin: 0; }
+          </style>
+        </head>
+        <body>
+          <div class="card">
+            <div class="spinner"></div>
+            <h3>Authentication Successful</h3>
+            <p>Welcome, ${user.full_name}! Launching your client dashboard...</p>
+          </div>
+          <script>
+            try {
+              localStorage.setItem('elite_drone_user', JSON.stringify(${JSON.stringify(userPayload)}));
+              localStorage.setItem('token', ${JSON.stringify(token)});
+            } catch(e) {}
+            setTimeout(() => {
+              window.location.href = '/dashboard.html';
+            }, 600);
+          </script>
+        </body>
+        </html>
+      `);
+    }
+
     return res.json({
       success: true,
       message: 'Google authentication successful.',
       token,
-      user: {
-        id: user.id,
-        full_name: user.full_name,
-        email: user.email,
-        username: user.username,
-        avatar_url: picture || user.avatar_url,
-        role: 'customer',
-      },
+      user: userPayload,
       redirectUrl: '/dashboard.html',
     });
   } catch (err) {
