@@ -838,7 +838,86 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const regAlert = document.getElementById('register-alert-box');
-    if (urlParams.get('msg') === 'register_required') {
+
+    // Handle Google OAuth Auto-fill & Mandatory OTP Verification
+    if (urlParams.get('google_auth') === 'true') {
+      const gName = urlParams.get('name') || '';
+      const gEmail = urlParams.get('email') || '';
+      const gAvatar = urlParams.get('avatar') || '';
+
+      if (gName) {
+        document.getElementById('full_name').value = gName;
+        const nameHint = document.getElementById('name-hint');
+        if (nameHint) {
+          nameHint.textContent = '✓ Autofilled from Google Account';
+          nameHint.className = 'field-hint is-success';
+        }
+      }
+
+      if (gEmail) {
+        emailInput.value = gEmail;
+        confirmEmailInput.value = gEmail;
+        // Lock email fields so user cannot tamper with verified email
+        emailInput.readOnly = true;
+        confirmEmailInput.readOnly = true;
+        emailInput.style.backgroundColor = '#f8fafc';
+        confirmEmailInput.style.backgroundColor = '#f8fafc';
+        emailInput.style.cursor = 'not-allowed';
+        confirmEmailInput.style.cursor = 'not-allowed';
+
+        const emailHint = document.getElementById('email-hint');
+        if (emailHint) {
+          emailHint.textContent = '✓ Verified by Google Account';
+          emailHint.className = 'field-hint is-success';
+        }
+        const confirmEmailHint = document.getElementById('confirm-email-hint');
+        if (confirmEmailHint) {
+          confirmEmailHint.textContent = '✓ Email Confirmed';
+          confirmEmailHint.className = 'field-hint is-success';
+        }
+
+        // Auto-generate clean username from email
+        let baseUsername = gEmail.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '').slice(0, 20);
+        if (baseUsername.length < 3) baseUsername = 'pilot_' + baseUsername;
+        usernameInput.value = baseUsername;
+
+        // Trigger input event on username to run availability check
+        setTimeout(() => {
+          usernameInput.dispatchEvent(new Event('input'));
+        }, 150);
+
+        // Update OTP destination preview text
+        const destEl = document.getElementById('otp-dest-display');
+        if (destEl) {
+          destEl.textContent = gEmail;
+          destEl.style.color = '#0284c7';
+          destEl.style.fontWeight = '700';
+        }
+
+        // Show prominent Google Account Connected Alert Banner
+        regAlert.className = 'auth-alert';
+        regAlert.style.display = 'block';
+        regAlert.style.background = '#f0f9ff';
+        regAlert.style.border = '1.5px solid #0284c7';
+        regAlert.style.color = '#0369a1';
+        regAlert.style.borderRadius = '12px';
+        regAlert.style.padding = '0.9rem 1.1rem';
+        regAlert.style.marginBottom = '1.5rem';
+        regAlert.innerHTML = `
+          <div style="display:flex; align-items:center; gap:0.85rem; text-align:left;">
+            ${gAvatar ? `<img src="${gAvatar}" alt="Google Avatar" style="width:42px;height:42px;border-radius:50%;border:2px solid #0284c7;object-fit:cover;flex-shrink:0;">` : ''}
+            <div>
+              <strong style="color:#0284c7;font-size:0.95rem;display:block;">Google Account Connected: ${gEmail}</strong>
+              <span style="font-size:0.84rem;color:#334155;line-height:1.4;display:block;margin-top:0.2rem;">
+                Your Full Name, Email, and Username are autofilled. Please choose your gender, create a password, and <strong>complete OTP Verification</strong> to finalize your account.
+              </span>
+            </div>
+          </div>
+        `;
+
+        window.googleAvatarUrl = gAvatar;
+      }
+    } else if (urlParams.get('msg') === 'register_required') {
       regAlert.className = 'auth-alert auth-alert-warning';
       regAlert.innerHTML = '🔒 <strong>Registration Required:</strong> Please create an account first to access your Client Dashboard. (Already have an account? <a href="login.html?redirect=dashboard.html" style="color: #0284c7; text-decoration: underline; font-weight: 700;">Sign in here</a>)';
       regAlert.style.display = 'block';
@@ -1223,7 +1302,8 @@
         password: passwordInput.value,
         confirm_password: confirmPasswordInput.value,
         otp_destination_type: 'email',
-        otp_destination: verifiedDestination
+        otp_destination: verifiedDestination,
+        avatar_url: window.googleAvatarUrl || null
       };
 
       try {
@@ -1247,7 +1327,7 @@
     if (regGoogleBtn) {
       regGoogleBtn.addEventListener('click', async () => {
         try {
-          const res = await API.get('/api/auth/google');
+          const res = await API.get('/api/auth/google?from=register');
           if (res.authUrl) {
             window.location.href = res.authUrl;
           } else {

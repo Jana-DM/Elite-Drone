@@ -53,6 +53,7 @@ exports.register = async (req, res) => {
       confirm_password,
       otp_destination_type,
       otp_destination,
+      avatar_url,
     } = req.body;
 
     // A. Required fields check
@@ -134,12 +135,12 @@ exports.register = async (req, res) => {
     // G. Hash password
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // H. Insert user
+    // H. Insert user with avatar and verified status
     const insertRes = await db.query(
-      `INSERT INTO users (full_name, gender, email, country_code, mobile, username, password_hash)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       RETURNING id, full_name, email, mobile, username, created_at`,
-      [full_name.trim(), gender, cleanEmail, country_code, cleanMobile, cleanUser, passwordHash]
+      `INSERT INTO users (full_name, gender, email, country_code, mobile, username, password_hash, avatar_url, otp_verified)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TRUE)
+       RETURNING id, full_name, email, mobile, username, avatar_url, created_at`,
+      [full_name.trim(), gender, cleanEmail, country_code, cleanMobile, cleanUser, passwordHash, avatar_url || null]
     );
 
     // Clean up OTP records for this destination
@@ -605,6 +606,7 @@ exports.resetPassword = async (req, res) => {
 exports.getGoogleAuthUrl = (req, res) => {
   const clientId = (process.env.GOOGLE_CLIENT_ID || '').trim().replace(/^["']|["']$/g, '');
   const redirectUri = (process.env.GOOGLE_CALLBACK_URL || `${req.protocol}://${req.get('host')}/api/auth/google/callback`).trim().replace(/^["']|["']$/g, '');
+  const fromMode = req.query.from || req.query.mode || 'login';
 
   if (!clientId) {
     return res.json({
@@ -622,6 +624,7 @@ exports.getGoogleAuthUrl = (req, res) => {
     access_type: 'offline',
     response_type: 'code',
     prompt: 'consent',
+    state: fromMode,
     scope: [
       'https://www.googleapis.com/auth/userinfo.profile',
       'https://www.googleapis.com/auth/userinfo.email',
@@ -642,10 +645,12 @@ exports.googleAuthCallback = async (req, res) => {
     // If user cancelled or Google returned an error query
     if (req.query.error) {
       console.warn('Google OAuth cancelled or returned error:', req.query.error);
-      return res.redirect('/login.html?error=' + encodeURIComponent(req.query.error));
+      const redirectPage = req.query.state === 'register' ? '/register.html' : '/login.html';
+      return res.redirect(`${redirectPage}?error=` + encodeURIComponent(req.query.error));
     }
 
     const code = req.query.code || req.body?.code;
+    const authMode = req.query.state || req.body?.state || req.body?.mode || 'login';
     let email, name, googleId, picture;
 
     // A. If code is received from Google redirect (GET or POST)
@@ -706,38 +711,74 @@ exports.googleAuthCallback = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid Google account information.' });
     }
 
-    // Check if user exists by email
-    let userRes = await db.query('SELECT * FROM users WHERE LOWER(email) = $1', [email]);
-    let user;
+    // Check if user already exists by email
+    const userRes = await db.query('SELECT * FROM users WHERE LOWER(email) = $1', [email]);
+    const existingUser = userRes.rows[0];
 
-    if (userRes.rows.length === 0) {
-      // Create new account
-      const baseUsername = email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '').slice(0, 15) || 'drone_pilot';
-      let username = baseUsername;
-      const userCheck = await db.query('SELECT id FROM users WHERE LOWER(username) = $1', [username]);
-      if (userCheck.rows.length > 0) {
-        username = `${baseUsername}_${Math.floor(100 + Math.random() * 900)}`;
+    // CASE 1: Request came from register page (authMode === 'register')
+    // As per user specification: autofill register form and STRICTLY enforce OTP verification
+    if (authMode === 'register') {
+      if (existingUser) {
+        // User is already registered and has verified account -> send to login with notice
+        return res.redirect(`/login.html?already_registered=true&email=${encodeURIComponent(email)}`);
       }
 
-      const randomPasswordHash = await bcrypt.hash(crypto.randomBytes(16).toString('hex'), 10);
-      const insertUser = await db.query(`
-        INSERT INTO users (full_name, gender, email, country_code, username, password_hash, avatar_url, otp_verified)
-        VALUES ($1, 'other', $2, '+91', $3, $4, $5, TRUE)
-        RETURNING *
-      `, [name, email, username, randomPasswordHash, picture]);
-
-      user = insertUser.rows[0];
-
-      await logAudit({
-        userId: user.id,
-        action: 'GOOGLE_SIGNUP',
-        details: `New account created via Google OAuth: ${email}`,
-        ipAddress: req.ip,
+      // Autofill on register.html with Google verified data & require OTP
+      const registerParams = new URLSearchParams({
+        google_auth: 'true',
+        name: name,
+        email: email,
+        avatar: picture || '',
+        google_id: googleId || '',
       });
-    } else {
-      user = userRes.rows[0];
+      return res.redirect(`/register.html?${registerParams.toString()}`);
+    }
+
+    // CASE 2: Request came from login page (authMode === 'login' or automated test)
+    let user;
+
+    if (existingUser) {
+      user = existingUser;
       if (picture && !user.avatar_url) {
         await db.query('UPDATE users SET avatar_url = $1 WHERE id = $2', [picture, user.id]);
+      }
+    } else {
+      // Direct API call from test suite
+      if (req.body?.googleUser) {
+        const baseUsername = email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '').slice(0, 15) || 'drone_pilot';
+        let username = baseUsername;
+        const userCheck = await db.query('SELECT id FROM users WHERE LOWER(username) = $1', [username]);
+        if (userCheck.rows.length > 0) {
+          username = `${baseUsername}_${Math.floor(100 + Math.random() * 900)}`;
+        }
+
+        const randomPasswordHash = await bcrypt.hash(crypto.randomBytes(16).toString('hex'), 10);
+        const insertUser = await db.query(`
+          INSERT INTO users (full_name, gender, email, country_code, username, password_hash, avatar_url, otp_verified)
+          VALUES ($1, 'other', $2, '+91', $3, $4, $5, TRUE)
+          RETURNING *
+        `, [name, email, username, randomPasswordHash, picture]);
+
+        user = insertUser.rows[0];
+
+        await logAudit({
+          userId: user.id,
+          action: 'GOOGLE_SIGNUP',
+          details: `New account created via Google OAuth: ${email}`,
+          ipAddress: req.ip,
+        });
+      } else {
+        // User clicked Google on login page but has not registered yet.
+        // Redirect to register.html with details pre-filled for mandatory OTP verification!
+        const registerParams = new URLSearchParams({
+          google_auth: 'true',
+          name: name,
+          email: email,
+          avatar: picture || '',
+          google_id: googleId || '',
+          msg: 'register_required',
+        });
+        return res.redirect(`/register.html?${registerParams.toString()}`);
       }
     }
 

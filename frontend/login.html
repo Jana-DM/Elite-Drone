@@ -592,6 +592,17 @@
         alertBox.style.display = 'block';
       }
 
+      // Show alert if user with this Google account is already registered
+      if (urlParams.get('already_registered') === 'true' || urlParams.get('msg') === 'already_registered') {
+        const existingEmail = urlParams.get('email') || '';
+        if (existingEmail) {
+          document.getElementById('login_identifier').value = existingEmail;
+        }
+        alertBox.className = 'auth-alert auth-alert-info';
+        alertBox.innerHTML = `ℹ️ <strong>Account Exists:</strong> Your Google Account (<strong>${existingEmail}</strong>) is already registered. Please enter your password or sign in with Google below.`;
+        alertBox.style.display = 'block';
+      }
+
       // Show alert if redirected from protected route
       if (urlParams.get('unauthorized') === 'true') {
         alertBox.className = 'auth-alert auth-alert-error';
@@ -641,7 +652,7 @@
       if (googleBtn) {
         googleBtn.addEventListener('click', async () => {
           try {
-            const res = await API.get('/api/auth/google');
+            const res = await API.get('/api/auth/google?from=login');
             if (res.authUrl) {
               window.location.href = res.authUrl;
             } else {
