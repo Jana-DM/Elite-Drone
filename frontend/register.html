@@ -510,6 +510,19 @@
       box-shadow: none;
     }
 
+    /* Missing field guidance animation */
+    @keyframes shakeMissedField {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .field-missed-highlight {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3) !important;
+      animation: shakeMissedField 0.4s ease-in-out !important;
+    }
+
     /* Social Register & Login */
     .reg-divider {
       display: flex;
@@ -751,7 +764,7 @@
         </div>
 
         <!-- 8. Register Button -->
-        <button type="submit" id="btn-register-submit" class="btn-reg-main" disabled>
+        <button type="submit" id="btn-register-submit" class="btn-reg-main">
           REGISTER
         </button>
 
@@ -1259,21 +1272,111 @@
       }
     });
 
-    // 7. Overall Form Validation
-    function validateForm() {
-      const isNameValid = document.getElementById('full_name').value.trim().length >= 2;
-      const isGenderValid = genderHidden.value !== '';
-      const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim());
-      const isEmailMatch = emailInput.value.trim().toLowerCase() === confirmEmailInput.value.trim().toLowerCase() && emailInput.value.trim().length > 0;
-      
+    // 7. Missing Field Finder & Visual Guidance
+    function highlightMissingField(el) {
+      if (!el) return;
+      el.classList.add('field-missed-highlight');
+      setTimeout(() => {
+        el.classList.remove('field-missed-highlight');
+      }, 1500);
+    }
+
+    function findFirstMissingField() {
+      // 1. Full Name
+      const nameEl = document.getElementById('full_name');
+      if (!nameEl.value.trim() || nameEl.value.trim().length < 2) {
+        return {
+          element: nameEl,
+          focusElement: nameEl,
+          message: 'Please enter your Full Name (at least 2 characters).'
+        };
+      }
+
+      // 2. Gender
+      if (!genderHidden.value) {
+        const genderBox = document.querySelector('.gender-radio-group');
+        const firstRadio = document.querySelector('input[name="gender"]');
+        return {
+          element: genderBox,
+          focusElement: firstRadio,
+          message: 'Please select your Gender (Male, Female, or Other).'
+        };
+      }
+
+      // 3. Email
+      const emailVal = emailInput.value.trim();
+      if (!emailVal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+        return {
+          element: emailInput,
+          focusElement: emailInput,
+          message: 'Please enter a valid Email address.'
+        };
+      }
+
+      // 4. Confirm Email
+      const confirmEmailVal = confirmEmailInput.value.trim();
+      if (!confirmEmailVal || emailVal.toLowerCase() !== confirmEmailVal.toLowerCase()) {
+        return {
+          element: confirmEmailInput,
+          focusElement: confirmEmailInput,
+          message: 'Confirm Email does not match your Email address.'
+        };
+      }
+
+      // 5. Username
+      const userVal = usernameInput.value.trim();
+      if (!userVal || userVal.length < 3) {
+        return {
+          element: usernameInput,
+          focusElement: usernameInput,
+          message: 'Please choose a Username (at least 3 characters).'
+        };
+      }
+      if (!isUsernameAvailable) {
+        return {
+          element: usernameInput,
+          focusElement: usernameInput,
+          message: 'This Username is unavailable. Please pick a different username.'
+        };
+      }
+
+      // 6. Password
       const pwd = passwordInput.value;
       const isPwdValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/.test(pwd);
-      const isPwdMatch = pwd === confirmPasswordInput.value && pwd.length > 0;
+      if (!pwd || !isPwdValid) {
+        return {
+          element: passwordInput,
+          focusElement: passwordInput,
+          message: 'Please create a strong Password meeting all complexity rules.'
+        };
+      }
 
-      const isValid = isNameValid && isGenderValid && isEmailValid && isEmailMatch && 
-                      isUsernameAvailable && isPwdValid && isPwdMatch && isOtpVerified;
+      // 7. Confirm Password
+      const confirmPwd = confirmPasswordInput.value;
+      if (!confirmPwd || pwd !== confirmPwd) {
+        return {
+          element: confirmPasswordInput,
+          focusElement: confirmPasswordInput,
+          message: 'Passwords do not match. Please re-enter your confirm password.'
+        };
+      }
 
-      submitBtn.disabled = !isValid;
+      // 8. OTP Verification
+      if (!isOtpVerified) {
+        const otpBox = document.querySelector('.reg-otp-box');
+        const targetInput = otpCodeInput.value.length === 4 ? otpCodeInput : (!isOtpSent ? sendOtpBtn : otpCodeInput);
+        return {
+          element: otpBox,
+          focusElement: targetInput,
+          message: !isOtpSent ? 'Please click SEND OTP to receive your 4-digit code.' : 'Please enter the 4-digit OTP and click VERIFY OTP.'
+        };
+      }
+
+      return null; // All valid!
+    }
+
+    function validateForm() {
+      // Lightweight status validation for live visual hints
     }
 
     document.querySelectorAll('#registration-form input').forEach(input => {
@@ -1281,12 +1384,25 @@
       input.addEventListener('change', validateForm);
     });
 
-    // 8. Submit Registration
+    // 8. Submit Registration with Intelligent Field Navigation
     document.getElementById('registration-form').addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      if (!isOtpVerified) {
-        showToast('Please verify your OTP before submitting registration.', 'error');
+      const missing = findFirstMissingField();
+      if (missing) {
+        showToast(`Please fill in all the details above. (${missing.message})`, 'warning');
+
+        // Smoothly scroll to the missed field
+        missing.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Shake & highlight the element
+        highlightMissingField(missing.element);
+
+        // Focus the input
+        const toFocus = missing.focusElement || missing.element;
+        if (typeof toFocus.focus === 'function') {
+          setTimeout(() => toFocus.focus(), 250);
+        }
         return;
       }
 
