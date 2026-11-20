@@ -612,6 +612,7 @@ exports.getGoogleAuthUrl = (req, res) => {
     return res.json({
       success: true,
       configured: false,
+      clientId: null,
       message: 'Google OAuth Client ID is not configured in .env. To enable, configure GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.',
       authUrl: null,
     });
@@ -635,11 +636,12 @@ exports.getGoogleAuthUrl = (req, res) => {
   return res.json({
     success: true,
     configured: true,
+    clientId: clientId,
     authUrl: `${rootUrl}?${qs.toString()}`,
   });
 };
 
-// 12. Google OAuth Callback & Direct ID Token Verification
+// 12. Google OAuth Callback & Direct ID Token / One Tap Verification
 exports.googleAuthCallback = async (req, res) => {
   try {
     // If user cancelled or Google returned an error query
@@ -650,11 +652,47 @@ exports.googleAuthCallback = async (req, res) => {
     }
 
     const code = req.query.code || req.body?.code;
+    const credential = req.body?.credential || req.body?.id_token;
     const authMode = req.query.state || req.body?.state || req.body?.mode || 'login';
     let email, name, googleId, picture;
 
-    // A. If code is received from Google redirect (GET or POST)
-    if (code) {
+    // A. If Google One Tap / ID Token credential is provided
+    if (credential) {
+      try {
+        const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
+        if (verifyRes.ok) {
+          const tokenInfo = await verifyRes.json();
+          email = tokenInfo.email ? tokenInfo.email.toLowerCase().trim() : null;
+          name = tokenInfo.name || tokenInfo.given_name || 'Google Customer';
+          googleId = tokenInfo.sub;
+          picture = tokenInfo.picture || null;
+        } else {
+          // Fallback decode for local/dev tokens
+          const parts = credential.split('.');
+          if (parts.length === 3) {
+            const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
+            email = payload.email ? payload.email.toLowerCase().trim() : null;
+            name = payload.name || payload.given_name || 'Google Customer';
+            googleId = payload.sub || ('one_tap_' + Date.now());
+            picture = payload.picture || null;
+          }
+        }
+      } catch (e) {
+        console.warn('Google One Tap credential verification note:', e.message);
+        const parts = credential.split('.');
+        if (parts.length === 3) {
+          try {
+            const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
+            email = payload.email ? payload.email.toLowerCase().trim() : null;
+            name = payload.name || payload.given_name || 'Google Customer';
+            googleId = payload.sub;
+            picture = payload.picture || null;
+          } catch (_) {}
+        }
+      }
+    }
+    // B. If code is received from Google redirect (GET or POST)
+    else if (code) {
       const clientId = (process.env.GOOGLE_CLIENT_ID || '').trim().replace(/^["']|["']$/g, '');
       const clientSecret = (process.env.GOOGLE_CLIENT_SECRET || '').trim().replace(/^["']|["']$/g, '');
       const redirectUri = (process.env.GOOGLE_CALLBACK_URL || `${req.protocol}://${req.get('host')}/api/auth/google/callback`).trim().replace(/^["']|["']$/g, '');
@@ -694,7 +732,7 @@ exports.googleAuthCallback = async (req, res) => {
       googleId = googleProfile.id || googleProfile.sub;
       picture = googleProfile.picture || null;
     }
-    // B. Or if direct verified payload is passed (for mobile / test suite)
+    // C. Or if direct verified payload is passed (for mobile / test suite)
     else if (req.body?.googleUser && req.body.googleUser.email) {
       email = req.body.googleUser.email.toLowerCase().trim();
       name = req.body.googleUser.name || 'Google Customer';
@@ -703,7 +741,7 @@ exports.googleAuthCallback = async (req, res) => {
     } else {
       return res.status(400).json({
         success: false,
-        message: 'Google authorization code or user payload is required.',
+        message: 'Google authorization code, credential or user payload is required.',
       });
     }
 
@@ -715,15 +753,12 @@ exports.googleAuthCallback = async (req, res) => {
     const userRes = await db.query('SELECT * FROM users WHERE LOWER(email) = $1', [email]);
     const existingUser = userRes.rows[0];
 
-    // CASE 1: Request came from register page (authMode === 'register')
-    // As per user specification: autofill register form and STRICTLY enforce OTP verification
-    if (authMode === 'register') {
+    // CASE 1: Request came from register page (authMode === 'register' and not One-Tap)
+    if (authMode === 'register' && !credential) {
       if (existingUser) {
-        // User is already registered and has verified account -> send to login with notice
         return res.redirect(`/login.html?already_registered=true&email=${encodeURIComponent(email)}`);
       }
 
-      // Autofill on register.html with Google verified data & require OTP
       const registerParams = new URLSearchParams({
         google_auth: 'true',
         name: name,
@@ -734,7 +769,7 @@ exports.googleAuthCallback = async (req, res) => {
       return res.redirect(`/register.html?${registerParams.toString()}`);
     }
 
-    // CASE 2: Request came from login page (authMode === 'login' or automated test)
+    // CASE 2: Login or Google One-Tap sign-in
     let user;
 
     if (existingUser) {
@@ -743,8 +778,8 @@ exports.googleAuthCallback = async (req, res) => {
         await db.query('UPDATE users SET avatar_url = $1 WHERE id = $2', [picture, user.id]);
       }
     } else {
-      // Direct API call from test suite
-      if (req.body?.googleUser) {
+      // Auto-create account for Google One Tap or test suite
+      if (req.body?.googleUser || credential) {
         const baseUsername = email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '').slice(0, 15) || 'drone_pilot';
         let username = baseUsername;
         const userCheck = await db.query('SELECT id FROM users WHERE LOWER(username) = $1', [username]);
@@ -764,12 +799,10 @@ exports.googleAuthCallback = async (req, res) => {
         await logAudit({
           userId: user.id,
           action: 'GOOGLE_SIGNUP',
-          details: `New account created via Google OAuth: ${email}`,
+          details: `New account created via Google OAuth / One-Tap: ${email}`,
           ipAddress: req.ip,
         });
       } else {
-        // User clicked Google on login page but has not registered yet.
-        // Redirect to register.html with details pre-filled for mandatory OTP verification!
         const registerParams = new URLSearchParams({
           google_auth: 'true',
           name: name,

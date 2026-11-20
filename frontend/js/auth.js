@@ -12,6 +12,15 @@ const Auth = {
   setUser(user) {
     if (user) {
       localStorage.setItem('elite_drone_user', JSON.stringify(user));
+      try {
+        localStorage.setItem('elite_drone_last_user', JSON.stringify({
+          full_name: user.full_name || user.username,
+          username: user.username,
+          email: user.email,
+          avatar_url: user.avatar_url,
+          role: user.role
+        }));
+      } catch (e) {}
     } else {
       localStorage.removeItem('elite_drone_user');
     }
@@ -24,12 +33,22 @@ const Auth = {
 
   async logout() {
     try {
+      const currentUser = this.getUser();
+      if (currentUser) {
+        localStorage.setItem('elite_drone_last_user', JSON.stringify({
+          full_name: currentUser.full_name || currentUser.username,
+          username: currentUser.username,
+          email: currentUser.email,
+          avatar_url: currentUser.avatar_url,
+          role: currentUser.role
+        }));
+      }
       await API.post('/api/auth/logout').catch(() => null);
     } catch (e) {
       // Ignore network errors on logout
     }
     localStorage.removeItem('elite_drone_user');
-    window.location.href = '/login.html';
+    window.location.href = '/login.html?logged_out=true';
   },
 
   updateNavbar() {

@@ -19,6 +19,9 @@
   <link rel="icon" type="image/png" href="images/favicon.png">
   <link rel="apple-touch-icon" href="images/logo.png">
 
+  <!-- Google Identity Services (GIS) One Tap Library -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
   <link rel="stylesheet" href="css/style.css">
   <style>
     body {
@@ -402,6 +405,303 @@
       text-decoration: underline;
     }
 
+    /* Prominent Google Sign-in Button at Top */
+    .btn-google-prominent {
+      width: 100%;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 0.96rem;
+      font-weight: 700;
+      color: #1e293b;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-bottom: 0.75rem;
+      font-family: var(--font-sans);
+    }
+
+    .btn-google-prominent:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .btn-google-prominent:active {
+      transform: translateY(0);
+    }
+
+    .btn-google-prominent .google-svg-icon {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+
+    /* Secondary Facebook text link */
+    .secondary-social-text {
+      text-align: center;
+      margin-bottom: 1.25rem;
+      font-size: 0.84rem;
+      color: #64748b;
+    }
+
+    .btn-facebook-link {
+      color: #1877f2;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: 4px;
+      cursor: pointer;
+    }
+
+    .btn-facebook-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Welcome Back / Continue as [User] Re-login Card */
+    .relogin-card {
+      background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+      border: 1.5px solid #7dd3fc;
+      border-radius: 16px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .relogin-user-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+
+    .relogin-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0284c7, #002b5c);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);
+      flex-shrink: 0;
+    }
+
+    .relogin-avatar img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .relogin-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .relogin-subtitle {
+      font-size: 0.78rem;
+      color: #0369a1;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .relogin-name {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .relogin-email {
+      font-size: 0.82rem;
+      color: #64748b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn-continue-as {
+      width: 100%;
+      background: #0284c7;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.78rem 1rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 3px 10px rgba(2, 132, 199, 0.3);
+      font-family: var(--font-sans);
+    }
+
+    .btn-continue-as:hover {
+      background: #0369a1;
+      transform: translateY(-1px);
+    }
+
+    .switch-account-link {
+      display: inline-block;
+      margin-top: 0.65rem;
+      font-size: 0.8rem;
+      color: #0284c7;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .switch-account-link:hover {
+      text-decoration: underline;
+    }
+
+    /* TOP-RIGHT GOOGLE ONE TAP FLOATING PROMPT */
+    .google-one-tap-card {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      width: 360px;
+      max-width: calc(100vw - 32px);
+      background: #1e1e1e;
+      color: #ffffff;
+      border: 1px solid #333333;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
+      z-index: 9999;
+      animation: oneTapSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes oneTapSlideIn {
+      from { transform: translateY(-30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .one-tap-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .one-tap-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #e2e8f0;
+      font-weight: 600;
+    }
+
+    .one-tap-close-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      line-height: 1;
+      transition: all 0.15s ease;
+    }
+
+    .one-tap-close-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    .one-tap-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      padding: 4px;
+    }
+
+    .one-tap-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #ffffff;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .one-tap-avatar img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .one-tap-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .one-tap-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .one-tap-email {
+      font-size: 12px;
+      color: #94a3b8;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .btn-one-tap-continue {
+      width: 100%;
+      background: #1a73e8;
+      color: #ffffff;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: inherit;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    }
+
+    .btn-one-tap-continue:hover {
+      background: #1557b0;
+    }
+
     /* Quick Admin Badge */
     .admin-quick-badge {
       margin-top: 1.75rem;
@@ -459,6 +759,34 @@
 
 <body>
 
+  <!-- Top-Right Floating Google One Tap Prompt (Exact match to Claude.ai) -->
+  <div id="google-one-tap-card" class="google-one-tap-card" style="display: none;">
+    <div class="one-tap-header">
+      <div class="one-tap-brand">
+        <svg width="18" height="18" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        <span>Use Elite Drone with google.com</span>
+      </div>
+      <button type="button" class="one-tap-close-btn" id="one-tap-close-btn" aria-label="Close One Tap">×</button>
+    </div>
+
+    <div class="one-tap-user">
+      <div class="one-tap-avatar" id="one-tap-avatar">J</div>
+      <div class="one-tap-info">
+        <div class="one-tap-name" id="one-tap-name">Client</div>
+        <div class="one-tap-email" id="one-tap-email">client@gmail.com</div>
+      </div>
+    </div>
+
+    <button type="button" class="btn-one-tap-continue" id="btn-one-tap-continue">
+      Continue as Client
+    </button>
+  </div>
+
   <!-- Auth Content Wrapper -->
   <div class="auth-wrapper">
     <!-- Top Back Bar -->
@@ -483,6 +811,50 @@
 
       <!-- Alerts -->
       <div id="alert-box" class="auth-alert"></div>
+
+      <!-- Quick Re-login Card (Shown if user previously logged in/out on this browser) -->
+      <div id="relogin-box" class="relogin-card" style="display: none;">
+        <div class="relogin-user-meta">
+          <div class="relogin-avatar" id="relogin-avatar">U</div>
+          <div class="relogin-info">
+            <div class="relogin-subtitle">Welcome Back</div>
+            <div class="relogin-name" id="relogin-name">Customer</div>
+            <div class="relogin-email" id="relogin-email">client@example.com</div>
+          </div>
+        </div>
+        <button type="button" class="btn-continue-as" id="btn-relogin-continue">
+          <span id="relogin-btn-text">Continue as Customer</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+        <a class="switch-account-link" id="btn-switch-account">Sign in with different account</a>
+      </div>
+
+      <!-- Prominent Continue with Google Button (Top Placement) -->
+      <div id="social-top-container">
+        <button type="button" class="btn-google-prominent" id="btn-google-login">
+          <svg class="google-svg-icon" viewBox="0 0 48 48">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          <span>Continue with Google</span>
+        </button>
+
+        <div class="secondary-social-text">
+          or sign in with <a href="#" class="btn-facebook-link" id="btn-facebook-login">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#1877F2">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg> Facebook
+          </a>
+        </div>
+
+        <div class="reg-divider">
+          <span>or sign in with email</span>
+        </div>
+      </div>
 
       <form id="login-form" novalidate>
         <!-- 1. Email or Username -->
@@ -530,34 +902,8 @@
           SIGN IN
         </button>
 
-        <!-- Social Divider & Buttons -->
-        <div class="reg-divider">
-          <span>or Sign in with</span>
-        </div>
-
-        <div class="reg-social-row">
-          <button type="button" class="reg-social-btn" title="Sign in with Google" id="btn-google-login">
-            <svg width="22" height="22" viewBox="0 0 48 48">
-              <path fill="#EA4335"
-                d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
-              <path fill="#4285F4"
-                d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
-              <path fill="#FBBC05"
-                d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
-              <path fill="#34A853"
-                d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
-            </svg>
-          </button>
-          <button type="button" class="reg-social-btn" title="Sign in with Facebook" id="btn-facebook-login">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="#1877F2">
-              <path
-                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-            </svg>
-          </button>
-        </div>
-
         <!-- Don't have an account link -->
-        <p class="reg-login-note">
+        <p class="reg-login-note" style="margin-top: 1.5rem;">
           Don't have an account yet? <a href="register.html">Register here</a>
         </p>
       </form>
@@ -677,6 +1023,107 @@
           } catch (e) {
             showToast('Facebook OAuth service is ready on backend.', 'info');
           }
+        });
+      }
+
+      // Google Identity Services (GIS) / One-Tap & Re-Login Handler
+      async function handleGoogleCredentialResponse(response) {
+        if (!response || !response.credential) return;
+        try {
+          showToast('Signing in with Google...', 'info');
+          const res = await API.post('/api/auth/google/callback', {
+            credential: response.credential,
+            mode: 'login'
+          });
+          if (res.success && res.user) {
+            Auth.setUser(res.user);
+            showToast(`Welcome back, ${res.user.full_name || res.user.username}!`, 'success');
+            setTimeout(() => {
+              window.location.href = res.redirectUrl || '/dashboard.html';
+            }, 600);
+          }
+        } catch (err) {
+          showToast(err.message || 'Google authentication failed.', 'error');
+        }
+      }
+      window.handleGoogleCredentialResponse = handleGoogleCredentialResponse;
+
+      // Initialize Google One Tap if configured
+      API.get('/api/auth/google?from=login').then(cfg => {
+        if (cfg && cfg.configured && cfg.clientId && window.google && google.accounts && google.accounts.id) {
+          google.accounts.id.initialize({
+            client_id: cfg.clientId,
+            callback: handleGoogleCredentialResponse,
+            auto_select: false,
+            cancel_on_tap_outside: false,
+          });
+          google.accounts.id.prompt();
+        }
+      }).catch(() => null);
+
+      // Check for previously logged in user (Client Re-login experience)
+      let lastUser = null;
+      try {
+        const storedLast = localStorage.getItem('elite_drone_last_user');
+        if (storedLast) lastUser = JSON.parse(storedLast);
+      } catch (e) {}
+
+      const reloginBox = document.getElementById('relogin-box');
+      const oneTapCard = document.getElementById('google-one-tap-card');
+
+      if (lastUser && (lastUser.email || lastUser.username)) {
+        const displayName = lastUser.full_name || lastUser.username || 'Customer';
+        const firstName = displayName.split(' ')[0];
+
+        // 1. Populate and show center Re-login card
+        const reloginAvatar = document.getElementById('relogin-avatar');
+        if (lastUser.avatar_url) {
+          reloginAvatar.innerHTML = `<img src="${lastUser.avatar_url}" alt="${displayName}">`;
+        } else {
+          reloginAvatar.textContent = firstName.charAt(0).toUpperCase();
+        }
+        document.getElementById('relogin-name').textContent = displayName;
+        document.getElementById('relogin-email').textContent = lastUser.email || `@${lastUser.username}`;
+        document.getElementById('relogin-btn-text').textContent = `Continue as ${firstName}`;
+        reloginBox.style.display = 'block';
+
+        // 2. Populate and show Top-Right Floating Google One Tap Card
+        const oneTapAvatar = document.getElementById('one-tap-avatar');
+        if (lastUser.avatar_url) {
+          oneTapAvatar.innerHTML = `<img src="${lastUser.avatar_url}" alt="${displayName}">`;
+        } else {
+          oneTapAvatar.textContent = firstName.charAt(0).toUpperCase();
+        }
+        document.getElementById('one-tap-name').textContent = displayName.toUpperCase();
+        document.getElementById('one-tap-email').textContent = lastUser.email || `${lastUser.username}@gmail.com`;
+        document.getElementById('btn-one-tap-continue').textContent = `Continue as ${displayName}`;
+        oneTapCard.style.display = 'block';
+
+        // Prefill identifier in form
+        document.getElementById('login_identifier').value = lastUser.email || lastUser.username;
+
+        // Button events
+        document.getElementById('btn-one-tap-continue').addEventListener('click', () => {
+          document.getElementById('login_identifier').value = lastUser.email || lastUser.username;
+          pwdInput.focus();
+          pwdInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          showToast(`Please enter password for ${firstName} to sign in.`, 'info');
+        });
+
+        document.getElementById('btn-relogin-continue').addEventListener('click', () => {
+          document.getElementById('login_identifier').value = lastUser.email || lastUser.username;
+          pwdInput.focus();
+          pwdInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+
+        document.getElementById('btn-switch-account').addEventListener('click', () => {
+          reloginBox.style.display = 'none';
+          document.getElementById('login_identifier').value = '';
+          document.getElementById('login_identifier').focus();
+        });
+
+        document.getElementById('one-tap-close-btn').addEventListener('click', () => {
+          oneTapCard.style.display = 'none';
         });
       }
 
