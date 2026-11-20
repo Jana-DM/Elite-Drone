@@ -158,7 +158,7 @@ pm2 startup
 - [x] **Milestone 2**: Homepage, navigation bar, cinematic hero section, testimonials, footer, and responsive UI.
 - [x] **Milestone 3**: Services page with dynamic packages and gallery page with photo/video playback & filtering.
 - [x] **Milestone 4**: Registration form, real-time client-side validation, password policy, and OTP UX.
-- [x] **Milestone 5**: Backend email/mobile OTP generation, bcrypt hashing, rate limiting, and verification.
+- [x] **Milestone 5**: Backend email/bcrypt hashing, rate limiting, and verification.
 - [x] **Milestone 6**: Customer login, JWT/cookie authentication, route protection, session management, logout.
 - [x] **Milestone 7**: Online booking form, PostgreSQL integration, and unique reference code generation (`ELD-YYYYMMDD-XXXX`).
 - [x] **Milestone 8**: Customer dashboard for profile, active bookings, status tracking, and cancellation.
