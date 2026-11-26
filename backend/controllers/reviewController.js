@@ -50,7 +50,7 @@ exports.createReview = async (req, res) => {
 
     const result = await db.query(`
       INSERT INTO reviews (user_id, customer_name, rating, comment, service_name, status)
-      VALUES ($1, $2, $3, $4, $5, 'Approved')
+      VALUES ($1, $2, $3, $4, $5, 'Pending')
       RETURNING *;
     `, [
       userId,
@@ -68,7 +68,7 @@ exports.createReview = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Review submitted successfully! Thank you for your feedback.',
+      message: 'Review submitted for approval! It will be published after admin review.',
       review: result.rows[0]
     });
   } catch (err) {

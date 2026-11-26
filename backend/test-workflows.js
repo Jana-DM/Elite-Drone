@@ -188,7 +188,7 @@ async function runTests() {
     // Submit Booking
     const weddingServiceId = servicesData.data[0].id;
     const weddingPackageId = servicesData.data[0].packages[0].id;
-    const shootDate = '2026-11-20';
+    const shootDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
     const resBooking = await fetch(`${BASE_URL}/api/bookings`, {
       method: 'POST',

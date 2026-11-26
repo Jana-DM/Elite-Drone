@@ -328,7 +328,29 @@ exports.updateProfile = async (req, res) => {
     const userId = req.user.id;
     const role = req.user.role;
 
+    let cleanUsername = null;
+    if (username !== undefined && username !== null && String(username).trim() !== '') {
+      cleanUsername = String(username).trim().toLowerCase();
+      if (cleanUsername.length < 3) {
+        return res.status(400).json({ success: false, message: 'Username must be at least 3 characters.' });
+      }
+    }
+
     if (role === 'admin' || role === 'superadmin') {
+      if (cleanUsername) {
+        const dupAdmin = await db.query(
+          'SELECT id FROM admin_users WHERE LOWER(username) = $1 AND id != $2',
+          [cleanUsername, userId]
+        );
+        const dupUser = await db.query(
+          'SELECT id FROM users WHERE LOWER(username) = $1',
+          [cleanUsername]
+        );
+        if (dupAdmin.rows.length > 0 || dupUser.rows.length > 0) {
+          return res.status(400).json({ success: false, message: 'This username is already taken.' });
+        }
+      }
+
       const updateRes = await db.query(
         `UPDATE admin_users 
          SET full_name = COALESCE($1, full_name),
@@ -336,13 +358,57 @@ exports.updateProfile = async (req, res) => {
              updated_at = NOW()
          WHERE id = $3
          RETURNING id, username, email, full_name, role`,
-        [full_name, username ? username.trim().toLowerCase() : null, userId]
+        [full_name ? full_name.trim() : null, cleanUsername, userId]
       );
       return res.json({
         success: true,
         message: 'Admin profile updated successfully!',
         user: updateRes.rows[0],
       });
+    }
+
+    // Validate gender against schema CHECK constraint
+    const allowedGenders = ['Male', 'Female', 'Other', 'Prefer not to say'];
+    let cleanGender = null;
+    if (gender !== undefined && gender !== null && String(gender).trim() !== '') {
+      if (!allowedGenders.includes(gender)) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid gender. Allowed values: ${allowedGenders.join(', ')}.`,
+        });
+      }
+      cleanGender = gender;
+    }
+
+    // Validate & normalize mobile if provided
+    let cleanMobile = null;
+    if (mobile !== undefined && mobile !== null && String(mobile).trim() !== '') {
+      cleanMobile = String(mobile).replace(/\D/g, '').slice(-10);
+      if (!/^[6-9]\d{9}$/.test(cleanMobile)) {
+        return res.status(400).json({ success: false, message: 'Mobile must be a valid 10-digit Indian number.' });
+      }
+      const dupMobile = await db.query(
+        'SELECT id FROM users WHERE mobile = $1 AND id != $2',
+        [cleanMobile, userId]
+      );
+      if (dupMobile.rows.length > 0) {
+        return res.status(400).json({ success: false, message: 'This mobile number is already linked to another account.' });
+      }
+    }
+
+    // Check username uniqueness across both users and admin_users
+    if (cleanUsername) {
+      const dupUser = await db.query(
+        'SELECT id FROM users WHERE LOWER(username) = $1 AND id != $2',
+        [cleanUsername, userId]
+      );
+      const dupAdmin = await db.query(
+        'SELECT id FROM admin_users WHERE LOWER(username) = $1',
+        [cleanUsername]
+      );
+      if (dupUser.rows.length > 0 || dupAdmin.rows.length > 0) {
+        return res.status(400).json({ success: false, message: 'This username is already taken.' });
+      }
     }
 
     // Customer profile update
@@ -355,8 +421,12 @@ exports.updateProfile = async (req, res) => {
            updated_at = NOW()
        WHERE id = $5
        RETURNING id, full_name, gender, email, country_code, mobile, username`,
-      [full_name, gender, mobile, username ? username.trim().toLowerCase() : null, userId]
+      [full_name ? full_name.trim() : null, cleanGender, cleanMobile, cleanUsername, userId]
     );
+
+    if (updateRes.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
 
     return res.json({
       success: true,
@@ -656,40 +726,35 @@ exports.googleAuthCallback = async (req, res) => {
     const authMode = req.query.state || req.body?.state || req.body?.mode || 'login';
     let email, name, googleId, picture;
 
-    // A. If Google One Tap / ID Token credential is provided
+    // A. If Google One Tap / ID Token credential is provided (strict cryptographic verification via Google tokeninfo)
     if (credential) {
-      try {
-        const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
-        if (verifyRes.ok) {
-          const tokenInfo = await verifyRes.json();
-          email = tokenInfo.email ? tokenInfo.email.toLowerCase().trim() : null;
-          name = tokenInfo.name || tokenInfo.given_name || 'Google Customer';
-          googleId = tokenInfo.sub;
-          picture = tokenInfo.picture || null;
-        } else {
-          // Fallback decode for local/dev tokens
-          const parts = credential.split('.');
-          if (parts.length === 3) {
-            const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
-            email = payload.email ? payload.email.toLowerCase().trim() : null;
-            name = payload.name || payload.given_name || 'Google Customer';
-            googleId = payload.sub || ('one_tap_' + Date.now());
-            picture = payload.picture || null;
-          }
-        }
-      } catch (e) {
-        console.warn('Google One Tap credential verification note:', e.message);
-        const parts = credential.split('.');
-        if (parts.length === 3) {
-          try {
-            const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
-            email = payload.email ? payload.email.toLowerCase().trim() : null;
-            name = payload.name || payload.given_name || 'Google Customer';
-            googleId = payload.sub;
-            picture = payload.picture || null;
-          } catch (_) {}
-        }
+      const configuredClientId = (process.env.GOOGLE_CLIENT_ID || '').trim().replace(/^["']|["']$/g, '');
+      const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
+      if (!verifyRes.ok) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid or expired Google ID token.',
+        });
       }
+
+      const tokenInfo = await verifyRes.json();
+      if (configuredClientId && tokenInfo.aud !== configuredClientId) {
+        return res.status(401).json({
+          success: false,
+          message: 'Google token audience mismatch.',
+        });
+      }
+      if (tokenInfo.email_verified !== 'true' && tokenInfo.email_verified !== true) {
+        return res.status(401).json({
+          success: false,
+          message: 'Google account email is not verified.',
+        });
+      }
+
+      email = tokenInfo.email ? tokenInfo.email.toLowerCase().trim() : null;
+      name = tokenInfo.name || tokenInfo.given_name || 'Google Customer';
+      googleId = tokenInfo.sub;
+      picture = tokenInfo.picture || null;
     }
     // B. If code is received from Google redirect (GET or POST)
     else if (code) {
@@ -790,7 +855,7 @@ exports.googleAuthCallback = async (req, res) => {
         const randomPasswordHash = await bcrypt.hash(crypto.randomBytes(16).toString('hex'), 10);
         const insertUser = await db.query(`
           INSERT INTO users (full_name, gender, email, country_code, username, password_hash, avatar_url, otp_verified)
-          VALUES ($1, 'other', $2, '+91', $3, $4, $5, TRUE)
+          VALUES ($1, 'Other', $2, '+91', $3, $4, $5, TRUE)
           RETURNING *
         `, [name, email, username, randomPasswordHash, picture]);
 
@@ -938,8 +1003,9 @@ exports.googleAuthCallback = async (req, res) => {
 
 // 13. Facebook OAuth URL Generation
 exports.getFacebookAuthUrl = (req, res) => {
-  const appId = process.env.FACEBOOK_APP_ID;
-  const redirectUri = process.env.FACEBOOK_CALLBACK_URL || `${req.protocol}://${req.get('host')}/api/auth/facebook/callback`;
+  const appId = (process.env.FACEBOOK_APP_ID || '').trim().replace(/^["']|["']$/g, '');
+  const redirectUri = (process.env.FACEBOOK_CALLBACK_URL || `${req.protocol}://${req.get('host')}/api/auth/facebook/callback`).trim().replace(/^["']|["']$/g, '');
+  const fromMode = req.query.from || req.query.mode || 'login';
 
   if (!appId) {
     return res.json({
@@ -956,6 +1022,7 @@ exports.getFacebookAuthUrl = (req, res) => {
     redirect_uri: redirectUri,
     scope: 'email,public_profile',
     response_type: 'code',
+    state: fromMode,
   });
 
   return res.json({
@@ -968,24 +1035,77 @@ exports.getFacebookAuthUrl = (req, res) => {
 // 14. Facebook OAuth Callback & Login
 exports.facebookAuthCallback = async (req, res) => {
   try {
-    const { facebookUser } = req.body || {};
-    if (!facebookUser || !facebookUser.id) {
-      return res.status(400).json({
-        success: false,
-        message: 'Facebook authentication payload is required. Provide user profile with id and email.',
-      });
+    if (req.query.error) {
+      const redirectPage = req.query.state === 'register' ? '/register.html' : '/login.html';
+      return res.redirect(`${redirectPage}?error=${encodeURIComponent(req.query.error)}`);
     }
 
-    const fbId = facebookUser.id;
-    const email = (facebookUser.email || `fb_${fbId}@facebook.user`).toLowerCase().trim();
-    const name = facebookUser.name || 'Facebook Customer';
-    const picture = facebookUser.picture?.data?.url || null;
+    const code = req.query.code || req.body?.code;
+    let fbId, email, name, picture;
+
+    if (code) {
+      const appId = (process.env.FACEBOOK_APP_ID || '').trim().replace(/^["']|["']$/g, '');
+      const appSecret = (process.env.FACEBOOK_APP_SECRET || '').trim().replace(/^["']|["']$/g, '');
+      const redirectUri = (process.env.FACEBOOK_CALLBACK_URL || `${req.protocol}://${req.get('host')}/api/auth/facebook/callback`).trim().replace(/^["']|["']$/g, '');
+
+      if (!appId || !appSecret) {
+        return res.status(500).json({
+          success: false,
+          message: 'Facebook OAuth credentials are not configured on the server.',
+        });
+      }
+
+      const tokenUrl = new URL('https://graph.facebook.com/v18.0/oauth/access_token');
+      tokenUrl.searchParams.set('client_id', appId);
+      tokenUrl.searchParams.set('redirect_uri', redirectUri);
+      tokenUrl.searchParams.set('client_secret', appSecret);
+      tokenUrl.searchParams.set('code', code);
+
+      const tokenResponse = await fetch(tokenUrl.toString());
+      const tokenData = await tokenResponse.json();
+      if (!tokenResponse.ok || !tokenData.access_token) {
+        console.error('Facebook token exchange error:', tokenData);
+        return res.status(400).send(`
+          <!DOCTYPE html><html><body style="font-family:sans-serif;padding:2rem;text-align:center;background:#0b0f19;color:#fff;">
+            <h2 style="color:#ef4444;">Facebook Sign-In Failed</h2>
+            <p style="color:#94a3b8;">${tokenData.error?.message || 'Unable to exchange Facebook authorization code.'}</p>
+            <a href="/login.html" style="color:#38bdf8;">Back to Login</a>
+          </body></html>
+        `);
+      }
+
+      const profileUrl = new URL('https://graph.facebook.com/v18.0/me');
+      profileUrl.searchParams.set('fields', 'id,name,email,picture.type(large)');
+      profileUrl.searchParams.set('access_token', tokenData.access_token);
+
+      const profileResponse = await fetch(profileUrl.toString());
+      const fbProfile = await profileResponse.json();
+      if (!profileResponse.ok || !fbProfile.id) {
+        return res.status(400).json({ success: false, message: 'Failed to retrieve Facebook profile.' });
+      }
+
+      fbId = fbProfile.id;
+      email = (fbProfile.email || `fb_${fbId}@facebook.user`).toLowerCase().trim();
+      name = fbProfile.name || 'Facebook Customer';
+      picture = fbProfile.picture?.data?.url || null;
+    } else if (req.body?.facebookUser && req.body.facebookUser.id) {
+      const { facebookUser } = req.body;
+      fbId = facebookUser.id;
+      email = (facebookUser.email || `fb_${fbId}@facebook.user`).toLowerCase().trim();
+      name = facebookUser.name || 'Facebook Customer';
+      picture = facebookUser.picture?.data?.url || null;
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'Facebook authorization code or profile payload is required.',
+      });
+    }
 
     let userRes = await db.query('SELECT * FROM users WHERE LOWER(email) = $1', [email]);
     let user;
 
     if (userRes.rows.length === 0) {
-      const baseUsername = (facebookUser.name ? facebookUser.name.replace(/\s+/g, '').toLowerCase() : 'fb_user').slice(0, 15);
+      const baseUsername = (name ? name.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase() : 'fb_user').slice(0, 15) || 'fb_user';
       let username = baseUsername;
       const userCheck = await db.query('SELECT id FROM users WHERE LOWER(username) = $1', [username]);
       if (userCheck.rows.length > 0) {
@@ -995,7 +1115,7 @@ exports.facebookAuthCallback = async (req, res) => {
       const randomPasswordHash = await bcrypt.hash(crypto.randomBytes(16).toString('hex'), 10);
       const insertUser = await db.query(`
         INSERT INTO users (full_name, gender, email, country_code, username, password_hash, avatar_url, otp_verified)
-        VALUES ($1, 'other', $2, '+91', $3, $4, $5, TRUE)
+        VALUES ($1, 'Other', $2, '+91', $3, $4, $5, TRUE)
         RETURNING *
       `, [name, email, username, randomPasswordHash, picture]);
 
@@ -1009,6 +1129,9 @@ exports.facebookAuthCallback = async (req, res) => {
       });
     } else {
       user = userRes.rows[0];
+      if (picture && !user.avatar_url) {
+        await db.query('UPDATE users SET avatar_url = $1 WHERE id = $2', [picture, user.id]);
+      }
     }
 
     // Link in oauth_accounts table
@@ -1048,18 +1171,42 @@ exports.facebookAuthCallback = async (req, res) => {
       ipAddress: req.ip,
     });
 
+    const userPayload = {
+      id: user.id,
+      full_name: user.full_name,
+      email: user.email,
+      username: user.username,
+      avatar_url: picture || user.avatar_url,
+      role: 'customer',
+    };
+
+    if (req.method === 'GET') {
+      return res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="UTF-8"><title>Authenticating with Elite Drone...</title></head>
+        <body style="background:#0b0f19;color:#f8fafc;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
+          <div style="text-align:center;">
+            <h3 style="color:#38bdf8;">Authentication Successful</h3>
+            <p>Welcome, ${user.full_name}! Redirecting to your dashboard...</p>
+          </div>
+          <script>
+            try {
+              localStorage.setItem('elite_drone_user', JSON.stringify(${JSON.stringify(userPayload)}));
+              localStorage.setItem('token', ${JSON.stringify(token)});
+            } catch(e) {}
+            setTimeout(() => { window.location.href = '/dashboard.html'; }, 500);
+          </script>
+        </body>
+        </html>
+      `);
+    }
+
     return res.json({
       success: true,
       message: 'Facebook authentication successful.',
       token,
-      user: {
-        id: user.id,
-        full_name: user.full_name,
-        email: user.email,
-        username: user.username,
-        avatar_url: picture || user.avatar_url,
-        role: 'customer',
-      },
+      user: userPayload,
       redirectUrl: '/dashboard.html',
     });
   } catch (err) {

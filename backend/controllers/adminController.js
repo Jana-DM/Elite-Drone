@@ -352,15 +352,36 @@ exports.getSettings = async (req, res) => {
 
 exports.updateSettings = async (req, res) => {
   try {
-    const { hotline, email, upi, base_rate, rush_permit_fee, cinematic_surcharge, siteName } = req.body;
+    const {
+      hotline, supportPhone,
+      email, contactEmail,
+      upi, upiId,
+      base_rate, baseRate,
+      rush_permit_fee, rushPermitFee,
+      cinematic_surcharge, cinematicSurcharge,
+      siteName, business_name,
+    } = req.body;
+
+    const resolvedUpi = upi ?? upiId;
+    const resolvedHotline = hotline ?? supportPhone;
+    const resolvedEmail = email ?? contactEmail;
+    const resolvedBaseRate = base_rate ?? baseRate;
+    const resolvedRushFee = rush_permit_fee ?? rushPermitFee;
+    const resolvedSurcharge = cinematic_surcharge ?? cinematicSurcharge;
+    const resolvedBusinessName = siteName ?? business_name;
+
     const updates = [];
-    if (upi) updates.push(['upi_id', upi]);
-    if (hotline) updates.push(['support_hotline', hotline]);
-    if (email) updates.push(['emergency_email', email]);
-    if (base_rate) updates.push(['base_rate', String(base_rate)]);
-    if (rush_permit_fee) updates.push(['rush_permit_fee', String(rush_permit_fee)]);
-    if (cinematic_surcharge) updates.push(['cinematic_surcharge', String(cinematic_surcharge)]);
-    if (siteName) updates.push(['business_name', siteName]);
+    if (resolvedUpi !== undefined && String(resolvedUpi).trim()) updates.push(['upi_id', String(resolvedUpi).trim()]);
+    if (resolvedHotline !== undefined && String(resolvedHotline).trim()) updates.push(['support_hotline', String(resolvedHotline).trim()]);
+    if (resolvedEmail !== undefined && String(resolvedEmail).trim()) updates.push(['emergency_email', String(resolvedEmail).trim()]);
+    if (resolvedBaseRate !== undefined && resolvedBaseRate !== '') updates.push(['base_rate', String(Number(resolvedBaseRate))]);
+    if (resolvedRushFee !== undefined && resolvedRushFee !== '') updates.push(['rush_permit_fee', String(Number(resolvedRushFee))]);
+    if (resolvedSurcharge !== undefined && resolvedSurcharge !== '') updates.push(['cinematic_surcharge', String(Number(resolvedSurcharge))]);
+    if (resolvedBusinessName !== undefined && String(resolvedBusinessName).trim()) updates.push(['business_name', String(resolvedBusinessName).trim()]);
+
+    if (updates.length === 0) {
+      return res.status(400).json({ success: false, message: 'No valid settings fields provided.' });
+    }
 
     for (const [k, v] of updates) {
       await db.query(`

@@ -5,17 +5,20 @@ const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcrypt');
 const { sendSmsOtp, sendEmailOtp } = require('./config/mailer');
+const { protect } = require('./middleware/authMiddleware');
 require('dotenv').config();
 
 const db = require('./config/db');
 
-// In-memory cache for fast booking OTP verification
+// In-memory cache for fast booking OTP verification (stores bcrypt hashes, never plaintext)
 const bookingOtps = new Map();
 
 // Ensure database schema extensions
 db.query(`
   ALTER TABLE users ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT TRUE;
   ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP;
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url VARCHAR(500) DEFAULT NULL;
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS otp_verified BOOLEAN NOT NULL DEFAULT TRUE;
 `).catch(err => console.warn('Database column sync note:', err.message));
 
 const app = express();
@@ -110,36 +113,65 @@ app.get('/api/stats', async (req, res) => {
 // BOOKING PAGE DEDICATED ENDPOINTS (/send-otp, /verify-otp, /api/booking/notify)
 // ============================================================
 
+const bookingOtpLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 6,
+  message: { success: false, message: 'Too many OTP requests. Please wait a few minutes before trying again.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // 1. Send Booking Email/Mobile OTP
-app.post('/send-otp', async (req, res) => {
+app.post('/send-otp', bookingOtpLimiter, async (req, res) => {
   try {
     const { contact, method } = req.body;
     if (!contact) {
       return res.status(400).json({ success: false, message: 'Contact is required' });
     }
 
-    const cleanContact = String(contact).trim();
+    const cleanContact = String(contact).trim().toLowerCase();
     const isEmail = cleanContact.includes('@') || method === 'email';
     const destType = isEmail ? 'email' : 'mobile';
 
+    // Rate limit per destination in DB (max 4 per 10 mins)
+    try {
+      const recentOtps = await db.query(
+        `SELECT count(*) FROM otp_verifications 
+         WHERE LOWER(destination) = $1 AND created_at > (NOW() - INTERVAL '10 minutes')`,
+        [cleanContact]
+      );
+      if (parseInt(recentOtps.rows[0].count, 10) >= 4) {
+        return res.status(429).json({
+          success: false,
+          message: 'Too many OTP requests for this destination. Please wait 10 minutes before requesting again.',
+        });
+      }
+    } catch (rateErr) {
+      // Continue with IP rate limiter if DB check fails
+    }
+
     // 4-digit OTP for booking form
     const rawOtp = Math.floor(1000 + Math.random() * 9000).toString();
+    const otpHash = await bcrypt.hash(rawOtp, 10);
     const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-    // Store in-memory
-    bookingOtps.set(cleanContact.toLowerCase(), { otp: rawOtp, expiresAt });
-    bookingOtps.set(cleanContact, { otp: rawOtp, expiresAt });
+    // Store hashed OTP in memory fallback
+    bookingOtps.set(cleanContact, { otpHash, expiresAt });
 
-    // Store in PostgreSQL otp_verifications if available
+    // Store in PostgreSQL otp_verifications
     try {
-      const otpHash = await bcrypt.hash(rawOtp, 10);
+      await db.query(
+        `UPDATE otp_verifications SET expires_at = NOW()
+         WHERE LOWER(destination) = $1 AND purpose = 'booking' AND is_verified = FALSE`,
+        [cleanContact]
+      );
       await db.query(
         `INSERT INTO otp_verifications (destination_type, destination, otp_hash, purpose, expires_at)
          VALUES ($1, $2, $3, 'booking', NOW() + INTERVAL '10 minutes')`,
-        [destType, cleanContact.toLowerCase(), otpHash]
+        [destType, cleanContact, otpHash]
       );
     } catch (dbErr) {
-      // Ignored for non-blocking dev mode
+      console.warn('Booking OTP DB store note:', dbErr.message);
     }
 
     // Dispatch Email / SMS
@@ -149,32 +181,18 @@ app.post('/send-otp', async (req, res) => {
         otpCode: rawOtp,
         purpose: 'Elite Drone Booking Email Verification'
       });
-
-      console.log(`====================================================`);
-      console.log(`📧 [ELITE DRONE BOOKING OTP DISPATCH]`);
-      console.log(`🎯 Recipient Email: ${cleanContact}`);
-      console.log(`🔑 OTP Code:        >>> ${rawOtp} <<<`);
-      console.log(`⏱️ Duration:        90s active countdown (10 min expiry)`);
-      console.log(`====================================================`);
     } else {
       await sendSmsOtp({
         mobile: cleanContact,
         otpCode: rawOtp,
         purpose: 'Elite Drone Booking Mobile Verification'
       });
-
-      console.log(`====================================================`);
-      console.log(`📱 [ELITE DRONE BOOKING OTP DISPATCH]`);
-      console.log(`🎯 Recipient Mobile: ${cleanContact}`);
-      console.log(`🔑 OTP Code:         >>> ${rawOtp} <<<`);
-      console.log(`⏱️ Duration:         90s active countdown (10 min expiry)`);
-      console.log(`====================================================`);
     }
 
     return res.json({
       success: true,
       message: isEmail ? 'OTP sent successfully to your email address.' : 'OTP sent successfully to your mobile number.',
-      otp: rawOtp // Exposed for seamless testing
+      countdownSeconds: 90,
     });
   } catch (err) {
     console.error('Error in /send-otp:', err);
@@ -183,51 +201,63 @@ app.post('/send-otp', async (req, res) => {
 });
 
 // 2. Verify Booking Email/Mobile OTP
-app.post('/verify-otp', async (req, res) => {
+app.post('/verify-otp', bookingOtpLimiter, async (req, res) => {
   try {
     const { contact, otp } = req.body;
     if (!contact || !otp) {
       return res.status(400).json({ success: false, message: 'Contact and OTP are required' });
     }
 
-    const cleanContact = String(contact).trim();
+    const cleanContact = String(contact).trim().toLowerCase();
     const cleanOtp = String(otp).trim();
 
-    // Check memory store (case-insensitive)
-    const memRecord = bookingOtps.get(cleanContact.toLowerCase()) || bookingOtps.get(cleanContact);
-    let isVerified = false;
-
-    if (memRecord && memRecord.otp === cleanOtp && Date.now() < memRecord.expiresAt) {
-      isVerified = true;
-      bookingOtps.delete(cleanContact.toLowerCase());
-      bookingOtps.delete(cleanContact);
+    if (!/^\d{4}$/.test(cleanOtp)) {
+      return res.status(400).json({ success: false, message: 'Please enter a valid 4-digit OTP' });
     }
 
-    // Check database if not matched in memory
-    if (!isVerified) {
-      try {
-        const dbRes = await db.query(
-          `SELECT id, otp_hash FROM otp_verifications 
-           WHERE LOWER(destination) = LOWER($1) AND is_verified = FALSE AND expires_at > NOW() 
-           ORDER BY id DESC LIMIT 1`,
-          [cleanContact]
-        );
-        if (dbRes.rows.length > 0) {
-          const match = await bcrypt.compare(cleanOtp, dbRes.rows[0].otp_hash);
-          if (match) {
-            isVerified = true;
-            await db.query(`UPDATE otp_verifications SET is_verified = TRUE WHERE id = $1`, [dbRes.rows[0].id]);
-          }
+    let isVerified = false;
+
+    // Check database first
+    try {
+      const dbRes = await db.query(
+        `SELECT id, otp_hash, attempts FROM otp_verifications 
+         WHERE LOWER(destination) = $1 AND purpose = 'booking' AND is_verified = FALSE AND expires_at > NOW() 
+         ORDER BY id DESC LIMIT 1`,
+        [cleanContact]
+      );
+      if (dbRes.rows.length > 0) {
+        const record = dbRes.rows[0];
+        if (record.attempts >= 5) {
+          return res.status(400).json({ success: false, message: 'Maximum OTP attempts exceeded. Please request a new code.' });
         }
-      } catch (dbErr) {
-        // Ignored
+        await db.query('UPDATE otp_verifications SET attempts = attempts + 1 WHERE id = $1', [record.id]);
+        const match = await bcrypt.compare(cleanOtp, record.otp_hash);
+        if (match) {
+          isVerified = true;
+          await db.query(`UPDATE otp_verifications SET is_verified = TRUE WHERE id = $1`, [record.id]);
+          bookingOtps.delete(cleanContact);
+        }
+      }
+    } catch (dbErr) {
+      // Fallback to memory store below
+    }
+
+    // Fallback check in memory store if DB record wasn't available
+    if (!isVerified) {
+      const memRecord = bookingOtps.get(cleanContact);
+      if (memRecord && Date.now() < memRecord.expiresAt) {
+        const match = await bcrypt.compare(cleanOtp, memRecord.otpHash);
+        if (match) {
+          isVerified = true;
+          bookingOtps.delete(cleanContact);
+        }
       }
     }
 
     if (isVerified) {
       return res.json({
         success: true,
-        message: 'Your OTP is correct'
+        message: 'Your OTP is verified'
       });
     } else {
       return res.status(400).json({
@@ -241,120 +271,105 @@ app.post('/verify-otp', async (req, res) => {
   }
 });
 
-// 3. Booking Owner Notification & Central Database Record
-app.post('/api/booking/notify', async (req, res) => {
+// 3. Booking Owner Notification & Central Database Record (Authenticated only)
+app.post('/api/booking/notify', protect, async (req, res) => {
   try {
     const booking = req.body || {};
-    const bookingRef = booking.bookingId || ('ED-' + Date.now().toString().slice(-8));
-    const customerName = booking.customerName || booking.name || 'Valued Customer';
-    const email = (booking.email || 'client@elitedrone.com').trim().toLowerCase();
-    const mobile = (booking.mobile || '0000000000').trim();
-    const serviceName = booking.service || booking.event || 'Aerial Photography';
+    const userId = req.user.id;
+    const customerName = String(booking.customerName || booking.name || req.user.full_name || 'Valued Customer').trim();
+    const email = String(booking.email || req.user.email || '').trim().toLowerCase();
+    const mobile = String(booking.mobile || '0000000000').trim();
+    const serviceName = String(booking.service || booking.event || 'Aerial Photography').trim();
     const eventDate = booking.startDate || booking.date || new Date().toISOString().slice(0, 10);
-    const address = booking.location || booking.address || 'Address provided on file';
-    const amount = Number(booking.totalAmount || booking.amount || 1999);
-    const paymentStatus = booking.paymentStatus || 'Paid';
-    const paymentMode = booking.paymentMode || 'UPI';
+    const endDate = booking.endDate || eventDate;
+    const address = String(booking.location || booking.address || 'Address provided on file').trim();
 
-    // 1. Identify User ID from JWT Token, booking payload, or Database lookup
-    let userId = booking.userId || null;
-    if (!userId && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
-      try {
-        const token = req.headers.authorization.split(' ')[1];
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'elite_drone_jwt_secret_key_2026');
-        userId = decoded.id;
-      } catch (tokenErr) {
-        // Continue fallback lookup
-      }
+    if (!email || !address) {
+      return res.status(400).json({ success: false, message: 'Valid email and address are required.' });
     }
 
-    if (!userId) {
-      const userLookup = await db.query(
-        'SELECT id FROM users WHERE LOWER(email) = $1 OR mobile = $2 LIMIT 1',
-        [email, mobile]
-      );
-      if (userLookup.rows.length > 0) {
-        userId = userLookup.rows[0].id;
+    // Calculate booking days & total amount server-side from persistent settings
+    let days = parseInt(booking.numberOfDays, 10) || 1;
+    if (booking.startDate && booking.endDate) {
+      const sDate = new Date(`${booking.startDate}T00:00:00Z`);
+      const eDate = new Date(`${booking.endDate}T00:00:00Z`);
+      if (!Number.isNaN(sDate.getTime()) && !Number.isNaN(eDate.getTime()) && eDate >= sDate) {
+        days = Math.floor((eDate - sDate) / (1000 * 60 * 60 * 24)) + 1;
       }
     }
+    days = Math.max(1, Math.min(days, 365));
 
-    console.log(`====================================================`);
-    console.log(`🚁 [NEW ELITE DRONE BOOKING CONFIRMED]`);
-    console.log(`🆔 Reference: ${bookingRef}`);
-    console.log(`👤 Client:    ${customerName} (User ID: ${userId || 'Guest/Unlinked'})`);
-    console.log(`📱 Contact:   ${mobile}`);
-    console.log(`🎯 Event:     ${serviceName}`);
-    console.log(`📅 Date:      ${eventDate} (${booking.numberOfDays || '1 Day'})`);
-    console.log(`📍 Address:   ${address}`);
-    console.log(`💳 Payment:   ${paymentStatus} (${paymentMode} ₹${amount})`);
-    console.log(`====================================================`);
-
-    // 2. Sync into PostgreSQL bookings table
+    let baseRate = 1999;
     try {
-      const svcRes = await db.query('SELECT id FROM services WHERE is_active = TRUE LIMIT 1');
-      const serviceId = svcRes.rows.length > 0 ? svcRes.rows[0].id : 1;
-
-      await db.query(`
-        INSERT INTO bookings (
-          booking_reference, user_id, customer_name, email, mobile, event_type,
-          service_id, event_date, event_time, event_location, complete_address,
-          total_amount, payment_mode, payment_status,
-          status, admin_notes
-        ) VALUES (
-          $1, $2, $3, $4, $5, $6,
-          $7, $8, '10:00:00', $9, $10,
-          $11, $12, $13,
-          'Confirmed', $14
-        ) ON CONFLICT (booking_reference) DO UPDATE SET
-          user_id = COALESCE(EXCLUDED.user_id, bookings.user_id),
-          total_amount = EXCLUDED.total_amount,
-          payment_mode = EXCLUDED.payment_mode,
-          payment_status = EXCLUDED.payment_status,
-          status = 'Confirmed',
-          admin_notes = EXCLUDED.admin_notes
-      `, [
-        bookingRef,
-        userId,
-        customerName,
-        email,
-        mobile,
-        serviceName,
-        serviceId,
-        eventDate,
-        address.slice(0, 140),
-        address,
-        amount,
-        paymentMode,
-        paymentStatus,
-        `Payment: ${paymentStatus} via ${paymentMode}. Amount: ₹${amount}. Days: ${booking.numberOfDays || '1'}. Gender: ${booking.gender || 'N/A'}, Age: ${booking.age || 'N/A'}`
-      ]);
-
-      // Record audit log
-      await db.query(`
-        INSERT INTO audit_logs (user_id, action, details)
-        VALUES ($1, 'BOOKING_CREATED', $2)
-      `, [userId, `Booking ${bookingRef} created for ${serviceName} on ${eventDate}`]);
-
-      // Record in-app notification if customer is identified
-      if (userId) {
-        await db.query(`
-          INSERT INTO notifications (user_id, title, message, type, action_url)
-          VALUES ($1, 'Booking Confirmed', $2, 'success', '/dashboard.html')
-        `, [userId, `Your flight booking ${bookingRef} for ${serviceName} on ${eventDate} is confirmed!`]);
+      const rateSetting = await db.query("SELECT value FROM settings WHERE key = 'base_rate'");
+      if (rateSetting.rows.length > 0 && Number(rateSetting.rows[0].value) > 0) {
+        baseRate = Number(rateSetting.rows[0].value);
       }
+    } catch (e) {}
 
-    } catch (dbErr) {
-      console.warn('Booking PostgreSQL sync note:', dbErr.message);
-    }
+    const amount = days * baseRate;
 
-    return res.json({
+    // Never trust client-claimed "Paid" or "Confirmed" status without server-side payment verification
+    const rawPaymentText = String(booking.paymentStatus || booking.paymentMode || '').toLowerCase();
+    const isOffline = rawPaymentText.includes('offline');
+    const paymentMode = isOffline ? 'Cash / Pay on Shoot' : 'UPI';
+    const paymentStatus = isOffline ? 'Pending (Pay on Shoot)' : 'Pending Verification';
+
+    const dateStamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const bookingRef = `ELD-${dateStamp}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+
+    const svcRes = await db.query('SELECT id FROM services WHERE is_active = TRUE LIMIT 1');
+    const serviceId = svcRes.rows.length > 0 ? svcRes.rows[0].id : 1;
+
+    const insertRes = await db.query(`
+      INSERT INTO bookings (
+        booking_reference, user_id, customer_name, email, mobile, event_type,
+        service_id, event_date, event_time, event_location, complete_address,
+        total_amount, payment_mode, payment_status,
+        status, admin_notes
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6,
+        $7, $8, '10:00:00', $9, $10,
+        $11, $12, $13,
+        'Pending', $14
+      )
+      RETURNING *
+    `, [
+      bookingRef,
+      userId,
+      customerName,
+      email,
+      mobile,
+      serviceName,
+      serviceId,
+      eventDate,
+      address.slice(0, 140),
+      address,
+      amount,
+      paymentMode,
+      paymentStatus,
+      `Payment: ${paymentStatus} via ${paymentMode}. Server-calculated amount: ₹${amount} (${days} day(s) @ ₹${baseRate}/day). End Date: ${endDate}.`
+    ]);
+
+    await db.query(`
+      INSERT INTO audit_logs (user_id, action, details, ip_address)
+      VALUES ($1, 'BOOKING_CREATED', $2, $3)
+    `, [userId, `Booking ${bookingRef} submitted (${serviceName} on ${eventDate}, ₹${amount})`, req.ip]);
+
+    await db.query(`
+      INSERT INTO notifications (user_id, title, message, type, action_url)
+      VALUES ($1, 'Booking Request Received', $2, 'info', '/dashboard.html')
+    `, [userId, `Your flight booking ${bookingRef} for ${serviceName} on ${eventDate} is pending review.`]);
+
+    return res.status(201).json({
       success: true,
-      message: 'Booking notification dispatched and synced successfully',
-      bookingReference: bookingRef
+      message: 'Booking submitted successfully and is pending review.',
+      bookingReference: bookingRef,
+      booking: insertRes.rows[0],
     });
   } catch (err) {
     console.error('Error in /api/booking/notify:', err);
-    return res.status(500).json({ success: false, message: 'Notification dispatch error' });
+    return res.status(500).json({ success: false, message: 'Failed to submit booking.' });
   }
 });
 

@@ -20,6 +20,8 @@ CREATE TABLE IF NOT EXISTS users (
     mobile VARCHAR(20) UNIQUE,
     username VARCHAR(50) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
+    avatar_url VARCHAR(500) DEFAULT NULL,
+    otp_verified BOOLEAN NOT NULL DEFAULT TRUE,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -196,7 +198,7 @@ CREATE TABLE IF NOT EXISTS reviews (
     rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
     comment TEXT NOT NULL,
     service_name VARCHAR(100) DEFAULT 'Commercial Aerial Shoot',
-    status VARCHAR(20) DEFAULT 'Approved' CHECK (status IN ('Pending', 'Approved', 'Rejected')),
+    status VARCHAR(20) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Approved', 'Rejected')),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 

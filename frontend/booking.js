@@ -490,13 +490,8 @@ if (sendOtpBtn) {
             }
 
             startOtpCountdown(90);
-
-            // In local development, show the code helper
-            if (result.otp) {
-                console.log("🔑 Dev OTP Code:", result.otp);
-                showError(errors.otp, `OTP sent! (Test Code: ${result.otp})`);
-                if (errors.otp) errors.otp.style.color = "#0284c7";
-            }
+            showError(errors.otp, "OTP sent! Please check your email inbox.");
+            if (errors.otp) errors.otp.style.color = "#0284c7";
 
         } catch (error) {
             console.error("SEND OTP ERROR:", error);
@@ -945,8 +940,8 @@ function completeBooking(paymentStatus) {
         amount: totalAmount,
         totalAmount,
         paymentStatus,
-        bookingStatus: "Confirmed",
-        status: "Confirmed",
+        bookingStatus: "Pending",
+        status: "Pending",
         createdAt: now
     };
 
@@ -1006,7 +1001,7 @@ function showBookingSuccess(booking) {
 
     const displayDate = booking.date ? formatBookingDate(booking.date) : "Not provided";
     const displayTime = booking.time || "10:00 AM";
-    const displayStatus = booking.bookingStatus || "Confirmed";
+    const displayStatus = booking.bookingStatus || "Pending";
 
     details.innerHTML = `
         <div class="success-detail-row"><span>Booking ID</span><strong>${escapeBookingHtml(booking.bookingId)}</strong></div>
@@ -1196,15 +1191,6 @@ window.addEventListener("online", function () {
 async function sendOwnerNotification(bookingData) {
     try {
         const token = localStorage.getItem('token');
-        let user = null;
-        try {
-            user = JSON.parse(localStorage.getItem('user') || 'null');
-        } catch (e) {}
-
-        if (user && user.id && !bookingData.userId) {
-            bookingData.userId = user.id;
-        }
-
         const headers = { "Content-Type": "application/json" };
         if (token) {
             headers["Authorization"] = `Bearer ${token}`;
@@ -1213,17 +1199,24 @@ async function sendOwnerNotification(bookingData) {
         const response = await fetch("/api/booking/notify", {
             method: "POST",
             headers: headers,
+            credentials: "include",
             body: JSON.stringify(bookingData)
         });
 
         const result = await response.json();
-        if (result.success) {
-            console.log("✅ Owner & database booking notification dispatched successfully");
-        } else {
-            console.warn("Owner notification response note:", result.message);
+        if (response.status === 401) {
+            console.warn("Booking sync requires login:", result.message);
+            return null;
         }
+        if (result.success) {
+            console.log("✅ Booking synced with database:", result.bookingReference);
+        } else {
+            console.warn("Booking sync note:", result.message);
+        }
+        return result;
     } catch (error) {
         console.warn("Could not reach notification endpoint:", error.message);
+        return null;
     }
 }
 
